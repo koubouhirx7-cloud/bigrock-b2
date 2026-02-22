@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="ja"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Big Rock B2B Dashboard</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;family=Noto+Sans+JP:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#f2c84a",
+                        "primary-dim": "#b39020",
+                        "background-dark": "#111113",
+                        "surface": "#1E1E21",
+                        "surface-highlight": "#2a2a2d",
+                        "text-main": "#EAEAEA",
+                        "text-muted": "#888888",
+                        "border-subtle": "#333336",
+                        "accent-red": "#EB5757",
+                        "accent-green": "#27AE60",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "Noto Sans JP", "sans-serif"],
+                        "mono": ["JetBrains Mono", "monospace"],
+                    },
+                    backgroundImage: {
+                        "grid-pattern": "linear-gradient(to right, #333336 1px, transparent 1px), linear-gradient(to bottom, #333336 1px, transparent 1px)",
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        /* Custom scrollbar for industrial feel */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #111113; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #333336; 
+            border-radius: 2px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #555; 
+        }
+        .technical-grid {
+            background-size: 40px 40px;
+            mask-image: linear-gradient(to bottom, transparent, 10%, black, 90%, transparent);
+            opacity: 0.1;
+            pointer-events: none;
+        }
+        /* Circular progress animation */
+        circle {
+            transition: stroke-dashoffset 1s ease-in-out;
+            transform: rotate(-90deg);
+            transform-origin: 50% 50%;
+        }
+    </style>
+</head>
+<body class="bg-background-dark text-text-main font-display antialiased overflow-hidden h-screen flex">
+<!-- Sidebar Navigation -->
+<aside class="w-64 h-full bg-surface border-r border-border-subtle flex flex-col shrink-0 z-20">
+<!-- Logo Area -->
+<div class="h-16 flex items-center gap-3 px-6 border-b border-border-subtle">
+<div class="size-8 bg-primary rounded-sm flex items-center justify-center text-background-dark font-bold">
+<span class="material-symbols-outlined text-xl">landscape</span>
+</div>
+<div class="flex flex-col">
+<h1 class="text-white text-base font-bold tracking-wide leading-none">BIG ROCK</h1>
+<p class="text-text-muted text-[10px] font-mono leading-none mt-1 tracking-wider">PROCUREMENT HUB</p>
+</div>
+</div>
+<!-- Navigation Links -->
+<nav class="flex-1 overflow-y-auto py-6 flex flex-col gap-1">
+<!-- Active Item -->
+<a class="group flex items-center gap-3 px-6 py-3 bg-white/5 border-l-2 border-primary text-primary transition-colors" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="text-sm font-bold tracking-wide">ダッシュボード</span>
+</a>
+<!-- Inactive Items -->
+<a class="group flex items-center gap-3 px-6 py-3 border-l-2 border-transparent text-text-muted hover:text-white hover:bg-white/5 transition-colors" href="#">
+<span class="material-symbols-outlined">inventory_2</span>
+<span class="text-sm font-medium">製品カタログ</span>
+</a>
+<a class="group flex items-center gap-3 px-6 py-3 border-l-2 border-transparent text-text-muted hover:text-white hover:bg-white/5 transition-colors" href="#">
+<span class="material-symbols-outlined">history</span>
+<span class="text-sm font-medium">注文履歴</span>
+</a>
+<a class="group flex items-center gap-3 px-6 py-3 border-l-2 border-transparent text-text-muted hover:text-white hover:bg-white/5 transition-colors" href="#">
+<span class="material-symbols-outlined">tune</span>
+<span class="text-sm font-medium">設定・予算</span>
+</a>
+</nav>
+<!-- User Profile / Footer -->
+<div class="p-4 border-t border-border-subtle">
+<div class="flex items-center gap-3 p-2 rounded-sm bg-white/5 border border-border-subtle">
+<div class="size-8 rounded-full bg-cover bg-center" data-alt="User avatar showing a professional man" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuA6yrj2C701VItjvYiYACzp9h4ur-Batw0UWctRRoI3mPxiVrU4ROv-82u5DqcFramgKT7kT0_TL_yEyCIkefBJiSeJu2gCBN-OGcm3hkBrCAr_-bYvdc_mIUPe-hPzh0mD4HbD_MHcxxHknrcAQWefQMp9CPJucG8PgEm0UCOPRCCUhhkvPZojAbGIkUfVHhcDMojFbw-A_N-HjblJlkWnCMb1He2CgGsYN85XUFjUmbbu_zYS1nASgLyl-2mBKG2LqVKB82oPYg');"></div>
+<div class="flex flex-col flex-1 min-w-0">
+<span class="text-xs font-bold text-white truncate">K. Tanaka</span>
+<span class="text-[10px] text-text-muted truncate">Big Rock Cycle</span>
+</div>
+<button class="text-text-muted hover:text-white transition-colors">
+<span class="material-symbols-outlined text-lg">logout</span>
+</button>
+</div>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="flex-1 flex flex-col h-full overflow-hidden relative">
+<!-- Background Grid Pattern -->
+<div class="absolute inset-0 technical-grid bg-grid-pattern z-0"></div>
+<!-- Header -->
+<header class="h-16 flex items-center justify-between px-8 border-b border-border-subtle bg-background-dark/80 backdrop-blur-sm z-10 shrink-0">
+<div>
+<h2 class="text-lg font-bold text-white tracking-wide">DASHBOARD</h2>
+<p class="text-xs text-text-muted font-mono">2023.10.24 (TUE) // SYSTEM ONLINE</p>
+</div>
+<div class="flex items-center gap-4">
+<div class="flex items-center gap-2 px-3 py-1.5 rounded-sm bg-surface border border-border-subtle">
+<div class="size-2 rounded-full bg-accent-green animate-pulse"></div>
+<span class="text-xs font-mono text-text-muted">API: CONNECTED</span>
+</div>
+<button class="flex items-center justify-center size-9 rounded-sm border border-border-subtle text-text-muted hover:text-primary hover:border-primary transition-all">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+</div>
+</header>
+<!-- Dashboard Content Grid -->
+<div class="flex-1 overflow-y-auto p-8 z-10">
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6 max-w-7xl mx-auto h-full">
+<!-- Center/Main Column (Takes up 2/3 on large screens) -->
+<div class="lg:col-span-2 flex flex-col gap-6">
+<!-- KPI Cards Row -->
+<div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
+<div class="bg-surface border border-border-subtle p-5 rounded-sm flex flex-col justify-between group hover:border-primary/50 transition-colors">
+<div class="flex justify-between items-start">
+<span class="text-text-muted text-xs font-bold uppercase tracking-wider">今月の支出</span>
+<span class="material-symbols-outlined text-text-muted group-hover:text-primary transition-colors">payments</span>
+</div>
+<div class="mt-2">
+<span class="text-2xl font-bold text-white font-mono tracking-tight">¥450,000</span>
+<div class="flex items-center gap-1 mt-1">
+<span class="text-[10px] text-accent-green font-mono bg-accent-green/10 px-1 rounded-sm">+12%</span>
+<span class="text-[10px] text-text-muted">vs last month</span>
+</div>
+</div>
+</div>
+<div class="bg-surface border border-border-subtle p-5 rounded-sm flex flex-col justify-between group hover:border-primary/50 transition-colors">
+<div class="flex justify-between items-start">
+<span class="text-text-muted text-xs font-bold uppercase tracking-wider">進行中の注文</span>
+<span class="material-symbols-outlined text-text-muted group-hover:text-primary transition-colors">local_shipping</span>
+</div>
+<div class="mt-2">
+<span class="text-2xl font-bold text-white font-mono tracking-tight">12<span class="text-sm ml-1 text-text-muted">件</span></span>
+<div class="flex items-center gap-1 mt-1">
+<span class="text-[10px] text-primary font-mono bg-primary/10 px-1 rounded-sm">Processing</span>
+</div>
+</div>
+</div>
+<div class="bg-surface border border-border-subtle p-5 rounded-sm flex flex-col justify-between group hover:border-primary/50 transition-colors">
+<div class="flex justify-between items-start">
+<span class="text-text-muted text-xs font-bold uppercase tracking-wider">カート</span>
+<span class="material-symbols-outlined text-text-muted group-hover:text-primary transition-colors">shopping_cart</span>
+</div>
+<div class="mt-2">
+<span class="text-2xl font-bold text-white font-mono tracking-tight">5<span class="text-sm ml-1 text-text-muted">点</span></span>
+<div class="flex items-center gap-1 mt-1">
+<a class="text-[10px] text-primary underline decoration-primary/50 hover:decoration-primary" href="#">確認する →</a>
+</div>
+</div>
+</div>
+</div>
+<!-- Budget Meter & Recent Orders Split -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6 flex-1">
+<!-- Budget Meter -->
+<div class="bg-surface border border-border-subtle rounded-sm p-6 flex flex-col items-center justify-center relative min-h-[320px]">
+<h3 class="absolute top-6 left-6 text-sm font-bold text-white uppercase tracking-wider flex items-center gap-2">
+<span class="size-2 bg-primary rounded-full"></span>
+                                今月の予算使用率
+                            </h3>
+<!-- Circular Progress SVG -->
+<div class="relative size-48">
+<svg class="size-full" viewbox="0 0 100 100">
+<!-- Background circle -->
+<circle class="text-border-subtle stroke-current" cx="50" cy="50" fill="transparent" r="42" stroke-width="8"></circle>
+<!-- Progress circle (45%) -->
+<circle class="text-primary stroke-current" cx="50" cy="50" fill="transparent" r="42" stroke-dasharray="264" stroke-dashoffset="145" stroke-linecap="butt" stroke-width="8"></circle>
+</svg>
+<div class="absolute inset-0 flex flex-col items-center justify-center">
+<span class="text-3xl font-bold text-white font-mono">45%</span>
+<span class="text-[10px] text-text-muted uppercase tracking-widest mt-1">USED</span>
+</div>
+</div>
+<div class="w-full mt-6 grid grid-cols-2 gap-4 border-t border-border-subtle pt-4">
+<div>
+<p class="text-[10px] text-text-muted uppercase tracking-wider">SPENT</p>
+<p class="text-lg font-mono text-white">¥450,000</p>
+</div>
+<div class="text-right">
+<p class="text-[10px] text-text-muted uppercase tracking-wider">LIMIT</p>
+<p class="text-lg font-mono text-text-muted">¥1,000,000</p>
+</div>
+</div>
+</div>
+<!-- Recent Orders -->
+<div class="bg-surface border border-border-subtle rounded-sm flex flex-col min-h-[320px]">
+<div class="p-5 border-b border-border-subtle flex justify-between items-center">
+<h3 class="text-sm font-bold text-white uppercase tracking-wider">最近の注文</h3>
+<a class="text-xs text-primary hover:text-white transition-colors" href="#">すべて見る</a>
+</div>
+<div class="flex-1 overflow-x-auto">
+<table class="w-full text-left text-sm">
+<thead class="bg-surface-highlight text-text-muted text-xs uppercase font-mono border-b border-border-subtle">
+<tr>
+<th class="px-5 py-3 font-medium">ID</th>
+<th class="px-5 py-3 font-medium">Date</th>
+<th class="px-5 py-3 font-medium">Status</th>
+<th class="px-5 py-3 font-medium text-right">Total</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-border-subtle">
+<tr class="hover:bg-white/5 transition-colors group cursor-pointer">
+<td class="px-5 py-3 font-mono text-white group-hover:text-primary">#ORD-3921</td>
+<td class="px-5 py-3 text-text-muted font-mono text-xs">10/22</td>
+<td class="px-5 py-3">
+<span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium bg-blue-500/10 text-blue-400 border border-blue-500/20">
+                                                    発送済
+                                                </span>
+</td>
+<td class="px-5 py-3 text-right font-mono text-text-main">¥128,000</td>
+</tr>
+<tr class="hover:bg-white/5 transition-colors group cursor-pointer">
+<td class="px-5 py-3 font-mono text-white group-hover:text-primary">#ORD-3920</td>
+<td class="px-5 py-3 text-text-muted font-mono text-xs">10/20</td>
+<td class="px-5 py-3">
+<span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium bg-accent-green/10 text-accent-green border border-accent-green/20">
+                                                    完了
+                                                </span>
+</td>
+<td class="px-5 py-3 text-right font-mono text-text-main">¥45,000</td>
+</tr>
+<tr class="hover:bg-white/5 transition-colors group cursor-pointer">
+<td class="px-5 py-3 font-mono text-white group-hover:text-primary">#ORD-3919</td>
+<td class="px-5 py-3 text-text-muted font-mono text-xs">10/18</td>
+<td class="px-5 py-3">
+<span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium bg-accent-green/10 text-accent-green border border-accent-green/20">
+                                                    完了
+                                                </span>
+</td>
+<td class="px-5 py-3 text-right font-mono text-text-main">¥210,000</td>
+</tr>
+<tr class="hover:bg-white/5 transition-colors group cursor-pointer">
+<td class="px-5 py-3 font-mono text-white group-hover:text-primary">#ORD-3918</td>
+<td class="px-5 py-3 text-text-muted font-mono text-xs">10/15</td>
+<td class="px-5 py-3">
+<span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium bg-surface-highlight text-text-muted border border-border-subtle">
+                                                    取消
+                                                </span>
+</td>
+<td class="px-5 py-3 text-right font-mono text-text-main text-text-muted line-through">¥12,500</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</div>
+<!-- Right Column (Sidebar Extras) -->
+<div class="lg:col-span-1 flex flex-col gap-6">
+<!-- Quick Access Categories -->
+<div class="flex flex-col gap-3">
+<div class="flex justify-between items-center mb-1">
+<h3 class="text-xs font-bold text-text-muted uppercase tracking-wider">クイックアクセス</h3>
+</div>
+<div class="grid grid-cols-2 gap-3">
+<!-- Card 1: Frames -->
+<a class="group relative bg-surface border border-border-subtle p-4 rounded-sm hover:-translate-y-1 hover:border-primary transition-all duration-200" href="#">
+<div class="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity text-primary">
+<span class="material-symbols-outlined text-sm">arrow_outward</span>
+</div>
+<div class="size-10 rounded bg-white/5 flex items-center justify-center mb-3 group-hover:bg-primary/20 transition-colors">
+<span class="material-symbols-outlined text-white group-hover:text-primary">directions_bike</span>
+</div>
+<p class="text-sm font-bold text-white">フレーム</p>
+<p class="text-[10px] text-text-muted mt-1 font-mono">FRAMES</p>
+</a>
+<!-- Card 2: Forks -->
+<a class="group relative bg-surface border border-border-subtle p-4 rounded-sm hover:-translate-y-1 hover:border-primary transition-all duration-200" href="#">
+<div class="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity text-primary">
+<span class="material-symbols-outlined text-sm">arrow_outward</span>
+</div>
+<div class="size-10 rounded bg-white/5 flex items-center justify-center mb-3 group-hover:bg-primary/20 transition-colors">
+<span class="material-symbols-outlined text-white group-hover:text-primary">hardware</span>
+</div>
+<p class="text-sm font-bold text-white">フォーク</p>
+<p class="text-[10px] text-text-muted mt-1 font-mono">FORKS</p>
+</a>
+<!-- Card 3: Parts -->
+<a class="group relative bg-surface border border-border-subtle p-4 rounded-sm hover:-translate-y-1 hover:border-primary transition-all duration-200" href="#">
+<div class="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity text-primary">
+<span class="material-symbols-outlined text-sm">arrow_outward</span>
+</div>
+<div class="size-10 rounded bg-white/5 flex items-center justify-center mb-3 group-hover:bg-primary/20 transition-colors">
+<span class="material-symbols-outlined text-white group-hover:text-primary">settings</span>
+</div>
+<p class="text-sm font-bold text-white">パーツ</p>
+<p class="text-[10px] text-text-muted mt-1 font-mono">COMPONENTS</p>
+</a>
+<!-- Card 4: Apparel -->
+<a class="group relative bg-surface border border-border-subtle p-4 rounded-sm hover:-translate-y-1 hover:border-primary transition-all duration-200" href="#">
+<div class="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity text-primary">
+<span class="material-symbols-outlined text-sm">arrow_outward</span>
+</div>
+<div class="size-10 rounded bg-white/5 flex items-center justify-center mb-3 group-hover:bg-primary/20 transition-colors">
+<span class="material-symbols-outlined text-white group-hover:text-primary">checkroom</span>
+</div>
+<p class="text-sm font-bold text-white">アパレル</p>
+<p class="text-[10px] text-text-muted mt-1 font-mono">APPAREL</p>
+</a>
+</div>
+</div>
+<!-- Alerts / Notifications -->
+<div class="flex flex-col gap-3">
+<div class="flex justify-between items-center mb-1">
+<h3 class="text-xs font-bold text-text-muted uppercase tracking-wider">アラート</h3>
+<span class="text-[10px] text-accent-red font-mono px-1.5 py-0.5 border border-accent-red rounded-sm">1 ACTION REQUIRED</span>
+</div>
+<!-- Stock Alert Card -->
+<div class="bg-surface border border-accent-red/40 rounded-sm p-4 relative overflow-hidden group">
+<div class="absolute top-0 right-0 w-16 h-16 bg-accent-red/10 rounded-bl-full -mr-8 -mt-8 z-0"></div>
+<div class="relative z-10">
+<div class="flex items-start gap-3">
+<div class="p-2 bg-accent-red/10 rounded-sm text-accent-red shrink-0">
+<span class="material-symbols-outlined text-lg">warning</span>
+</div>
+<div>
+<p class="text-sm font-bold text-white">在庫切れ間近</p>
+<p class="text-xs text-text-muted mt-1 leading-snug">Shimano Brake Pads J04C<br/>Metal Ice-Tech</p>
+<div class="flex items-center gap-2 mt-2">
+<span class="text-[10px] font-mono text-accent-red">残り: 3 set</span>
+</div>
+</div>
+</div>
+<button class="mt-4 w-full bg-surface border border-accent-red/50 text-accent-red hover:bg-accent-red hover:text-white font-medium text-xs py-2 rounded-sm transition-colors flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-sm">add_shopping_cart</span>
+                                     クイック補充
+                                 </button>
+</div>
+</div>
+</div>
+<!-- System Status / Exchange Rate Small Widget -->
+<div class="mt-auto bg-surface-highlight/30 border border-border-subtle p-4 rounded-sm">
+<div class="flex items-center justify-between text-xs mb-2">
+<span class="text-text-muted">USD/JPY</span>
+<span class="font-mono text-white">¥149.42</span>
+</div>
+<div class="flex items-center justify-between text-xs">
+<span class="text-text-muted">SERVER LOAD</span>
+<span class="font-mono text-accent-green">12%</span>
+</div>
+<div class="w-full bg-border-subtle h-1 mt-3 rounded-full overflow-hidden">
+<div class="bg-accent-green h-full w-[12%]"></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+</body></html>

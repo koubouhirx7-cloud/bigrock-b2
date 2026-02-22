@@ -1,0 +1,321 @@
+[
+    {
+        "id": "p_001",
+        "sku": "BR-FRM-002T",
+        "name": "002/TEAM Road Frame",
+        "category": "Frame",
+        "description": "三菱超高弾性カーボン使用。世界最高峰の軽さと剛性を両立したオールラウンドモデル。",
+        "price": 450000,
+        "stock": 10,
+        "originalUrl": "https://www.bigrock-bike.jp/product-frame-team.html",
+        "imageUrl": "https://placehold.co/600x400/1a1a1a/accent?text=TEAM+Frame",
+        "variants": [
+            {
+                "id": "v_001_1",
+                "name": "Size XS (460)",
+                "stock": 2
+            },
+            {
+                "id": "v_001_2",
+                "name": "Size S (490)",
+                "stock": 5
+            },
+            {
+                "id": "v_001_3",
+                "name": "Size M (520)",
+                "stock": 3
+            },
+            {
+                "id": "v_001_4",
+                "name": "Size L (550)",
+                "stock": 0
+            }
+        ]
+    },
+    {
+        "id": "p_002",
+        "sku": "BR-FRM-002N",
+        "name": "002 (Normal Edition)",
+        "category": "Frame",
+        "description": "重量730g(XS)。TEAM版のDNAを受け継ぐ高コストパフォーマンスモデル。",
+        "price": 280000,
+        "stock": 15,
+        "originalUrl": "https://www.bigrock-bike.jp/product-frame-002-normal.html",
+        "imageUrl": "https://placehold.co/600x400/1a1a1a/accent?text=002+Frame",
+        "variants": [
+            {
+                "id": "v_002_1",
+                "name": "Size XS (460)",
+                "stock": 5
+            },
+            {
+                "id": "v_002_2",
+                "name": "Size S (490)",
+                "stock": 5
+            },
+            {
+                "id": "v_002_3",
+                "name": "Size M (520)",
+                "stock": 5
+            }
+        ]
+    },
+    {
+        "id": "p_003",
+        "sku": "BR-FRM-001A",
+        "name": "001/AERO Road Frame",
+        "category": "Frame",
+        "description": "暁星製T800/T1000カーボン採用。実効空力性能と駆動効率を追求した本格エアロモデル。",
+        "price": 380000,
+        "stock": 5,
+        "originalUrl": "https://www.bigrock-bike.jp/product-frame-001.html",
+        "imageUrl": "https://placehold.co/600x400/1a1a1a/accent?text=AERO+Frame",
+        "variants": [
+            {
+                "id": "v_003_1",
+                "name": "Size S (490)",
+                "stock": 2
+            },
+            {
+                "id": "v_003_2",
+                "name": "Size M (520)",
+                "stock": 3
+            }
+        ]
+    },
+    {
+        "id": "p_004",
+        "sku": "BR-HND-V2",
+        "name": "SKYLINE V2 Handlebar",
+        "category": "Handlebar",
+        "description": "第2世代一体型カーボンハンドル。軽量性と人間工学に基づいた形状で、操舵性能を革新。",
+        "price": 45000,
+        "stock": 20,
+        "originalUrl": "https://www.bigrock-bike.jp/product-handlebar-v2.html",
+        "imageUrl": "https://placehold.co/600x400/1a1a1a/accent?text=V2+Handlebar",
+        "variants": [
+            {
+                "id": "v_004_1",
+                "name": "380mm x 90mm",
+                "stock": 5
+            },
+            {
+                "id": "v_004_2",
+                "name": "400mm x 100mm",
+                "stock": 10
+            },
+            {
+                "id": "v_004_3",
+                "name": "420mm x 110mm",
+                "stock": 5
+            }
+        ]
+    },
+    {
+        "id": "p_005",
+        "sku": "BR-HND-BLD",
+        "name": "BIGROCK BLADE",
+        "category": "Handlebar",
+        "description": "190gクラスの超軽量フルカーボンドロップハンドル。自然なフレア形状で高いコントロール性を実現。",
+        "price": 38000,
+        "stock": 25,
+        "originalUrl": "https://www.bigrock-bike.jp/product-handlebar-blade.html",
+        "imageUrl": "https://placehold.co/600x400/1a1a1a/accent?text=BLADE+Bar",
+        "variants": [
+            {
+                "id": "v_005_1",
+                "name": "380mm",
+                "stock": 10
+            },
+            {
+                "id": "v_005_2",
+                "name": "400mm",
+                "stock": 10
+            },
+            {
+                "id": "v_005_3",
+                "name": "420mm",
+                "stock": 5
+            }
+        ]
+    },
+    {
+        "id": "p_006",
+        "sku": "BR-SDL-CRB",
+        "name": "Carbon Rail Saddle",
+        "category": "Saddle",
+        "description": "重量125g。カーボンベース＆レール採用の超軽量レーシングサドル。",
+        "price": 25000,
+        "stock": 30,
+        "originalUrl": "https://www.bigrock-bike.jp/product-saddle.html",
+        "imageUrl": "https://placehold.co/600x400/1a1a1a/accent?text=Carbon+Saddle",
+        "variants": [
+            {
+                "id": "v_006_1",
+                "name": "143mm / Black",
+                "stock": 20
+            },
+            {
+                "id": "v_006_2",
+                "name": "155mm / Black",
+                "stock": 10
+            }
+        ]
+    },
+    {
+        "id": "p_007",
+        "sku": "BR-SDL-3D",
+        "name": "BIGROCK TOP 3D",
+        "category": "Saddle",
+        "description": "最先端3Dプリント技術とT800カーボンが融合。究極の快適性能。",
+        "price": 48000,
+        "stock": 12,
+        "originalUrl": "https://www.bigrock-bike.jp/product-saddle-3d.html",
+        "imageUrl": "https://placehold.co/600x400/1a1a1a/accent?text=3D+Saddle",
+        "variants": [
+            {
+                "id": "v_007_1",
+                "name": "143mm",
+                "stock": 8
+            },
+            {
+                "id": "v_007_2",
+                "name": "155mm",
+                "stock": 4
+            }
+        ]
+    },
+    {
+        "id": "p_008",
+        "sku": "BR-SPT-LGT",
+        "name": "Lightweight Seatpost",
+        "category": "Seatpost",
+        "description": "重量180g。徹底的に無駄を削ぎ落とした軽量カーボンシートポスト。",
+        "price": 22000,
+        "stock": 18,
+        "originalUrl": "https://www.bigrock-bike.jp/product-seatpost.html",
+        "imageUrl": "https://placehold.co/600x400/1a1a1a/accent?text=Seatpost",
+        "variants": [
+            {
+                "id": "v_008_1",
+                "name": "27.2mm x 350mm / 0mm Setback",
+                "stock": 10
+            },
+            {
+                "id": "v_008_2",
+                "name": "27.2mm x 350mm / 20mm Setback",
+                "stock": 8
+            }
+        ]
+    },
+    {
+        "id": "p_009",
+        "sku": "BR-HND-GRV",
+        "name": "BIGROCK GRAVEL HANDLEBAR",
+        "category": "Handlebar",
+        "description": "安定性と剛性を高次元で融合したフルカーボン一体型グラベルハンドルバー。悪路でも確実なコントロールを実現。",
+        "price": 32000,
+        "stock": 8,
+        "originalUrl": "https://www.bigrock-bike.jp/product-handlebar-gravel.html",
+        "imageUrl": "https://placehold.co/600x400/1a1a1a/accent?text=Gravel+Bar",
+        "variants": [
+            {
+                "id": "v_009_1",
+                "name": "400mm (Flare 24°)",
+                "stock": 4
+            },
+            {
+                "id": "v_009_2",
+                "name": "420mm (Flare 24°)",
+                "stock": 4
+            }
+        ]
+    },
+    {
+        "id": "p_010",
+        "sku": "BR-CRK-RD",
+        "name": "Road Carbon Crank",
+        "category": "Crank",
+        "description": "クラス最軽量353gを誇るフルカーボンクランク。チタン合金スピンドル採用で圧倒的な駆動効率を実現。",
+        "price": 68000,
+        "stock": 6,
+        "originalUrl": "https://www.bigrock-bike.jp/product-crank-road.html",
+        "imageUrl": "https://placehold.co/600x400/1a1a1a/accent?text=Carbon+Crank",
+        "variants": [
+            {
+                "id": "v_010_1",
+                "name": "165mm (No Chainring)",
+                "stock": 2
+            },
+            {
+                "id": "v_010_2",
+                "name": "170mm (No Chainring)",
+                "stock": 4
+            }
+        ]
+    },
+    {
+        "id": "p_011",
+        "sku": "BR-MNT-V2",
+        "name": "SKYLINE V2 Mount",
+        "category": "Accessory",
+        "description": "SKYLINE V2ハンドルバー専用設計。36gの軽量マウント。",
+        "price": 8000,
+        "stock": 40,
+        "originalUrl": "https://www.bigrock-bike.jp/product-mount-v2.html",
+        "imageUrl": "https://placehold.co/600x400/1a1a1a/accent?text=V2+Mount",
+        "variants": [
+            {
+                "id": "v_011_1",
+                "name": "Garmin Mount",
+                "stock": 20
+            },
+            {
+                "id": "v_011_2",
+                "name": "Wahoo Mount",
+                "stock": 20
+            }
+        ]
+    },
+    {
+        "id": "p_012",
+        "sku": "BR-BTL-ST",
+        "name": "Carbon Bottle Cage",
+        "category": "Accessory",
+        "description": "18gの超軽量カーボンケージ。シンプルで確実なホールド性を実現。",
+        "price": 6000,
+        "stock": 50,
+        "originalUrl": "https://www.bigrock-bike.jp/product-cage-straight.html",
+        "imageUrl": "https://placehold.co/600x400/1a1a1a/accent?text=Bottle+Cage",
+        "variants": [
+            {
+                "id": "v_012_1",
+                "name": "Matte Black",
+                "stock": 50
+            }
+        ]
+    },
+    {
+        "id": "p_013",
+        "sku": "BR-BTL-SD",
+        "name": "Side Open Cage",
+        "category": "Accessory",
+        "description": "サイドオープン形状の軽量カーボンケージ。フレーム内スペースが限られた車体に最適。",
+        "price": 6500,
+        "stock": 45,
+        "originalUrl": "https://www.bigrock-bike.jp/product-cage-side.html",
+        "imageUrl": "https://placehold.co/600x400/1a1a1a/accent?text=Side+Cage",
+        "variants": [
+            {
+                "id": "v_013_1",
+                "name": "Left Open",
+                "stock": 20
+            },
+            {
+                "id": "v_013_2",
+                "name": "Right Open",
+                "stock": 25
+            }
+        ]
+    }
+]
