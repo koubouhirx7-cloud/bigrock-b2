@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+
+<html class="h-full" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Technical Handover: Big Rock B2B Procurement Hub</title>
+<!-- Google Fonts: Noto Sans JP & JetBrains Mono -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&amp;family=Noto+Sans+JP:wght@400;700&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS v3 with Plugins -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#F2C94C', // Anodized Gold
+            background: '#111113', // Carbon Matte
+            surface: '#1E1E21', // Gunmetal
+            text: '#EAEAEA', // Raw Aluminum
+            muted: '#888888', // Dust
+            accent: '#EB5757', // Red Line
+            border: '#333336',
+          },
+          fontFamily: {
+            sans: ['Noto Sans JP', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          },
+        },
+      },
+    };
+  </script>
+<style data-purpose="custom-layout">
+    body {
+      background-color: #111113;
+      color: #EAEAEA;
+      font-family: 'Noto Sans JP', sans-serif;
+    }
+    .grid-lines {
+      background-image: radial-gradient(circle, #333336 1px, transparent 1px);
+      background-size: 24px 24px;
+    }
+    code {
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .status-badge {
+      background: rgba(242, 201, 76, 0.1);
+      border: 1px solid #F2C94C;
+      color: #F2C94C;
+    }
+    /* Industrial scrollbar */
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-track { background: #111113; }
+    ::-webkit-scrollbar-thumb { background: #333336; }
+    ::-webkit-scrollbar-thumb:hover { background: #F2C94C; }
+  </style>
+</head>
+<body class="min-h-screen py-12 px-6 lg:px-24 grid-lines">
+<!-- BEGIN: MainContainer -->
+<main class="max-w-6xl mx-auto space-y-12">
+<!-- BEGIN: HeaderSection -->
+<section class="border-l-4 border-primary pl-6 py-2" data-purpose="header">
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+<div>
+<h1 class="text-3xl font-bold tracking-tighter uppercase font-mono">Technical Handover</h1>
+<p class="text-xl text-muted font-mono mt-1">Project: Big Rock B2B Procurement Hub</p>
+</div>
+<div class="flex items-center">
+<span class="status-badge px-4 py-2 text-sm font-bold tracking-widest uppercase font-mono">
+            Status: Ready for Implementation
+          </span>
+</div>
+</div>
+<div class="mt-8 flex items-center gap-4 text-xs font-mono text-muted">
+<span>FOR: TEAM ANTIGRAVITY</span>
+<span>/</span>
+<span>VER: 1.0.4-STABLE</span>
+<span>/</span>
+<span>DATE: 2023.10.24</span>
+</div>
+</section>
+<!-- END: HeaderSection -->
+<!-- BEGIN: ProjectOverview -->
+<section class="bg-surface border border-border p-8" data-purpose="overview">
+<h2 class="text-lg font-bold text-primary mb-4 flex items-center gap-2">
+<span class="w-2 h-2 bg-primary"></span> 01. PROJECT OVERVIEW
+      </h2>
+<p class="leading-relaxed text-lg max-w-4xl">
+        A high-performance B2B procurement hub designed for Japan's premier mountain bike distributor. 
+        The interface follows an <span class="text-primary font-bold">"Industrial Precision"</span> aesthetic, 
+        mirroring the rugged, technical nature of CNC-machined MTB components. It prioritizes data density, 
+        visual stock verification, and speed-optimized workflows for dealers and workshop managers.
+      </p>
+</section>
+<!-- END: ProjectOverview -->
+<!-- BEGIN: TechStack -->
+<section class="grid grid-cols-1 md:grid-cols-2 gap-8" data-purpose="tech-stack">
+<div class="bg-surface border border-border p-8">
+<h2 class="text-lg font-bold text-primary mb-6 flex items-center gap-2">
+<span class="w-2 h-2 bg-primary"></span> 02. TECH STACK REQUIREMENTS
+        </h2>
+<ul class="space-y-4 font-mono text-sm">
+<li class="flex items-start gap-3">
+<span class="text-primary mt-1">›</span>
+<div>
+<span class="block font-bold text-white">Frontend</span>
+<span class="text-muted">Next.js (App Router), Tailwind CSS v3, Lucide React icons.</span>
+</div>
+</li>
+<li class="flex items-start gap-3">
+<span class="text-primary mt-1">›</span>
+<div>
+<span class="block font-bold text-white">Authentication</span>
+<span class="text-muted">NextAuth.js with Google Provider (Enterprise OAuth).</span>
+</div>
+</li>
+<li class="flex items-start gap-3">
+<span class="text-primary mt-1">›</span>
+<div>
+<span class="block font-bold text-white">Backend/DB</span>
+<span class="text-muted">Supabase (PostgreSQL) with Row Level Security.</span>
+</div>
+</li>
+</ul>
+</div>
+<div class="bg-surface border border-border p-8">
+<h2 class="text-lg font-bold text-primary mb-6 flex items-center gap-2">
+<span class="w-2 h-2 bg-primary"></span> 03. DESIGN TOKENS
+        </h2>
+<!-- Code block for CSS variables -->
+<div class="bg-background rounded p-4 font-mono text-[11px] text-primary/80 border border-border overflow-x-auto">
+<pre>:root {
+  --color-primary: #F2C94C;
+  --color-background: #111113;
+  --color-surface: #1E1E21;
+  --color-text: #EAEAEA;
+  --color-muted: #888888;
+  --color-border: #333336;
+  --font-body: 'Noto Sans JP', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+  --radius: 0px;
+}
+</pre>
+</div>
+</div>
+</section>
+<!-- END: TechStack -->
+<!-- BEGIN: ScreenReference -->
+<section class="bg-surface border border-border p-8" data-purpose="screen-reference">
+<h2 class="text-lg font-bold text-primary mb-6 flex items-center gap-2">
+<span class="w-2 h-2 bg-primary"></span> 04. SCREEN REFERENCE GUIDE
+      </h2>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+<!-- Login -->
+<div class="border border-border p-4 bg-background/50">
+<h3 class="text-primary font-bold font-mono text-xs mb-2">SCREEN_2 // LOGIN</h3>
+<p class="text-xs text-muted mb-4">Implement industrial-styled Google OAuth flow with system status indicators.</p>
+<div class="text-[10px] font-mono p-2 bg-background border border-border text-muted italic">
+            // Note: Verify domain-restricted access.
+          </div>
+</div>
+<!-- Dashboard -->
+<div class="border border-border p-4 bg-background/50">
+<h3 class="text-primary font-bold font-mono text-xs mb-2">SCREEN_13 // DASHBOARD</h3>
+<p class="text-xs text-muted mb-4">Real-time spend tracking via SVG/Recharts circles. Stock alert polling.</p>
+<div class="text-[10px] font-mono p-2 bg-background border border-border text-muted italic">
+            // Component: BudgetMeter.tsx
+          </div>
+</div>
+<!-- Catalog -->
+<div class="border border-border p-4 bg-background/50">
+<h3 class="text-primary font-bold font-mono text-xs mb-2">SCREEN_10 // CATALOG</h3>
+<p class="text-xs text-muted mb-4">Faceted search. Real-time availability toggles. Bulk-add bottom bar logic.</p>
+<div class="text-[10px] font-mono p-2 bg-background border border-border text-muted italic">
+            // Hook: useProductFilters()
+          </div>
+</div>
+<!-- Detail -->
+<div class="border border-border p-4 bg-background/50">
+<h3 class="text-primary font-bold font-mono text-xs mb-2">SCREEN_4 // PRODUCT DETAIL</h3>
+<p class="text-xs text-muted mb-4">Size/Color variant selection matrix. Tiered volume pricing calculations.</p>
+<div class="text-[10px] font-mono p-2 bg-background border border-border text-muted italic">
+            // Note: Update SVG geometry labels.
+          </div>
+</div>
+<!-- History -->
+<div class="border border-border p-4 bg-background/50">
+<h3 class="text-primary font-bold font-mono text-xs mb-2">SCREEN_5 // ORDER HISTORY</h3>
+<p class="text-xs text-muted mb-4">Audit trail with "One-Click Reorder" logic and PDF/CSV export functionality.</p>
+<div class="text-[10px] font-mono p-2 bg-background border border-border text-muted italic">
+            // API: /api/orders/reorder
+          </div>
+</div>
+<!-- Import -->
+<div class="border border-border p-4 bg-background/50">
+<h3 class="text-primary font-bold font-mono text-xs mb-2">SCREEN_9 // IMPORT TOOL</h3>
+<p class="text-xs text-muted mb-4">Client-side XLSX/CSV parsing. SKU conflict resolution modal.</p>
+<div class="text-[10px] font-mono p-2 bg-background border border-border text-muted italic">
+            // Utility: parseInventoryFile()
+          </div>
+</div>
+</div>
+</section>
+<!-- END: ScreenReference -->
+<!-- BEGIN: PhaseTasks -->
+<section class="bg-surface border border-border p-8" data-purpose="phases">
+<h2 class="text-lg font-bold text-primary mb-6 flex items-center gap-2">
+<span class="w-2 h-2 bg-primary"></span> 05. PHASE-WISE TASKS
+      </h2>
+<div class="space-y-6">
+<div class="relative pl-8 border-l border-border">
+<div class="absolute -left-[5px] top-0 w-[9px] h-[9px] bg-primary"></div>
+<h4 class="font-bold text-white font-mono text-sm mb-2">PHASE 1: DATABASE SCHEMA DEFINITION</h4>
+<p class="text-sm text-muted">Model products with multiple variants, pricing tiers, and inventory locations. Setup dealer-specific pricing overrides.</p>
+</div>
+<div class="relative pl-8 border-l border-border">
+<div class="absolute -left-[5px] top-0 w-[9px] h-[9px] bg-border border border-primary"></div>
+<h4 class="font-bold text-white font-mono text-sm mb-2">PHASE 2: FRONTEND COMPONENT ATOMIZATION</h4>
+<p class="text-sm text-muted">Build the custom UI library (Buttons, Inputs, Cards) using Tailwind utility classes. Strict adherence to 0px border-radius.</p>
+</div>
+<div class="relative pl-8 border-l border-border">
+<div class="absolute -left-[5px] top-0 w-[9px] h-[9px] bg-border border border-primary"></div>
+<h4 class="font-bold text-white font-mono text-sm mb-2">PHASE 3: AUTH &amp; API INTEGRATION</h4>
+<p class="text-sm text-muted">Connect NextAuth.js and implement real-time stock sync via Supabase Realtime for the Catalog view.</p>
+</div>
+</div>
+</section>
+<!-- END: PhaseTasks -->
+<!-- BEGIN: Footer -->
+<footer class="pt-8 border-t border-border flex flex-col md:flex-row justify-between items-center gap-4">
+<div class="flex items-center gap-4">
+<div class="bg-primary text-background p-1 font-bold text-xs">BIG ROCK</div>
+<span class="text-xs font-mono text-muted uppercase tracking-widest">Antigravity Implementation Unit</span>
+</div>
+<div class="text-[10px] font-mono text-muted">
+        SYSTEM STATUS: <span class="text-green-500">OPERATIONAL</span> // AUTH_MODULE: READY // ENCRYPTION: AES-256-GCM
+      </div>
+</footer>
+<!-- END: Footer -->
+</main>
+<!-- END: MainContainer -->
+</body></html>

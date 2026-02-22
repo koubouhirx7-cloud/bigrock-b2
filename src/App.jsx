@@ -1,7 +1,10 @@
 import { useState } from 'react'
 import productsData from './data/products.json'
+import Login from './components/Login'
+import Admin from './components/Admin'
 
 function App() {
+  const [appMode, setAppMode] = useState('login')
   const [activeTab, setActiveTab] = useState('dashboard')
   const [selectedProduct, setSelectedProduct] = useState(null)
   const [cart, setCart] = useState([])
@@ -58,9 +61,19 @@ function App() {
 
   // Example filtering for quick access categories if needed
   const frames = productsData.filter(p => p.category === 'Frame')
+  const components = productsData.filter(p => p.category === 'Components')
+  const apparel = productsData.filter(p => p.category === 'Apparel')
+
+  if (appMode === 'login') {
+    return <Login onLogin={() => setAppMode('store')} />
+  }
+
+  if (appMode === 'admin') {
+    return <Admin products={productsData} onExitAdmin={() => setAppMode('store')} />
+  }
 
   return (
-    <div className="flex-1 flex flex-col h-full w-full overflow-hidden relative">
+    <div className="flex h-screen bg-[#111113] text-white">
       {/* Sidebar Navigation */}
       <aside className="fixed left-0 top-0 bottom-0 w-64 bg-surface border-r border-border-subtle flex flex-col shrink-0 z-20">
         {/* Logo Area */}
@@ -102,6 +115,16 @@ function App() {
             <span className="text-sm font-medium">注文履歴</span>
           </button>
         </nav>
+        {/* Admin Link (Test) */}
+        <div className="px-4 pb-2">
+          <button
+            onClick={() => setAppMode('admin')}
+            className="w-full py-2 px-3 flex items-center gap-2 justify-center text-xs font-bold text-background-dark bg-primary hover:bg-white transition-colors uppercase tracking-wider shadow-[0_0_10px_rgba(242,201,76,0.2)]"
+          >
+            <span className="material-symbols-outlined text-[16px]">settings_applications</span>
+            <span>管理者メニューへ</span>
+          </button>
+        </div>
 
         {/* User Profile / Footer */}
         <div className="p-4 border-t border-border-subtle">
@@ -111,7 +134,10 @@ function App() {
               <span className="text-xs font-bold text-white truncate">MURAKAMI</span>
               <span className="text-[10px] text-text-muted truncate">Murakami Cycle</span>
             </div>
-            <button className="text-text-muted hover:text-white transition-colors">
+            <button
+              onClick={() => setAppMode('login')}
+              className="text-text-muted hover:text-white transition-colors"
+            >
               <span className="material-symbols-outlined text-lg">logout</span>
             </button>
           </div>

@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="ja"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Big Rock B2B - 製品カタログ</title>
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500;700&amp;family=Noto+Sans+JP:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#F2C94C", // Anodized Gold
+                        "background-light": "#f8f8f6",
+                        "background-dark": "#111113", // Carbon Matte
+                        "surface": "#1E1E21", // Gunmetal
+                        "surface-highlight": "#252528",
+                        "border-dark": "#333336", // Subtle dividers
+                        "text-main": "#EAEAEA", // Raw Aluminum
+                        "text-muted": "#888888", // Dust
+                        "accent-red": "#EB5757", // Red Line
+                    },
+                    fontFamily: {
+                        "display": ["Noto Sans JP", "Inter", "sans-serif"],
+                        "mono": ["JetBrains Mono", "monospace"],
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0px", // Industrial sharp corners
+                        "sm": "2px",
+                        "md": "4px",
+                        "lg": "0px", 
+                        "xl": "0px",
+                        "full": "9999px",
+                    },
+                    backgroundImage: {
+                        'grid-pattern': "linear-gradient(to right, #333336 1px, transparent 1px), linear-gradient(to bottom, #333336 1px, transparent 1px)",
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        /* Custom scrollbar for industrial look */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #111113; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #333336; 
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #F2C94C; 
+        }
+        
+        /* Checkbox styling override */
+        input[type="checkbox"] {
+            border-radius: 0px !important;
+            border-color: #333336 !important;
+            background-color: #1E1E21 !important;
+            color: #F2C94C !important;
+        }
+        input[type="checkbox"]:focus {
+            --tw-ring-color: transparent !important;
+        }
+
+        /* Number input styling */
+        input[type=number]::-webkit-inner-spin-button, 
+        input[type=number]::-webkit-outer-spin-button { 
+            -webkit-appearance: none; 
+            margin: 0; 
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-text-main font-display antialiased h-screen overflow-hidden flex flex-col">
+<!-- Top Navigation -->
+<header class="flex-none z-50 border-b border-border-dark bg-[#181611]">
+<div class="flex items-center justify-between whitespace-nowrap px-6 py-3">
+<div class="flex items-center gap-4 text-white">
+<div class="size-6 text-primary">
+<span class="material-symbols-outlined text-[24px]">terrain</span>
+</div>
+<h2 class="text-white text-lg font-bold leading-tight tracking-tight font-display uppercase">Big Rock <span class="text-primary">B2B</span></h2>
+</div>
+<div class="flex flex-1 justify-end gap-8">
+<nav class="hidden md:flex items-center gap-6">
+<a class="text-text-muted hover:text-primary transition-colors text-sm font-medium leading-normal" href="#">ダッシュボード</a>
+<a class="text-white border-b-2 border-primary text-sm font-bold leading-normal pb-0.5" href="#">製品カタログ</a>
+<a class="text-text-muted hover:text-primary transition-colors text-sm font-medium leading-normal" href="#">注文履歴</a>
+<a class="text-text-muted hover:text-primary transition-colors text-sm font-medium leading-normal" href="#">設定</a>
+</nav>
+<div class="flex gap-3 items-center border-l border-border-dark pl-6">
+<button class="flex items-center justify-center size-9 hover:bg-surface-highlight text-text-muted hover:text-white transition-colors">
+<span class="material-symbols-outlined text-[20px]">notifications</span>
+</button>
+<button class="flex items-center justify-center size-9 hover:bg-surface-highlight text-text-muted hover:text-white transition-colors relative">
+<span class="material-symbols-outlined text-[20px]">shopping_cart</span>
+<span class="absolute top-1 right-1 size-2 bg-primary rounded-full"></span>
+</button>
+<button class="flex items-center justify-center size-9 hover:bg-surface-highlight text-text-muted hover:text-white transition-colors">
+<span class="material-symbols-outlined text-[20px]">account_circle</span>
+</button>
+</div>
+</div>
+</div>
+</header>
+<!-- Main Content Area -->
+<div class="flex flex-1 overflow-hidden">
+<!-- Left Sidebar: Filters -->
+<aside class="w-[280px] flex-none border-r border-border-dark bg-surface overflow-y-auto flex flex-col">
+<div class="p-5 border-b border-border-dark">
+<div class="flex justify-between items-center mb-4">
+<h3 class="font-bold text-sm text-text-main uppercase tracking-wider">Filters</h3>
+<button class="text-xs text-text-muted hover:text-primary underline decoration-dotted">リセット</button>
+</div>
+<!-- Search within filters -->
+<div class="relative">
+<span class="absolute inset-y-0 left-0 flex items-center pl-3 text-text-muted pointer-events-none">
+<span class="material-symbols-outlined text-[16px]">search</span>
+</span>
+<input class="w-full bg-background-dark border border-border-dark text-white text-sm pl-9 py-2 focus:border-primary focus:ring-0 placeholder:text-text-muted/50 font-mono" placeholder="キーワード検索..." type="text"/>
+</div>
+</div>
+<!-- Facets -->
+<div class="flex-1 p-5 space-y-8">
+<!-- Stock Status -->
+<div class="space-y-3">
+<h4 class="text-xs font-mono text-text-muted uppercase tracking-wider">Availability</h4>
+<label class="flex items-center justify-between cursor-pointer group">
+<span class="text-sm text-text-main group-hover:text-white">在庫ありのみ</span>
+<div class="relative inline-block w-10 mr-2 align-middle select-none transition duration-200 ease-in">
+<input class="toggle-checkbox absolute block w-4 h-4 rounded-none bg-text-muted border-none appearance-none cursor-pointer checked:right-0 checked:bg-primary transition-all duration-300 left-0 top-[2px]" id="toggle" name="toggle" type="checkbox"/>
+<label class="toggle-label block overflow-hidden h-5 rounded-none bg-background-dark border border-border-dark cursor-pointer" for="toggle"></label>
+</div>
+</label>
+</div>
+<!-- Category Accordion -->
+<div class="space-y-3">
+<div class="flex items-center justify-between cursor-pointer group">
+<h4 class="text-xs font-mono text-text-muted uppercase tracking-wider group-hover:text-primary transition-colors">Category</h4>
+<span class="material-symbols-outlined text-text-muted text-[16px]">remove</span>
+</div>
+<div class="space-y-2 pl-1">
+<label class="flex items-center gap-3 cursor-pointer group">
+<input class="size-4 border-border-dark bg-background-dark text-primary focus:ring-0 focus:ring-offset-0" type="checkbox"/>
+<span class="text-sm text-text-muted group-hover:text-white font-mono">Frames <span class="text-text-muted/50 ml-1">(12)</span></span>
+</label>
+<label class="flex items-center gap-3 cursor-pointer group">
+<input checked="" class="size-4 border-border-dark bg-background-dark text-primary focus:ring-0 focus:ring-offset-0" type="checkbox"/>
+<span class="text-sm text-white font-bold font-mono">Drivetrain <span class="text-primary ml-1">(45)</span></span>
+</label>
+<label class="flex items-center gap-3 cursor-pointer group">
+<input class="size-4 border-border-dark bg-background-dark text-primary focus:ring-0 focus:ring-offset-0" type="checkbox"/>
+<span class="text-sm text-text-muted group-hover:text-white font-mono">Brakes <span class="text-text-muted/50 ml-1">(28)</span></span>
+</label>
+<label class="flex items-center gap-3 cursor-pointer group">
+<input class="size-4 border-border-dark bg-background-dark text-primary focus:ring-0 focus:ring-offset-0" type="checkbox"/>
+<span class="text-sm text-text-muted group-hover:text-white font-mono">Cockpit <span class="text-text-muted/50 ml-1">(64)</span></span>
+</label>
+<label class="flex items-center gap-3 cursor-pointer group">
+<input class="size-4 border-border-dark bg-background-dark text-primary focus:ring-0 focus:ring-offset-0" type="checkbox"/>
+<span class="text-sm text-text-muted group-hover:text-white font-mono">Apparel <span class="text-text-muted/50 ml-1">(18)</span></span>
+</label>
+</div>
+</div>
+<!-- Brand Accordion -->
+<div class="space-y-3 pt-4 border-t border-border-dark/50">
+<div class="flex items-center justify-between cursor-pointer group">
+<h4 class="text-xs font-mono text-text-muted uppercase tracking-wider group-hover:text-primary transition-colors">Brand</h4>
+<span class="material-symbols-outlined text-text-muted text-[16px]">remove</span>
+</div>
+<div class="space-y-2 pl-1">
+<label class="flex items-center gap-3 cursor-pointer group">
+<input class="size-4 border-border-dark bg-background-dark text-primary focus:ring-0 focus:ring-offset-0" type="checkbox"/>
+<span class="text-sm text-text-muted group-hover:text-white font-mono">Yeti Cycles</span>
+</label>
+<label class="flex items-center gap-3 cursor-pointer group">
+<input class="size-4 border-border-dark bg-background-dark text-primary focus:ring-0 focus:ring-offset-0" type="checkbox"/>
+<span class="text-sm text-text-muted group-hover:text-white font-mono">Chromag</span>
+</label>
+<label class="flex items-center gap-3 cursor-pointer group">
+<input class="size-4 border-border-dark bg-background-dark text-primary focus:ring-0 focus:ring-offset-0" type="checkbox"/>
+<span class="text-sm text-text-muted group-hover:text-white font-mono">FOX Factory</span>
+</label>
+<label class="flex items-center gap-3 cursor-pointer group">
+<input class="size-4 border-border-dark bg-background-dark text-primary focus:ring-0 focus:ring-offset-0" type="checkbox"/>
+<span class="text-sm text-text-muted group-hover:text-white font-mono">Shimano</span>
+</label>
+</div>
+</div>
+<!-- Price Range -->
+<div class="space-y-3 pt-4 border-t border-border-dark/50">
+<h4 class="text-xs font-mono text-text-muted uppercase tracking-wider">Price Range</h4>
+<div class="flex items-center gap-2">
+<input class="w-full bg-background-dark border border-border-dark text-white text-xs p-2 font-mono focus:border-primary focus:ring-0 text-center" type="number" value="0"/>
+<span class="text-text-muted text-xs">-</span>
+<input class="w-full bg-background-dark border border-border-dark text-white text-xs p-2 font-mono focus:border-primary focus:ring-0 text-center" type="number" value="500000"/>
+</div>
+<div class="h-1 bg-border-dark w-full relative">
+<div class="absolute left-0 right-0 h-full bg-primary/50"></div>
+<div class="absolute left-0 top-1/2 -translate-y-1/2 w-2 h-2 bg-primary"></div>
+<div class="absolute right-0 top-1/2 -translate-y-1/2 w-2 h-2 bg-primary"></div>
+</div>
+</div>
+</div>
+<div class="p-4 border-t border-border-dark text-xs text-text-muted text-center font-mono">
+                v2.4.0 • SYSTEM ACTIVE
+            </div>
+</aside>
+<!-- Right Content: Grid -->
+<main class="flex-1 flex flex-col h-full relative">
+<!-- Toolbar -->
+<div class="flex-none p-6 pb-2 bg-background-dark z-10">
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4">
+<h1 class="text-2xl font-bold text-white tracking-tight">Drivetrain Components</h1>
+<div class="flex items-center gap-3">
+<button class="flex items-center gap-2 h-10 px-4 bg-surface border border-border-dark text-text-main hover:border-primary hover:text-primary transition-all text-sm font-bold uppercase tracking-wider">
+<span class="material-symbols-outlined text-[20px]">upload_file</span>
+<span>製品インポート</span>
+</button><div class="relative group">
+<select class="appearance-none bg-surface border border-border-dark text-white text-sm pl-4 pr-10 py-2 focus:border-primary focus:ring-0 cursor-pointer font-mono hover:border-text-muted transition-colors">
+<option>Sort: Popular</option>
+<option>Sort: Price Low-High</option>
+<option>Sort: Price High-Low</option>
+<option>Sort: Newest</option>
+</select>
+<span class="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-text-muted">
+<span class="material-symbols-outlined text-[18px]">arrow_drop_down</span>
+</span>
+</div>
+<div class="flex border border-border-dark bg-surface">
+<button class="p-2 text-primary bg-surface-highlight border-r border-border-dark">
+<span class="material-symbols-outlined text-[20px]">grid_view</span>
+</button>
+<button class="p-2 text-text-muted hover:text-white transition-colors">
+<span class="material-symbols-outlined text-[20px]">view_list</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Active Filters Tags -->
+<div class="flex flex-wrap gap-2 items-center">
+<span class="text-xs text-text-muted font-mono mr-2">ACTIVE:</span>
+<div class="flex items-center gap-1 bg-surface border border-border-dark px-2 py-1 text-xs text-text-main font-mono">
+                        Drivetrain
+                        <button class="hover:text-primary"><span class="material-symbols-outlined text-[14px]">close</span></button>
+</div>
+<div class="flex items-center gap-1 bg-surface border border-border-dark px-2 py-1 text-xs text-text-main font-mono">
+                        In Stock
+                        <button class="hover:text-primary"><span class="material-symbols-outlined text-[14px]">close</span></button>
+</div>
+<span class="text-xs text-text-muted ml-auto font-mono">Showing 1-12 of 45 items</span>
+</div>
+</div>
+<!-- Product Grid -->
+<div class="flex-1 overflow-y-auto p-6 pt-2 pb-24">
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+<!-- Product Card 1 -->
+<div class="group relative flex flex-col bg-surface border border-border-dark hover:border-primary transition-colors duration-200">
+<div class="absolute top-2 left-2 z-10">
+<input class="size-4 border-border-dark bg-background-dark/80 text-primary focus:ring-0 focus:ring-offset-0 cursor-pointer" type="checkbox"/>
+</div>
+<div class="absolute top-2 right-2 z-10">
+<span class="inline-flex items-center gap-1 bg-background-dark/90 text-primary text-[10px] font-bold px-2 py-0.5 border border-border-dark font-mono uppercase">
+                                New Arrival
+                            </span>
+</div>
+<!-- Image -->
+<div class="relative w-full aspect-[4/3] bg-[#151517] overflow-hidden flex items-center justify-center border-b border-border-dark">
+<!-- Background Texture -->
+<div class="absolute inset-0 opacity-[0.03]" style="background-image: url('data:image/svg+xml,%3Csvg width=\'6\' height=\'6\' viewBox=\'0 0 6 6\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'%23ffffff\' fill-opacity=\'1\' fill-rule=\'evenodd\'%3E%3Cpath d=\'M5 0h1L0 6V5zM6 5v1H5z\'/%3E%3C/g%3E%3C/svg%3E');"></div>
+<img class="w-full h-full object-cover mix-blend-overlay opacity-30 absolute inset-0" data-alt="Close up of bicycle gears and chain" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBO_RusTMNte268aYfs8Zsto1gAmB7rLBuaf3RZ0KbRIN-MayBT_vFd44azFWggsY7-6G9vchBYiUhe3n1dtsj2Q9BcOh0yL__dkvbyVUuKwC82nD_xBVolcmhXsfx6iXRJndaOrQrP4qfUAV5fZALWw4QPsrJVMo-DIZIS9S0eY4ePGyZFxbm7Qs0W01eTByenfuBDgNS2F2uxhdVx9PtSq9de-NPiIEkjl6bS3VNjxlN-ZDSm1QqwJMeUyrTLEOfidJsI7TcJ0w"/>
+<img class="relative z-10 w-3/4 h-3/4 object-contain group-hover:scale-105 transition-transform duration-300" data-alt="Bicycle rear derailleur isolated" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBsC2gZIV8fK414NDwcjj414XFGcaUNWA9kJ8tmIBPHeAeA4N8udp1xNGKu4ZZPf8NtaIXUum9nIvPu3ur-9qc2ErqX2kQbabsatMBROvQVI9_j98dh0aB1mWlCDoltlPMtujerCAFHv3BRmFvmQ7ED2-zMcfl0hxF-8KaJbgE0KKVqUxIBZpZGfw7u4-1-0r83vsrOf1ffwg_F3xxc8kqweMUUccF5rV60hS76x4bw_vO9u6meLIHZsZRkXLOd6hNCrBbhBs4DZA"/>
+</div>
+<!-- Content -->
+<div class="p-3 flex flex-col flex-1 gap-2">
+<div class="flex justify-between items-start">
+<div>
+<p class="text-[10px] font-bold text-text-muted uppercase tracking-wider mb-0.5">Shimano</p>
+<h3 class="text-sm font-bold text-white leading-tight line-clamp-2">XTR M9100 Rear Derailleur 12-Speed</h3>
+</div>
+</div>
+<div class="flex items-center gap-2 mt-1">
+<span class="text-xs font-mono text-text-muted">SKU: RD-M9100-SGS</span>
+</div>
+<div class="mt-auto pt-3 flex items-end justify-between border-t border-border-dark border-dashed">
+<div class="flex flex-col">
+<span class="text-[10px] text-text-muted mb-0.5">Wholesale Price</span>
+<span class="text-base font-bold font-mono text-primary">¥28,500</span>
+</div>
+<div class="flex flex-col items-end">
+<div class="flex items-center gap-1.5 mb-1">
+<div class="size-2 rounded-full bg-emerald-500 animate-pulse"></div>
+<span class="text-[10px] font-bold text-emerald-500 uppercase">In Stock (12)</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Action Footer -->
+<div class="bg-surface-highlight p-2 flex items-center gap-2 border-t border-border-dark">
+<div class="flex items-center bg-background-dark border border-border-dark h-8">
+<button class="w-7 h-full text-text-muted hover:text-white hover:bg-white/5 flex items-center justify-center transition-colors">
+<span class="material-symbols-outlined text-[16px]">remove</span>
+</button>
+<input class="w-10 h-full bg-transparent border-0 text-center text-xs font-mono text-white focus:ring-0 p-0" type="number" value="1"/>
+<button class="w-7 h-full text-text-muted hover:text-white hover:bg-white/5 flex items-center justify-center transition-colors">
+<span class="material-symbols-outlined text-[16px]">add</span>
+</button>
+</div>
+<button class="flex-1 h-8 bg-background-dark border border-primary/50 text-primary hover:bg-primary hover:text-background-dark text-xs font-bold uppercase tracking-wider transition-all flex items-center justify-center gap-1 group/btn">
+<span>Add</span>
+<span class="material-symbols-outlined text-[16px] group-hover/btn:translate-x-0.5 transition-transform">arrow_forward</span>
+</button>
+</div>
+</div>
+<!-- Product Card 2 -->
+<div class="group relative flex flex-col bg-surface border border-border-dark hover:border-primary transition-colors duration-200">
+<div class="absolute top-2 left-2 z-10">
+<input class="size-4 border-border-dark bg-background-dark/80 text-primary focus:ring-0 focus:ring-offset-0 cursor-pointer" type="checkbox"/>
+</div>
+<div class="relative w-full aspect-[4/3] bg-[#151517] overflow-hidden flex items-center justify-center border-b border-border-dark">
+<div class="absolute inset-0 opacity-[0.03]" style="background-image: url('data:image/svg+xml,%3Csvg width=\'6\' height=\'6\' viewBox=\'0 0 6 6\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'%23ffffff\' fill-opacity=\'1\' fill-rule=\'evenodd\'%3E%3Cpath d=\'M5 0h1L0 6V5zM6 5v1H5z\'/%3E%3C/g%3E%3C/svg%3E');"></div>
+<img class="relative z-10 w-3/4 h-3/4 object-contain group-hover:scale-105 transition-transform duration-300" data-alt="Bicycle cassette" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDZskDW41F-mvbisbQLQOSq7-FqBEP-_GD7O8A6vY3eH1pLKtubfgroiVaroy1kBKfjJ-q_tyilDj5SSB17DVu3_ksv-pVhYaDGb965WgP0q5-8eDvb_lGRVHzJsTJKtE8zZFP7FwREXxuyT1kJPBh_HcX_-_qOm67liYLOX8HjXqqXo_2npqFOwoD-W7-KJzzgOmefv53l2NNNc85sZST0v1cFww7YJF94sBVr8q1uBu_dm5z7Ycm0bWeZ28joeKQJifH6mN9M-Q"/>
+</div>
+<div class="p-3 flex flex-col flex-1 gap-2">
+<div class="flex justify-between items-start">
+<div>
+<p class="text-[10px] font-bold text-text-muted uppercase tracking-wider mb-0.5">SRAM</p>
+<h3 class="text-sm font-bold text-white leading-tight line-clamp-2">XG-1299 Eagle Cassette Rainbow</h3>
+</div>
+</div>
+<div class="flex items-center gap-2 mt-1">
+<span class="text-xs font-mono text-text-muted">SKU: CS-XG-1299-A1</span>
+</div>
+<div class="mt-auto pt-3 flex items-end justify-between border-t border-border-dark border-dashed">
+<div class="flex flex-col">
+<span class="text-[10px] text-text-muted mb-0.5">Wholesale Price</span>
+<span class="text-base font-bold font-mono text-primary">¥45,000</span>
+</div>
+<div class="flex flex-col items-end">
+<div class="flex items-center gap-1.5 mb-1">
+<div class="size-2 rounded-full bg-amber-500"></div>
+<span class="text-[10px] font-bold text-amber-500 uppercase">Low Stock (3)</span>
+</div>
+</div>
+</div>
+</div>
+<div class="bg-surface-highlight p-2 flex items-center gap-2 border-t border-border-dark">
+<div class="flex items-center bg-background-dark border border-border-dark h-8">
+<button class="w-7 h-full text-text-muted hover:text-white hover:bg-white/5 flex items-center justify-center transition-colors">
+<span class="material-symbols-outlined text-[16px]">remove</span>
+</button>
+<input class="w-10 h-full bg-transparent border-0 text-center text-xs font-mono text-white focus:ring-0 p-0" type="number" value="1"/>
+<button class="w-7 h-full text-text-muted hover:text-white hover:bg-white/5 flex items-center justify-center transition-colors">
+<span class="material-symbols-outlined text-[16px]">add</span>
+</button>
+</div>
+<button class="flex-1 h-8 bg-background-dark border border-primary/50 text-primary hover:bg-primary hover:text-background-dark text-xs font-bold uppercase tracking-wider transition-all flex items-center justify-center gap-1 group/btn">
+<span>Add</span>
+<span class="material-symbols-outlined text-[16px] group-hover/btn:translate-x-0.5 transition-transform">arrow_forward</span>
+</button>
+</div>
+</div>
+<!-- Product Card 3 (Out of stock) -->
+<div class="group relative flex flex-col bg-surface border border-border-dark opacity-60 hover:opacity-100 transition-opacity duration-200">
+<div class="absolute inset-0 bg-background-dark/10 pointer-events-none z-20"></div>
+<div class="relative w-full aspect-[4/3] bg-[#151517] overflow-hidden flex items-center justify-center border-b border-border-dark">
+<div class="absolute inset-0 opacity-[0.03]" style="background-image: url('data:image/svg+xml,%3Csvg width=\'6\' height=\'6\' viewBox=\'0 0 6 6\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'%23ffffff\' fill-opacity=\'1\' fill-rule=\'evenodd\'%3E%3Cpath d=\'M5 0h1L0 6V5zM6 5v1H5z\'/%3E%3C/g%3E%3C/svg%3E');"></div>
+<img class="relative z-10 w-3/4 h-3/4 object-contain grayscale" data-alt="Bicycle chain close up" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA5ucMB-8cJV_MjYr1ZJrlCneQwxhfQkDsQtJOygqOmLrj1lduk3yQiXhm59SwbAvMzoYyLTfanRGXp4aCcy7FK8gJCXVHUHmNTbsOE3CmX_Esfvw6hgCIP9jWIVaDBFFpxBMzWtUaOtHkyshc4gTqOIy793tz2eR2wVV6H2Og_sGtd75IVTbpXLdbAV2EsNb14B7sUBBXp62a0JE8-JVYsbO6RrafWQOkkbU4oRwvT1z6vwhud4bp_pUrdu9ym_4gFf6b-dfcQlQ"/>
+</div>
+<div class="p-3 flex flex-col flex-1 gap-2">
+<div class="flex justify-between items-start">
+<div>
+<p class="text-[10px] font-bold text-text-muted uppercase tracking-wider mb-0.5">KMC</p>
+<h3 class="text-sm font-bold text-white leading-tight line-clamp-2">X12 Ti-N Gold Chain</h3>
+</div>
+</div>
+<div class="flex items-center gap-2 mt-1">
+<span class="text-xs font-mono text-text-muted">SKU: CH-X12-GLD</span>
+</div>
+<div class="mt-auto pt-3 flex items-end justify-between border-t border-border-dark border-dashed">
+<div class="flex flex-col">
+<span class="text-[10px] text-text-muted mb-0.5">Wholesale Price</span>
+<span class="text-base font-bold font-mono text-text-muted line-through">¥6,500</span>
+</div>
+<div class="flex flex-col items-end">
+<div class="flex items-center gap-1.5 mb-1">
+<div class="size-2 rounded-full bg-accent-red"></div>
+<span class="text-[10px] font-bold text-accent-red uppercase">Out of Stock</span>
+</div>
+</div>
+</div>
+</div>
+<div class="bg-surface-highlight p-2 flex items-center gap-2 border-t border-border-dark pointer-events-none">
+<div class="flex items-center bg-background-dark border border-border-dark h-8 opacity-50">
+<button class="w-7 h-full text-text-muted flex items-center justify-center">
+<span class="material-symbols-outlined text-[16px]">remove</span>
+</button>
+<input class="w-10 h-full bg-transparent border-0 text-center text-xs font-mono text-text-muted p-0" disabled="" type="number" value="0"/>
+<button class="w-7 h-full text-text-muted flex items-center justify-center">
+<span class="material-symbols-outlined text-[16px]">add</span>
+</button>
+</div>
+<button class="flex-1 h-8 bg-background-dark border border-border-dark text-text-muted text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-1 cursor-not-allowed" disabled="">
+<span>Notify Me</span>
+</button>
+</div>
+</div>
+<!-- Product Card 4 -->
+<div class="group relative flex flex-col bg-surface border border-border-dark hover:border-primary transition-colors duration-200 ring-1 ring-primary">
+<div class="absolute top-2 left-2 z-10">
+<input checked="" class="size-4 border-border-dark bg-background-dark/80 text-primary focus:ring-0 focus:ring-offset-0 cursor-pointer" type="checkbox"/>
+</div>
+<div class="relative w-full aspect-[4/3] bg-[#151517] overflow-hidden flex items-center justify-center border-b border-border-dark">
+<div class="absolute inset-0 opacity-[0.03]" style="background-image: url('data:image/svg+xml,%3Csvg width=\'6\' height=\'6\' viewBox=\'0 0 6 6\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'%23ffffff\' fill-opacity=\'1\' fill-rule=\'evenodd\'%3E%3Cpath d=\'M5 0h1L0 6V5zM6 5v1H5z\'/%3E%3C/g%3E%3C/svg%3E');"></div>
+<img class="relative z-10 w-3/4 h-3/4 object-contain group-hover:scale-105 transition-transform duration-300" data-alt="Bicycle frame detail" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBDwZdmUtqWKCDPE8-GHcDv3SKgS7rR87p9qtN1Pkp_T_DNi5TPd3gm8ukq6CgNId7XXJ5O2nvZn8aJbK7VZAmRJkFEC6TUA3DlPruj5VIHQILGWVV82rWP6D85Rw_sv-3CdBgNsRxY_StPPIx_DWGnWFv9jEKpihMAZOx33AM1ON1Nzc3uA9trGRhFv33DbnlV4vFIcxA0wrS8Vjo1Kkwta5r9hv3ClV5tkbHXCgeHcCzqzJdBlDh3HJGnTBJlubBeG6Y3V7qOUA"/>
+</div>
+<div class="p-3 flex flex-col flex-1 gap-2">
+<div class="flex justify-between items-start">
+<div>
+<p class="text-[10px] font-bold text-text-muted uppercase tracking-wider mb-0.5">RaceFace</p>
+<h3 class="text-sm font-bold text-white leading-tight line-clamp-2">Next R Carbon Crankset</h3>
+</div>
+</div>
+<div class="flex items-center gap-2 mt-1">
+<span class="text-xs font-mono text-text-muted">SKU: CK-NEXT-R</span>
+</div>
+<div class="mt-auto pt-3 flex items-end justify-between border-t border-border-dark border-dashed">
+<div class="flex flex-col">
+<span class="text-[10px] text-text-muted mb-0.5">Wholesale Price</span>
+<span class="text-base font-bold font-mono text-primary">¥38,000</span>
+</div>
+<div class="flex flex-col items-end">
+<div class="flex items-center gap-1.5 mb-1">
+<div class="size-2 rounded-full bg-emerald-500"></div>
+<span class="text-[10px] font-bold text-emerald-500 uppercase">In Stock (8)</span>
+</div>
+</div>
+</div>
+</div>
+<div class="bg-surface-highlight p-2 flex items-center gap-2 border-t border-border-dark">
+<div class="flex items-center bg-background-dark border border-border-dark h-8">
+<button class="w-7 h-full text-text-muted hover:text-white hover:bg-white/5 flex items-center justify-center transition-colors">
+<span class="material-symbols-outlined text-[16px]">remove</span>
+</button>
+<input class="w-10 h-full bg-transparent border-0 text-center text-xs font-mono text-white focus:ring-0 p-0" type="number" value="2"/>
+<button class="w-7 h-full text-text-muted hover:text-white hover:bg-white/5 flex items-center justify-center transition-colors">
+<span class="material-symbols-outlined text-[16px]">add</span>
+</button>
+</div>
+<button class="flex-1 h-8 bg-primary border border-primary text-background-dark hover:bg-primary/90 text-xs font-bold uppercase tracking-wider transition-all flex items-center justify-center gap-1 group/btn">
+<span>Added</span>
+<span class="material-symbols-outlined text-[16px]">check</span>
+</button>
+</div>
+</div>
+<!-- Product Card 5 -->
+<div class="group relative flex flex-col bg-surface border border-border-dark hover:border-primary transition-colors duration-200 ring-1 ring-primary">
+<div class="absolute top-2 left-2 z-10">
+<input checked="" class="size-4 border-border-dark bg-background-dark/80 text-primary focus:ring-0 focus:ring-offset-0 cursor-pointer" type="checkbox"/>
+</div>
+<div class="relative w-full aspect-[4/3] bg-[#151517] overflow-hidden flex items-center justify-center border-b border-border-dark">
+<div class="absolute inset-0 opacity-[0.03]" style="background-image: url('data:image/svg+xml,%3Csvg width=\'6\' height=\'6\' viewBox=\'0 0 6 6\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'%23ffffff\' fill-opacity=\'1\' fill-rule=\'evenodd\'%3E%3Cpath d=\'M5 0h1L0 6V5zM6 5v1H5z\'/%3E%3C/g%3E%3C/svg%3E');"></div>
+<img class="relative z-10 w-3/4 h-3/4 object-contain group-hover:scale-105 transition-transform duration-300" data-alt="Bicycle disc brake rotor" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAhWhnqEuLKn0z82k19BrtVHpE9G9_3TchqEBv-AJi_YMXCgfUulQbemR_D6KdYo3PNYir8lMXPyTcr_pbpyi4INAe7b7fV6qQQaoxQyxOLDAawMKhwpLsCtBPXAtmC_N4q-7cZQa3sg7L5d_7mhquy_GU1rs1bAPmZlcNdSvfLBlKGXGDsFVzYUU7YY9-TVHStg6tcBPZg_BbZ99pobz4ggJ7lbY0bcYklJ5U6_wETUX9-a9PuJdN60b4EmfaaehvkGcoB0sXukw"/>
+</div>
+<div class="p-3 flex flex-col flex-1 gap-2">
+<div class="flex justify-between items-start">
+<div>
+<p class="text-[10px] font-bold text-text-muted uppercase tracking-wider mb-0.5">Magura</p>
+<h3 class="text-sm font-bold text-white leading-tight line-clamp-2">Storm HC Rotor 203mm</h3>
+</div>
+</div>
+<div class="flex items-center gap-2 mt-1">
+<span class="text-xs font-mono text-text-muted">SKU: MG-RTR-203</span>
+</div>
+<div class="mt-auto pt-3 flex items-end justify-between border-t border-border-dark border-dashed">
+<div class="flex flex-col">
+<span class="text-[10px] text-text-muted mb-0.5">Wholesale Price</span>
+<span class="text-base font-bold font-mono text-primary">¥4,200</span>
+</div>
+<div class="flex flex-col items-end">
+<div class="flex items-center gap-1.5 mb-1">
+<div class="size-2 rounded-full bg-emerald-500"></div>
+<span class="text-[10px] font-bold text-emerald-500 uppercase">In Stock (50+)</span>
+</div>
+</div>
+</div>
+</div>
+<div class="bg-surface-highlight p-2 flex items-center gap-2 border-t border-border-dark">
+<div class="flex items-center bg-background-dark border border-border-dark h-8">
+<button class="w-7 h-full text-text-muted hover:text-white hover:bg-white/5 flex items-center justify-center transition-colors">
+<span class="material-symbols-outlined text-[16px]">remove</span>
+</button>
+<input class="w-10 h-full bg-transparent border-0 text-center text-xs font-mono text-white focus:ring-0 p-0" type="number" value="5"/>
+<button class="w-7 h-full text-text-muted hover:text-white hover:bg-white/5 flex items-center justify-center transition-colors">
+<span class="material-symbols-outlined text-[16px]">add</span>
+</button>
+</div>
+<button class="flex-1 h-8 bg-primary border border-primary text-background-dark hover:bg-primary/90 text-xs font-bold uppercase tracking-wider transition-all flex items-center justify-center gap-1 group/btn">
+<span>Added</span>
+<span class="material-symbols-outlined text-[16px]">check</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Bulk Action Bar -->
+<div class="absolute bottom-6 left-1/2 -translate-x-1/2 w-auto min-w-[400px] z-40 animate-slide-up">
+<div class="bg-[#252528] border border-primary/30 shadow-[0_4px_24px_rgba(0,0,0,0.4)] flex items-center justify-between p-2 pl-6 rounded-none backdrop-blur-sm">
+<div class="flex items-center gap-4">
+<span class="text-white font-bold text-sm tracking-wide">3 items selected</span>
+<div class="h-4 w-px bg-border-dark"></div>
+<span class="text-primary font-mono text-sm">Total: ¥84,200</span>
+</div>
+<div class="flex items-center gap-2">
+<button class="h-9 px-4 text-text-muted hover:text-white text-xs font-bold uppercase tracking-wider transition-colors border-r border-border-dark mr-2">
+                            Clear
+                        </button>
+<button class="h-9 px-6 bg-primary text-background-dark text-sm font-bold uppercase tracking-wider hover:bg-white transition-colors flex items-center gap-2 shadow-[0_0_10px_rgba(242,201,76,0.2)]">
+<span class="material-symbols-outlined text-[18px]">shopping_cart</span>
+                            Add to Cart
+                        </button>
+</div>
+</div>
+</div>
+<!-- Background Grid Lines -->
+<div class="absolute inset-0 pointer-events-none z-0 bg-[linear-gradient(rgba(51,51,54,0.3)_1px,transparent_1px),linear-gradient(90deg,rgba(51,51,54,0.3)_1px,transparent_1px)] bg-[size:40px_40px] opacity-20"></div>
+</main>
+</div>
+<!-- Import Modal Overlay -->
+<div class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-background-dark/80 backdrop-blur-sm">
+<!-- Modal Container -->
+<div class="w-full max-w-lg bg-surface border border-border-dark shadow-2xl flex flex-col">
+<!-- Modal Header -->
+<div class="p-6 border-b border-border-dark flex items-center justify-between">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary text-[24px]">file_upload</span>
+<h3 class="text-lg font-bold text-white uppercase tracking-tight">製品インポート</h3>
+</div>
+<button class="text-text-muted hover:text-white transition-colors">
+<span class="material-symbols-outlined">close</span>
+</button>
+</div>
+<!-- Modal Body -->
+<div class="p-8 space-y-6">
+<p class="text-sm text-text-muted">一括登録用のファイルをアップロードしてください。既存の製品データはSKUを基準に更新されます。</p>
+<!-- Upload Area -->
+<div class="border-2 border-dashed border-border-dark hover:border-primary transition-colors bg-background-dark/50 group cursor-pointer p-10 flex flex-col items-center justify-center gap-4 text-center">
+<span class="material-symbols-outlined text-[48px] text-text-muted group-hover:text-primary transition-colors">cloud_upload</span>
+<div>
+<p class="text-white font-bold">ファイルをドラッグ＆ドロップ</p>
+<p class="text-xs text-text-muted mt-1">または <span class="text-primary underline decoration-dotted">コンピュータから選択</span></p>
+</div>
+</div>
+<!-- Support Info -->
+<div class="flex items-center gap-4 text-xs font-mono">
+<span class="text-text-muted uppercase">Supported formats:</span>
+<span class="px-2 py-0.5 bg-surface-highlight border border-border-dark text-white">CSV</span>
+<span class="px-2 py-0.5 bg-surface-highlight border border-border-dark text-white">XLSX</span>
+</div>
+</div>
+<!-- Modal Footer -->
+<div class="p-6 bg-surface-highlight border-t border-border-dark flex justify-end gap-3">
+<button class="px-6 py-2 text-text-muted hover:text-white text-sm font-bold uppercase tracking-wider transition-colors">キャンセル</button>
+<button class="px-8 py-2 bg-primary text-background-dark hover:bg-white text-sm font-bold uppercase tracking-wider transition-colors shadow-[0_0_15px_rgba(242,201,76,0.3)]">
+                インポート開始
+            </button>
+</div>
+</div>
+</div></body></html>

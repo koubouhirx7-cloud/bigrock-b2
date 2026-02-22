@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="ja"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Database Schema - Big Rock B2B Procurement Hub</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&amp;family=Noto+Sans+JP:wght@300;500;700&amp;display=swap" rel="stylesheet"/>
+<script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            industrial: {
+              bg: '#111113',
+              gold: '#F2C94C',
+              grid: 'rgba(242, 201, 76, 0.05)',
+              border: '#2A2A2E',
+              muted: '#8E8E93'
+            }
+          },
+          fontFamily: {
+            mono: ['"JetBrains Mono"', 'monospace'],
+            sans: ['"Noto Sans JP"', 'sans-serif']
+          }
+        }
+      }
+    }
+  </script>
+<style data-purpose="industrial-grid">
+    body {
+      background-color: #111113;
+      background-image: 
+        linear-gradient(to right, rgba(242, 201, 76, 0.05) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(242, 201, 76, 0.05) 1px, transparent 1px);
+      background-size: 40px 40px;
+    }
+    .entity-box {
+      border: 1px solid #F2C94C;
+      background: rgba(17, 17, 19, 0.95);
+      box-shadow: 4px 4px 0px rgba(242, 201, 76, 0.2);
+    }
+    .line-vertical {
+      border-left: 2px dashed #F2C94C;
+      opacity: 0.3;
+    }
+    .line-horizontal {
+      border-top: 2px dashed #F2C94C;
+      opacity: 0.3;
+    }
+  </style>
+</head>
+<body class="font-sans text-white p-8 md:p-12 lg:p-20">
+<!-- BEGIN: Header -->
+<header class="mb-12 border-l-4 border-[#F2C94C] pl-6 py-2" data-purpose="document-title">
+<h1 class="text-3xl font-bold tracking-tighter uppercase mb-1">
+      データベース設計書 <span class="text-industrial-gold text-xl block md:inline md:ml-4 font-normal">(Database Schema Design)</span>
+</h1>
+<p class="font-mono text-industrial-muted text-sm uppercase tracking-widest">
+      Project: Big Rock B2B Procurement Hub // System Blueprint v1.0.4
+    </p>
+</header>
+<!-- END: Header -->
+<!-- BEGIN: Main Schema Container -->
+<main class="relative grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12 max-w-7xl mx-auto" data-purpose="diagram-canvas">
+<!-- BEGIN: Table - Users -->
+<section class="entity-box p-0 flex flex-col" data-purpose="table-definition">
+<div class="bg-industrial-gold text-industrial-bg px-4 py-2 font-bold font-mono text-sm flex justify-between items-center">
+<span>users</span>
+<span class="text-[10px] opacity-70">PK: id</span>
+</div>
+<div class="p-4 font-mono text-sm space-y-2">
+<div class="flex justify-between border-b border-industrial-border pb-1">
+<span class="text-industrial-gold">id</span>
+<span class="text-industrial-muted italic">uuid</span>
+</div>
+<div class="flex justify-between border-b border-industrial-border pb-1">
+<span>email</span>
+<span class="text-industrial-muted italic">varchar</span>
+</div>
+<div class="flex justify-between border-b border-industrial-border pb-1">
+<span>role</span>
+<span class="text-industrial-muted italic">enum</span>
+</div>
+<div class="flex justify-between">
+<span class="text-industrial-gold">company_id</span>
+<span class="text-industrial-muted italic">fk(companies)</span>
+</div>
+</div>
+</section>
+<!-- END: Table - Users -->
+<!-- BEGIN: Table - Companies -->
+<section class="entity-box p-0 flex flex-col" data-purpose="table-definition">
+<div class="bg-industrial-gold text-industrial-bg px-4 py-2 font-bold font-mono text-sm flex justify-between items-center">
+<span>companies</span>
+<span class="text-[10px] opacity-70">PK: id</span>
+</div>
+<div class="p-4 font-mono text-sm space-y-2">
+<div class="flex justify-between border-b border-industrial-border pb-1">
+<span class="text-industrial-gold">id</span>
+<span class="text-industrial-muted italic">uuid</span>
+</div>
+<div class="flex justify-between border-b border-industrial-border pb-1">
+<span>name</span>
+<span class="text-industrial-muted italic">varchar</span>
+</div>
+<div class="flex justify-between border-b border-industrial-border pb-1">
+<span>address</span>
+<span class="text-industrial-muted italic">text</span>
+</div>
+<div class="flex justify-between">
+<span>budget_limit</span>
+<span class="text-industrial-muted italic">decimal</span>
+</div>
+</div>
+</section>
+<!-- END: Table - Companies -->
+<!-- BEGIN: Table - Products -->
+<section class="entity-box p-0 flex flex-col" data-purpose="table-definition">
+<div class="bg-industrial-gold text-industrial-bg px-4 py-2 font-bold font-mono text-sm flex justify-between items-center">
+<span>products</span>
+<span class="text-[10px] opacity-70">PK: id</span>
+</div>
+<div class="p-4 font-mono text-sm space-y-2">
+<div class="flex justify-between border-b border-industrial-border pb-1">
+<span class="text-industrial-gold">id</span>
+<span class="text-industrial-muted italic">uuid</span>
+</div>
+<div class="flex justify-between border-b border-industrial-border pb-1">
+<span>sku</span>
+<span class="text-industrial-muted italic">varchar(UNIQUE)</span>
+</div>
+<div class="flex justify-between border-b border-industrial-border pb-1">
+<span>name</span>
+<span class="text-industrial-muted italic">varchar</span>
+</div>
+<div class="flex justify-between border-b border-industrial-border pb-1">
+<span>brand</span>
+<span class="text-industrial-muted italic">varchar</span>
+</div>
+<div class="flex justify-between border-b border-industrial-border pb-1">
+<span>category</span>
+<span class="text-industrial-muted italic">varchar</span>
+</div>
+<div class="flex justify-between border-b border-industrial-border pb-1">
+<span>base_price</span>
+<span class="text-industrial-muted italic">decimal</span>
+</div>
+<div class="flex justify-between">
+<span>stock_level</span>
+<span class="text-industrial-muted italic">integer</span>
+</div>
+</div>
+</section>
+<!-- END: Table - Products -->
+<!-- BEGIN: Table - Price Tiers -->
+<section class="entity-box p-0 flex flex-col" data-purpose="table-definition">
+<div class="bg-industrial-gold text-industrial-bg px-4 py-2 font-bold font-mono text-sm flex justify-between items-center">
+<span>price_tiers</span>
+<span class="text-[10px] opacity-70">PK: id</span>
+</div>
+<div class="p-4 font-mono text-sm space-y-2">
+<div class="flex justify-between border-b border-industrial-border pb-1">
+<span class="text-industrial-gold">id</span>
+<span class="text-industrial-muted italic">uuid</span>
+</div>
+<div class="flex justify-between border-b border-industrial-border pb-1">
+<span class="text-industrial-gold">product_id</span>
+<span class="text-industrial-muted italic">fk(products)</span>
+</div>
+<div class="flex justify-between border-b border-industrial-border pb-1">
+<span>min_qty</span>
+<span class="text-industrial-muted italic">integer</span>
+</div>
+<div class="flex justify-between">
+<span>discount_price</span>
+<span class="text-industrial-muted italic">decimal</span>
+</div>
+</div>
+</section>
+<!-- END: Table - Price Tiers -->
+<!-- BEGIN: Table - Orders -->
+<section class="entity-box p-0 flex flex-col" data-purpose="table-definition">
+<div class="bg-industrial-gold text-industrial-bg px-4 py-2 font-bold font-mono text-sm flex justify-between items-center">
+<span>orders</span>
+<span class="text-[10px] opacity-70">PK: id</span>
+</div>
+<div class="p-4 font-mono text-sm space-y-2">
+<div class="flex justify-between border-b border-industrial-border pb-1">
+<span class="text-industrial-gold">id</span>
+<span class="text-industrial-muted italic">uuid</span>
+</div>
+<div class="flex justify-between border-b border-industrial-border pb-1">
+<span class="text-industrial-gold">user_id</span>
+<span class="text-industrial-muted italic">fk(users)</span>
+</div>
+<div class="flex justify-between border-b border-industrial-border pb-1">
+<span class="text-industrial-gold">company_id</span>
+<span class="text-industrial-muted italic">fk(companies)</span>
+</div>
+<div class="flex justify-between border-b border-industrial-border pb-1">
+<span>status</span>
+<span class="text-industrial-muted italic">varchar</span>
+</div>
+<div class="flex justify-between border-b border-industrial-border pb-1">
+<span>total_amount</span>
+<span class="text-industrial-muted italic">decimal</span>
+</div>
+<div class="flex justify-between">
+<span>created_at</span>
+<span class="text-industrial-muted italic">timestamp</span>
+</div>
+</div>
+</section>
+<!-- END: Table - Orders -->
+<!-- BEGIN: Table - Order Items -->
+<section class="entity-box p-0 flex flex-col" data-purpose="table-definition">
+<div class="bg-industrial-gold text-industrial-bg px-4 py-2 font-bold font-mono text-sm flex justify-between items-center">
+<span>order_items</span>
+<span class="text-[10px] opacity-70">PK: id</span>
+</div>
+<div class="p-4 font-mono text-sm space-y-2">
+<div class="flex justify-between border-b border-industrial-border pb-1">
+<span class="text-industrial-gold">id</span>
+<span class="text-industrial-muted italic">uuid</span>
+</div>
+<div class="flex justify-between border-b border-industrial-border pb-1">
+<span class="text-industrial-gold">order_id</span>
+<span class="text-industrial-muted italic">fk(orders)</span>
+</div>
+<div class="flex justify-between border-b border-industrial-border pb-1">
+<span class="text-industrial-gold">product_id</span>
+<span class="text-industrial-muted italic">fk(products)</span>
+</div>
+<div class="flex justify-between border-b border-industrial-border pb-1">
+<span>quantity</span>
+<span class="text-industrial-muted italic">integer</span>
+</div>
+<div class="flex justify-between">
+<span>unit_price</span>
+<span class="text-industrial-muted italic">decimal</span>
+</div>
+</div>
+</section>
+<!-- END: Table - Order Items -->
+</main>
+<!-- END: Main Schema Container -->
+<!-- BEGIN: Footer Legend -->
+<footer class="mt-20 border-t border-industrial-border pt-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-6" data-purpose="technical-metadata">
+<div class="font-mono text-[10px] space-y-1 opacity-60">
+<p>REF_ID: BR-HUB-SCHEMA-001</p>
+<p>EXPORT_DATE: 2023.10.27_09:00:00_JST</p>
+<p>ENCODING: UTF-8 / SQL_ANSI</p>
+</div>
+<div class="flex items-center gap-6">
+<div class="flex items-center gap-2">
+<div class="w-3 h-3 bg-industrial-gold"></div>
+<span class="text-xs font-mono uppercase tracking-widest text-industrial-gold">Primary / Foreign Key</span>
+</div>
+<div class="flex items-center gap-2">
+<div class="w-3 h-3 border border-industrial-border"></div>
+<span class="text-xs font-mono uppercase tracking-widest text-industrial-muted">Attribute</span>
+</div>
+</div>
+</footer>
+<!-- END: Footer Legend -->
+</body></html>

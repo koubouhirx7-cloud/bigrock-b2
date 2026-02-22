@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>API Endpoint Specifications - Big Rock B2B Procurement Hub</title>
+<!-- Tailwind CSS v3 CDN -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Google Fonts: Inter and JetBrains Mono -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;family=JetBrains+Mono:wght@400;600&amp;display=swap" rel="stylesheet"/>
+<script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            'industrial-bg': '#111113',
+            'industrial-surface': '#1E1E21',
+            'industrial-accent': '#F2C94C',
+            'industrial-border': '#333336',
+          },
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          },
+        }
+      }
+    }
+  </script>
+<style data-purpose="custom-grid-background">
+    body {
+      background-color: #111113;
+      background-image: 
+        linear-gradient(rgba(242, 201, 76, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(242, 201, 76, 0.03) 1px, transparent 1px);
+      background-size: 20px 20px;
+    }
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 6px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: #111113;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: #333336;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+      background: #F2C94C;
+    }
+  </style>
+<style data-purpose="typography">
+    .method-badge {
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 700;
+      padding: 2px 8px;
+      font-size: 0.75rem;
+    }
+    .code-block {
+      font-family: 'JetBrains Mono', monospace;
+      background: #0D0D0F;
+      border-left: 2px solid #F2C94C;
+    }
+  </style>
+</head>
+<body class="text-gray-300 font-sans min-h-screen">
+<!-- BEGIN: MainHeader -->
+<header class="border-b border-industrial-border bg-industrial-bg sticky top-0 z-50 px-6 py-4 flex justify-between items-center" data-purpose="page-header">
+<div class="flex flex-col">
+<h1 class="text-industrial-accent font-mono text-xl font-bold tracking-tighter">
+        APIエンドポイント定義書 <span class="text-gray-500 font-normal">(API ENDPOINT SPECIFICATIONS)</span>
+</h1>
+<p class="text-xs text-gray-500 mt-1 uppercase tracking-widest">Big Rock B2B Procurement Hub</p>
+</div>
+<div class="flex items-center space-x-4">
+<div class="flex items-center space-x-2 bg-industrial-surface px-3 py-1 border border-industrial-border" data-purpose="system-status">
+<span class="w-2 h-2 bg-industrial-accent rounded-full animate-pulse"></span>
+<span class="text-[10px] font-mono text-industrial-accent">API: DOCUMENTATION ONLY</span>
+</div>
+</div>
+</header>
+<!-- END: MainHeader -->
+<main class="max-w-7xl mx-auto p-6 lg:p-10">
+<!-- BEGIN: MetadataSection -->
+<section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-10" data-purpose="api-metadata">
+<div class="bg-industrial-surface p-4 border border-industrial-border">
+<label class="block text-[10px] text-gray-500 uppercase font-mono mb-1">Project Name</label>
+<div class="text-sm font-semibold">Big Rock B2B Platform</div>
+</div>
+<div class="bg-industrial-surface p-4 border border-industrial-border">
+<label class="block text-[10px] text-gray-500 uppercase font-mono mb-1">Version</label>
+<div class="text-sm font-semibold font-mono">v1.0.4</div>
+</div>
+<div class="bg-industrial-surface p-4 border border-industrial-border">
+<label class="block text-[10px] text-gray-500 uppercase font-mono mb-1">Base URL</label>
+<div class="text-sm font-semibold font-mono text-industrial-accent">https://api.bigrock-b2b.com/v1</div>
+</div>
+<div class="bg-industrial-surface p-4 border border-industrial-border">
+<label class="block text-[10px] text-gray-500 uppercase font-mono mb-1">Authentication</label>
+<div class="text-sm font-semibold">Bearer Token / OAuth2</div>
+</div>
+</section>
+<!-- END: MetadataSection -->
+<div class="flex flex-col space-y-12">
+<!-- BEGIN: AuthSection -->
+<section data-purpose="auth-endpoints" id="section-auth">
+<div class="flex items-center space-x-3 mb-6 border-l-4 border-industrial-accent pl-4">
+<h2 class="text-lg font-bold font-mono tracking-tight uppercase">01. AUTH</h2>
+<span class="text-xs text-gray-600 font-mono">Authentication &amp; Session Management</span>
+</div>
+<div class="space-y-6">
+<!-- Endpoint Item -->
+<div class="bg-industrial-surface border border-industrial-border p-6" data-purpose="endpoint-card">
+<div class="flex items-start justify-between mb-4">
+<div class="flex items-center space-x-3">
+<span class="method-badge bg-blue-900/40 text-blue-400 border border-blue-500/50">GET</span>
+<span class="font-mono text-industrial-accent font-semibold">/auth/google</span>
+</div>
+<span class="text-[10px] text-gray-500 font-mono uppercase">Internal / External</span>
+</div>
+<p class="text-sm text-gray-400 mb-4">Redirects user to Google OAuth flow for authentication.</p>
+<div class="code-block p-4 text-xs overflow-x-auto custom-scrollbar">
+<pre class="text-industrial-accent">RESPONSE: 302 REDIRECT</pre>
+<pre class="mt-2 text-gray-500">// Header: Location: https://accounts.google.com/o/oauth2/v2/...</pre>
+</div>
+</div>
+<!-- Endpoint Item -->
+<div class="bg-industrial-surface border border-industrial-border p-6" data-purpose="endpoint-card">
+<div class="flex items-start justify-between mb-4">
+<div class="flex items-center space-x-3">
+<span class="method-badge bg-blue-900/40 text-blue-400 border border-blue-500/50">GET</span>
+<span class="font-mono text-industrial-accent font-semibold">/auth/session</span>
+</div>
+</div>
+<p class="text-sm text-gray-400 mb-4">Validates current session and returns active user context.</p>
+<div class="code-block p-4 text-xs overflow-x-auto custom-scrollbar">
+<pre class="text-gray-400">{
+  "status": "success",
+  "data": {
+    "user_id": "usr_9921",
+    "role": "procurement_manager",
+    "expires_at": "2023-12-31T23:59:59Z"
+  }
+}</pre>
+</div>
+</div>
+</div>
+</section>
+<!-- END: AuthSection -->
+<!-- BEGIN: ProductsSection -->
+<section data-purpose="products-endpoints" id="section-products">
+<div class="flex items-center space-x-3 mb-6 border-l-4 border-industrial-accent pl-4">
+<h2 class="text-lg font-bold font-mono tracking-tight uppercase">02. PRODUCTS</h2>
+<span class="text-xs text-gray-600 font-mono">Catalog &amp; Pricing</span>
+</div>
+<div class="space-y-6">
+<!-- Endpoint Item -->
+<div class="bg-industrial-surface border border-industrial-border p-6" data-purpose="endpoint-card">
+<div class="flex items-start justify-between mb-4">
+<div class="flex items-center space-x-3">
+<span class="method-badge bg-blue-900/40 text-blue-400 border border-blue-500/50">GET</span>
+<span class="font-mono text-industrial-accent font-semibold">/products</span>
+</div>
+</div>
+<p class="text-sm text-gray-400 mb-4">Retrieve list of products with optional query parameters: category, manufacturer, and search.</p>
+<div class="code-block p-4 text-xs overflow-x-auto custom-scrollbar">
+<pre class="text-gray-400">{
+  "count": 1204,
+  "results": [
+    { "id": "BR-101", "name": "Heavy Duty Winch", "stock": 45 },
+    { "id": "BR-102", "name": "Titanium Alloy Bolt", "stock": 1200 }
+  ]
+}</pre>
+</div>
+</div>
+<!-- Endpoint Item -->
+<div class="bg-industrial-surface border border-industrial-border p-6" data-purpose="endpoint-card">
+<div class="flex items-start justify-between mb-4">
+<div class="flex items-center space-x-3">
+<span class="method-badge bg-blue-900/40 text-blue-400 border border-blue-500/50">GET</span>
+<span class="font-mono text-industrial-accent font-semibold">/products/{id}</span>
+</div>
+</div>
+<p class="text-sm text-gray-400 mb-4">Retrieve full product details including technical specs and volume-based price tiers.</p>
+<div class="code-block p-4 text-xs overflow-x-auto custom-scrollbar">
+<pre class="text-gray-400">{
+  "id": "BR-101",
+  "price_tiers": [
+    { "min_qty": 1, "price": 450.00 },
+    { "min_qty": 10, "price": 415.00 },
+    { "min_qty": 50, "price": 380.00 }
+  ]
+}</pre>
+</div>
+</div>
+</div>
+</section>
+<!-- END: ProductsSection -->
+<!-- BEGIN: OrdersSection -->
+<section data-purpose="orders-endpoints" id="section-orders">
+<div class="flex items-center space-x-3 mb-6 border-l-4 border-industrial-accent pl-4">
+<h2 class="text-lg font-bold font-mono tracking-tight uppercase">03. ORDERS</h2>
+<span class="text-xs text-gray-600 font-mono">Order Management &amp; Lifecycle</span>
+</div>
+<div class="grid grid-cols-1 gap-6">
+<!-- Endpoint Item -->
+<div class="bg-industrial-surface border border-industrial-border p-6">
+<div class="flex items-center space-x-3 mb-4">
+<span class="method-badge bg-green-900/40 text-green-400 border border-green-500/50">POST</span>
+<span class="font-mono text-industrial-accent font-semibold">/orders</span>
+</div>
+<p class="text-sm text-gray-400 mb-4">Create a new procurement order. Validates against current budget limits.</p>
+<div class="code-block p-4 text-xs overflow-x-auto custom-scrollbar">
+<pre class="text-gray-500">// REQUEST BODY</pre>
+<pre class="text-gray-400">{
+  "items": [{ "product_id": "BR-101", "quantity": 5 }],
+  "shipping_id": "addr_99"
+}</pre>
+</div>
+</div>
+<!-- Endpoint Item -->
+<div class="bg-industrial-surface border border-industrial-border p-6">
+<div class="flex items-center space-x-3 mb-4">
+<span class="method-badge bg-green-900/40 text-green-400 border border-green-500/50">POST</span>
+<span class="font-mono text-industrial-accent font-semibold">/orders/{id}/reorder</span>
+</div>
+<p class="text-sm text-gray-400 mb-4">Duplicate a previous order with current pricing and availability.</p>
+</div>
+</div>
+</section>
+<!-- END: OrdersSection -->
+<!-- BEGIN: ImportSection -->
+<section data-purpose="import-endpoints" id="section-import">
+<div class="flex items-center space-x-3 mb-6 border-l-4 border-industrial-accent pl-4">
+<h2 class="text-lg font-bold font-mono tracking-tight uppercase">04. IMPORT</h2>
+<span class="text-xs text-gray-600 font-mono">Bulk Data Ingestion</span>
+</div>
+<div class="bg-industrial-surface border border-industrial-border p-6">
+<div class="flex items-center space-x-3 mb-4">
+<span class="method-badge bg-green-900/40 text-green-400 border border-green-500/50">POST</span>
+<span class="font-mono text-industrial-accent font-semibold">/import/csv</span>
+</div>
+<p class="text-sm text-gray-400 mb-4">Multipart file upload for bulk order creation or inventory updates.</p>
+<div class="bg-black/40 p-3 font-mono text-[10px] text-yellow-500/70 border border-yellow-500/20">
+            NOTE: MAX FILE SIZE 50MB. SUPPORTED FORMATS: .CSV, .XLSX
+          </div>
+</div>
+</section>
+<!-- END: ImportSection -->
+<!-- BEGIN: BudgetSection -->
+<section class="pb-20" data-purpose="budget-endpoints" id="section-budget">
+<div class="flex items-center space-x-3 mb-6 border-l-4 border-industrial-accent pl-4">
+<h2 class="text-lg font-bold font-mono tracking-tight uppercase">05. BUDGET</h2>
+<span class="text-xs text-gray-600 font-mono">Financial Controls</span>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+<div class="bg-industrial-surface border border-industrial-border p-6">
+<div class="flex items-center space-x-3 mb-4">
+<span class="method-badge bg-blue-900/40 text-blue-400 border border-blue-500/50">GET</span>
+<span class="font-mono text-industrial-accent font-semibold">/budget/status</span>
+</div>
+<p class="text-sm text-gray-400">Current fiscal period usage and remaining balance.</p>
+</div>
+<div class="bg-industrial-surface border border-industrial-border p-6">
+<div class="flex items-center space-x-3 mb-4">
+<span class="method-badge bg-orange-900/40 text-orange-400 border border-orange-500/50">PATCH</span>
+<span class="font-mono text-industrial-accent font-semibold">/budget/config</span>
+</div>
+<p class="text-sm text-gray-400">Update budget thresholds and approval workflow triggers.</p>
+</div>
+</div>
+</section>
+<!-- END: BudgetSection -->
+</div>
+</main>
+<!-- BEGIN: Footer -->
+<footer class="border-t border-industrial-border bg-industrial-bg px-6 py-8 text-center" data-purpose="footer">
+<div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center text-[10px] font-mono text-gray-600 uppercase tracking-widest">
+<div>© 2023 Big Rock Industrial Systems</div>
+<div class="mt-4 md:mt-0">SECURE ENDPOINT ENVIRONMENT | ENCRYPTED AT REST</div>
+<div class="mt-4 md:mt-0 flex space-x-4">
+<a class="hover:text-industrial-accent transition-colors" href="#">Documentation</a>
+<a class="hover:text-industrial-accent transition-colors" href="#">Support</a>
+<a class="hover:text-industrial-accent transition-colors" href="#">System Health</a>
+</div>
+</div>
+</footer>
+<!-- END: Footer -->
+</body></html>

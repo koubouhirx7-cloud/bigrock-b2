@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="ja"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Big Rock B2B - Settings &amp; Budget</title>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500;700&amp;family=Noto+Sans+JP:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Tailwind Config -->
+<script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#F2C94C",
+                        "background-dark": "#111113",
+                        "surface": "#1E1E21",
+                        "surface-highlight": "#252528",
+                        "text-main": "#EAEAEA",
+                        "text-muted": "#888888",
+                        "border-subtle": "#333336",
+                        "accent-red": "#EB5757",
+                    },
+                    fontFamily: {
+                        "sans": ['Noto Sans JP', 'Inter', 'sans-serif'],
+                        "mono": ['JetBrains Mono', 'monospace'],
+                    },
+                    borderRadius: {
+                        "none": "0px",
+                        "sm": "2px",
+                        "DEFAULT": "2px",
+                        "md": "4px",
+                    },
+                    spacing: {
+                        "18": "4.5rem",
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        /* Custom Scrollbar for Industrial Feel */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #111113; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #333336; 
+            border-radius: 0px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #F2C94C; 
+        }
+
+        /* Range Slider Customization */
+        input[type=range] {
+            -webkit-appearance: none; 
+            background: transparent; 
+        }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 20px;
+            width: 20px;
+            border-radius: 0px;
+            background: #F2C94C;
+            cursor: pointer;
+            margin-top: -8px; 
+            border: 2px solid #1E1E21;
+        }
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 4px;
+            cursor: pointer;
+            background: #333336;
+            border-radius: 0px;
+        }
+        input[type=range]:focus::-webkit-slider-thumb {
+            border-color: #EAEAEA;
+        }
+
+        /* Custom Toggle Switch */
+        .toggle-checkbox:checked {
+            right: 0;
+            border-color: #F2C94C;
+        }
+        .toggle-checkbox:checked + .toggle-label {
+            background-color: #F2C94C;
+        }
+        .toggle-checkbox:checked + .toggle-label:before {
+            transform: translateX(100%);
+        }
+    </style>
+</head>
+<body class="bg-background-dark text-text-main font-sans antialiased min-h-screen flex flex-col overflow-x-hidden selection:bg-primary selection:text-background-dark">
+<!-- Header -->
+<header class="h-16 border-b border-border-subtle bg-background-dark flex items-center justify-between px-6 sticky top-0 z-50">
+<div class="flex items-center gap-4">
+<div class="size-8 bg-primary flex items-center justify-center text-background-dark font-black tracking-tighter text-xl rounded-none">
+                BR
+            </div>
+<h1 class="text-text-main font-bold tracking-tight text-lg">BIG ROCK <span class="text-text-muted font-normal text-sm ml-2 font-mono">B2B DASHBOARD // V.2.4</span></h1>
+</div>
+<nav class="flex items-center gap-6">
+<button class="flex items-center gap-2 text-text-muted hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-[20px]">dashboard</span>
+<span class="text-sm font-medium">ダッシュボード</span>
+</button>
+<button class="flex items-center gap-2 text-text-muted hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-[20px]">inventory_2</span>
+<span class="text-sm font-medium">製品カタログ</span>
+</button>
+<button class="flex items-center gap-2 text-primary border-b-2 border-primary pb-[22px] translate-y-[11px]">
+<span class="material-symbols-outlined text-[20px]">settings</span>
+<span class="text-sm font-medium">設定・予算</span>
+</button>
+</nav>
+<div class="flex items-center gap-4">
+<div class="flex items-center gap-3 px-3 py-1.5 bg-surface border border-border-subtle">
+<span class="material-symbols-outlined text-primary text-[18px]">shopping_cart</span>
+<span class="font-mono text-sm text-primary">¥142,800</span>
+</div>
+<div class="size-8 bg-surface border border-border-subtle flex items-center justify-center hover:border-primary cursor-pointer transition-colors">
+<span class="material-symbols-outlined text-text-muted text-[20px]">notifications</span>
+</div>
+<div class="size-8 bg-surface border border-border-subtle flex items-center justify-center hover:border-primary cursor-pointer transition-colors">
+<span class="material-symbols-outlined text-text-muted text-[20px]">account_circle</span>
+</div>
+</div>
+</header>
+<!-- Main Content Layout -->
+<main class="flex-1 flex w-full max-w-[1440px] mx-auto">
+<!-- Sidebar Navigation -->
+<aside class="w-64 border-r border-border-subtle bg-background-dark pt-8 hidden md:block">
+<div class="px-6 mb-6">
+<h2 class="text-text-muted text-xs font-bold tracking-widest uppercase mb-1">Settings</h2>
+<div class="h-0.5 w-8 bg-primary"></div>
+</div>
+<nav class="flex flex-col">
+<a class="flex items-center gap-3 px-6 py-3 bg-surface border-l-2 border-primary text-text-main group transition-colors" href="#">
+<span class="material-symbols-outlined text-[20px] text-primary">credit_card</span>
+<span class="text-sm font-bold">予算・配送設定</span>
+</a>
+<a class="flex items-center gap-3 px-6 py-3 text-text-muted hover:bg-surface-highlight hover:text-text-main border-l-2 border-transparent transition-colors" href="#">
+<span class="material-symbols-outlined text-[20px]">person</span>
+<span class="text-sm font-medium">アカウント情報</span>
+</a>
+<a class="flex items-center gap-3 px-6 py-3 text-text-muted hover:bg-surface-highlight hover:text-text-main border-l-2 border-transparent transition-colors" href="#">
+<span class="material-symbols-outlined text-[20px]">notifications</span>
+<span class="text-sm font-medium">通知設定</span>
+</a>
+<a class="flex items-center gap-3 px-6 py-3 text-text-muted hover:bg-surface-highlight hover:text-text-main border-l-2 border-transparent transition-colors" href="#">
+<span class="material-symbols-outlined text-[20px]">security</span>
+<span class="text-sm font-medium">セキュリティ</span>
+</a>
+<a class="flex items-center gap-3 px-6 py-3 text-text-muted hover:bg-surface-highlight hover:text-text-main border-l-2 border-transparent transition-colors" href="#">
+<span class="material-symbols-outlined text-[20px]">history</span>
+<span class="text-sm font-medium">操作ログ</span>
+</a>
+</nav>
+</aside>
+<!-- Content Area -->
+<div class="flex-1 p-8 overflow-y-auto">
+<div class="max-w-4xl space-y-12">
+<!-- Header Section -->
+<div class="flex flex-col gap-2 border-b border-border-subtle pb-6">
+<h1 class="text-3xl font-bold tracking-tight text-white flex items-center gap-3">
+                        予算・配送設定
+                        <span class="px-2 py-0.5 bg-surface border border-border-subtle text-xs font-mono text-text-muted">ADMIN MODE</span>
+</h1>
+<p class="text-text-muted text-sm">月間の仕入れ予算の上限設定と、配送先住所の管理を行います。</p>
+</div>
+<!-- Budget Section -->
+<section class="space-y-6">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">payments</span>
+<h2 class="text-lg font-bold text-text-main">月間予算設定 (Monthly Budget)</h2>
+</div>
+<span class="text-xs text-text-muted font-mono">LAST UPDATED: 2023-10-24</span>
+</div>
+<div class="bg-surface border border-border-subtle p-6 grid md:grid-cols-[1fr_300px] gap-8 items-center">
+<div class="space-y-6">
+<div class="flex justify-between items-end">
+<label class="text-sm text-text-muted">当月の予算上限</label>
+<span class="text-xs text-primary font-mono">BUDGET UTILIZATION: 45%</span>
+</div>
+<div class="relative w-full h-12">
+<input class="w-full absolute top-1/2 -translate-y-1/2 z-20" max="5000000" min="0" step="10000" type="range" value="3500000"/>
+<div class="absolute top-1/2 -translate-y-1/2 w-full h-1 bg-border-subtle z-10">
+<div class="h-full bg-primary/20 w-[70%]"></div>
+</div>
+</div>
+<div class="flex justify-between text-xs font-mono text-text-muted">
+<span>¥0</span>
+<span>¥2,500,000</span>
+<span>¥5,000,000</span>
+</div>
+</div>
+<div class="bg-background-dark border border-border-subtle p-4 flex flex-col gap-2">
+<label class="text-xs text-text-muted font-mono uppercase">Current Cap</label>
+<div class="flex items-center gap-2 border-b border-primary pb-1">
+<span class="text-text-muted font-mono">¥</span>
+<input class="bg-transparent text-2xl font-mono font-bold text-text-main focus:outline-none w-full text-right" spellcheck="false" type="text" value="3,500,000"/>
+</div>
+<button class="mt-2 w-full bg-primary hover:bg-yellow-400 text-background-dark font-bold text-sm py-2 px-4 transition-colors">
+                                設定を保存
+                            </button>
+</div>
+</div>
+</section>
+<!-- Address Section -->
+<section class="space-y-6">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">local_shipping</span>
+<h2 class="text-lg font-bold text-text-main">配送先住所 (Shipping Addresses)</h2>
+</div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+<!-- Address Card 1 (Default) -->
+<div class="bg-surface border border-primary p-5 relative group hover:bg-surface-highlight transition-all">
+<div class="absolute top-0 right-0 bg-primary text-background-dark text-[10px] font-bold px-2 py-0.5 font-mono">DEFAULT</div>
+<div class="flex flex-col h-full justify-between gap-4">
+<div>
+<h3 class="font-bold text-text-main mb-1">本店 (Main Store)</h3>
+<p class="text-sm text-text-muted font-mono mb-2">ID: LOC-001</p>
+<address class="text-sm text-text-main not-italic leading-relaxed">
+                                        〒150-0001<br/>
+                                        東京都渋谷区神宮前<br/>
+                                        5-12-3 ビッグロックビル 1F<br/>
+                                        03-1234-5678
+                                    </address>
+</div>
+<div class="flex gap-2 pt-4 border-t border-border-subtle">
+<button class="flex-1 py-1.5 border border-border-subtle text-xs text-text-muted hover:text-primary hover:border-primary transition-colors">編集</button>
+<button class="flex-1 py-1.5 border border-border-subtle text-xs text-text-muted hover:text-accent-red hover:border-accent-red transition-colors">削除</button>
+</div>
+</div>
+</div>
+<!-- Address Card 2 -->
+<div class="bg-surface border border-border-subtle p-5 relative group hover:bg-surface-highlight transition-all">
+<div class="flex flex-col h-full justify-between gap-4">
+<div>
+<h3 class="font-bold text-text-main mb-1">軽井沢倉庫 (Warehouse)</h3>
+<p class="text-sm text-text-muted font-mono mb-2">ID: LOC-002</p>
+<address class="text-sm text-text-main not-italic leading-relaxed">
+                                        〒389-0102<br/>
+                                        長野県北佐久郡軽井沢町<br/>
+                                        1128-1 南地区ロジスティクスC棟<br/>
+                                        0267-45-9876
+                                    </address>
+</div>
+<div class="flex gap-2 pt-4 border-t border-border-subtle">
+<button class="flex-1 py-1.5 border border-border-subtle text-xs text-text-muted hover:text-primary hover:border-primary transition-colors">編集</button>
+<button class="flex-1 py-1.5 border border-border-subtle text-xs text-text-muted hover:text-accent-red hover:border-accent-red transition-colors">削除</button>
+</div>
+</div>
+</div>
+<!-- Add New Card -->
+<button class="border border-dashed border-border-subtle hover:border-primary hover:bg-surface/50 p-5 flex flex-col items-center justify-center gap-3 text-text-muted hover:text-primary transition-all min-h-[220px]">
+<span class="material-symbols-outlined text-4xl">add</span>
+<span class="text-sm font-bold">新規住所を追加</span>
+</button>
+</div>
+</section>
+<!-- Notifications Section -->
+<section class="space-y-6">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">notifications_active</span>
+<h2 class="text-lg font-bold text-text-main">通知設定 (Alerts)</h2>
+</div>
+</div>
+<div class="bg-surface border border-border-subtle divide-y divide-border-subtle">
+<!-- Toggle Item 1 -->
+<div class="p-4 flex items-center justify-between">
+<div class="flex flex-col">
+<span class="text-sm font-bold text-text-main">出荷・配送ステータス</span>
+<span class="text-xs text-text-muted">商品が出荷された際や、配送遅延が発生した場合に通知します。</span>
+</div>
+<label class="flex items-center cursor-pointer relative" for="toggle-ship">
+<input checked="" class="sr-only peer" id="toggle-ship" type="checkbox"/>
+<div class="w-11 h-6 bg-border-subtle peer-focus:outline-none peer-focus:ring-1 peer-focus:ring-primary dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-primary rounded-none after:rounded-none"></div>
+</label>
+</div>
+<!-- Toggle Item 2 -->
+<div class="p-4 flex items-center justify-between">
+<div class="flex flex-col">
+<span class="text-sm font-bold text-text-main">在庫アラート (Low Stock)</span>
+<span class="text-xs text-text-muted">お気に入り商品の在庫が残りわずかになった時に通知します。</span>
+</div>
+<label class="flex items-center cursor-pointer relative" for="toggle-stock">
+<input checked="" class="sr-only peer" id="toggle-stock" type="checkbox"/>
+<div class="w-11 h-6 bg-border-subtle peer-focus:outline-none peer-focus:ring-1 peer-focus:ring-primary dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-primary rounded-none after:rounded-none"></div>
+</label>
+</div>
+<!-- Toggle Item 3 -->
+<div class="p-4 flex items-center justify-between">
+<div class="flex flex-col">
+<span class="text-sm font-bold text-text-main">新商品・キャンペーン情報</span>
+<span class="text-xs text-text-muted">新しい取り扱いブランドや季節のキャンペーン情報を受け取る。</span>
+</div>
+<label class="flex items-center cursor-pointer relative" for="toggle-news">
+<input class="sr-only peer" id="toggle-news" type="checkbox"/>
+<div class="w-11 h-6 bg-border-subtle peer-focus:outline-none peer-focus:ring-1 peer-focus:ring-primary dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-primary rounded-none after:rounded-none"></div>
+</label>
+</div>
+</div>
+</section>
+<div class="pt-8 flex justify-end gap-4 border-t border-border-subtle">
+<button class="px-6 py-2 border border-border-subtle text-text-muted text-sm font-bold hover:text-text-main hover:border-text-main transition-colors">キャンセル</button>
+<button class="px-6 py-2 bg-primary text-background-dark text-sm font-bold hover:bg-yellow-400 transition-colors shadow-[0_0_10px_rgba(242,201,76,0.2)]">変更を保存する</button>
+</div>
+</div>
+</div>
+</main>
+</body></html>
