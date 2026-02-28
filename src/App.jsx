@@ -66,15 +66,25 @@ function App() {
       const data = await fetchProducts()
       if (data && data.length > 0) {
         // MicroCMS response mapped to our standard expected format
-        const formattedData = data.map(item => ({
-          id: item.sku || item.id,
-          name: item.title,
-          category: item.category ? item.category[0] || item.category : 'General',
-          price: item.basePrice || item.price || 0,
-          stock: item.stock || 0,
-          imageUrl: item.image?.url || '',
-          variants: item.variants || null
-        }))
+        const formattedData = data.map(item => {
+          let parsedVariants = null;
+          if (item.variants) {
+            try {
+              parsedVariants = typeof item.variants === 'string' ? JSON.parse(item.variants) : item.variants;
+            } catch (e) {
+              console.warn('Failed to parse variants for', item.title);
+            }
+          }
+          return {
+            id: item.sku || item.id,
+            name: item.title,
+            category: item.category ? item.category[0] || item.category : 'General',
+            price: item.basePrice || item.price || 0,
+            stock: item.stock || 0,
+            imageUrl: item.image?.url || '',
+            variants: parsedVariants
+          };
+        })
         setProducts(formattedData)
       }
     }

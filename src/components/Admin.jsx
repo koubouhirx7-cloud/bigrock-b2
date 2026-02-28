@@ -88,11 +88,15 @@ export default function Admin({ products, onExitAdmin }) {
                                         <React.Fragment key={p.id}>
                                             {p.variants ? (
                                                 p.variants.map((v, i) => (
-                                                    <tr key={`${p.id}-${v.id}`} className="border-b border-border-dark/50 hover:bg-white/5 transition-colors">
+                                                    <tr key={`${p.id}-${v.id || i}`} className="border-b border-border-dark/50 hover:bg-white/5 transition-colors">
                                                         <td className="p-4 font-bold text-white">
-                                                            {i === 0 ? p.name : <span className="text-text-muted ml-4">↳ {v.name}</span>}
+                                                            {i === 0 ? p.name : (
+                                                                <span className="text-text-muted ml-4">
+                                                                    ↳ {v.type === 'color' ? 'Color' : 'Size'}: {v.name}
+                                                                </span>
+                                                            )}
                                                         </td>
-                                                        <td className="p-4 font-mono text-text-muted text-xs">{p.id}-{v.id}</td>
+                                                        <td className="p-4 font-mono text-text-muted text-xs">{p.id}-{v.id || `V${i}`}</td>
                                                         <td className="p-4 text-text-muted">{i === 0 ? p.category : ''}</td>
                                                         <td className="p-4 text-right font-mono text-primary">¥{(v.price || p.price).toLocaleString()}</td>
                                                         <td className="p-4 text-right">
