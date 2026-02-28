@@ -1,11 +1,13 @@
-import { useState } from 'react'
-import productsData from './data/products.json'
+import { useState, useEffect } from 'react'
+import productsDataFromJson from './data/products.json'
 import Login from './components/Login'
 import Admin from './components/Admin'
+import { fetchProducts } from './services/microcms'
 
 function App() {
   const [appMode, setAppMode] = useState('login')
   const [activeTab, setActiveTab] = useState('dashboard')
+  const [products, setProducts] = useState(productsDataFromJson)
   const [selectedProduct, setSelectedProduct] = useState(null)
   const [cart, setCart] = useState([])
   const [orderHistory, setOrderHistory] = useState([
@@ -59,17 +61,37 @@ function App() {
     setActiveTab('history')
   }
 
+  useEffect(() => {
+    const loadProducts = async () => {
+      const data = await fetchProducts()
+      if (data && data.length > 0) {
+        // MicroCMS response mapped to our standard expected format
+        const formattedData = data.map(item => ({
+          id: item.sku || item.id,
+          name: item.title,
+          category: item.category ? item.category[0] || item.category : 'General',
+          price: item.basePrice || item.price || 0,
+          stock: item.stock || 0,
+          imageUrl: item.image?.url || '',
+          variants: item.variants || null
+        }))
+        setProducts(formattedData)
+      }
+    }
+    loadProducts()
+  }, [])
+
   // Example filtering for quick access categories if needed
-  const frames = productsData.filter(p => p.category === 'Frame')
-  const components = productsData.filter(p => p.category === 'Components')
-  const apparel = productsData.filter(p => p.category === 'Apparel')
+  const frames = products.filter(p => p.category === 'Frame')
+  const components = products.filter(p => p.category === 'Components')
+  const apparel = products.filter(p => p.category === 'Apparel')
 
   if (appMode === 'login') {
     return <Login onLogin={() => setAppMode('store')} />
   }
 
   if (appMode === 'admin') {
-    return <Admin products={productsData} onExitAdmin={() => setAppMode('store')} />
+    return <Admin products={products} onExitAdmin={() => setAppMode('store')} />
   }
 
   return (
@@ -319,7 +341,7 @@ function App() {
                             <p className="text-sm font-bold text-white">在庫切れ間近</p>
                             <p className="text-xs text-text-muted mt-1 leading-snug">BR-HND-V2<br />SKYLINE V2 Handlebar</p>
                             <div className="flex items-center gap-2 mt-2">
-                              <span className="text-[10px] font-mono text-accent-red">残り: {productsData.find(p => p.sku === 'BR-HND-V2')?.stock || 0} units</span>
+                              <span className="text-[10px] font-mono text-accent-red">残り: {products.find(p => p.sku === 'BR-HND-V2')?.stock || 0} units</span>
                             </div>
                           </div>
                         </div>
@@ -436,7 +458,7 @@ function App() {
             {/* --- CATALOG VIEW --- */}
             {activeTab === 'catalog' && (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                {productsData.map(product => (
+                {products.map(product => (
                   <div key={product.id} className="bg-surface border border-border-subtle rounded-sm flex flex-col group hover:border-primary/50 transition-colors overflow-hidden">
                     {/* Thumbnail Image */}
                     <div className="h-40 w-full bg-background-dark relative border-b border-border-subtle overflow-hidden">
