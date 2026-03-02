@@ -42,3 +42,25 @@ export const fetchProducts = async () => {
         return [];
     }
 };
+
+/**
+ * Create a new order in MicroCMS.
+ * @param {Object} orderData 
+ */
+export const createOrder = async (orderData) => {
+    if (!serviceDomain || !apiKey) {
+        console.warn("[MicroCMS] Missing API keys. Cannot create order.");
+        return null;
+    }
+
+    try {
+        const response = await client.create({
+            endpoint: 'orders',
+            content: orderData,
+        });
+        return response;
+    } catch (err) {
+        console.error("Error creating order in MicroCMS:", err);
+        throw err;
+    }
+};

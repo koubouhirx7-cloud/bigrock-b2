@@ -2,14 +2,18 @@ import { useState, useEffect } from 'react'
 import productsDataFromJson from './data/products.json'
 import Login from './components/Login'
 import Admin from './components/Admin'
-import { fetchProducts } from './services/microcms'
+import { fetchProducts, createOrder } from './services/microcms'
 
 function App() {
   const [appMode, setAppMode] = useState('login')
   const [activeTab, setActiveTab] = useState('dashboard')
   const [products, setProducts] = useState(productsDataFromJson)
   const [selectedProduct, setSelectedProduct] = useState(null)
-  const [cart, setCart] = useState([])
+  // Check localStorage for existing cart
+  const [cart, setCart] = useState(() => {
+    const savedCart = localStorage.getItem('bigrock_b2b_cart');
+    return savedCart ? JSON.parse(savedCart) : [];
+  });
   const [orderHistory, setOrderHistory] = useState([
     { id: 'ORD-3921', date: '2023/10/22', items: 3, total: 128000, status: '発送済' },
     { id: 'ORD-3920', date: '2023/10/20', items: 1, total: 45000, status: '完了' }
@@ -45,14 +49,33 @@ function App() {
   const getCartTotalQuantity = () => cart.reduce((total, item) => total + item.quantity, 0)
   const getCartTotalPrice = () => cart.reduce((total, item) => total + (item.price * item.quantity), 0)
 
-  const placeOrder = () => {
+  const placeOrder = async () => {
     if (cart.length === 0) return;
 
+    const orderIdValue = `ORD-${Math.floor(Math.random() * 10000) + 4000}`;
+    const totalQty = getCartTotalQuantity();
+    const finalTotal = Math.floor(getCartTotalPrice() * 1.1);
+
+    try {
+      await createOrder({
+        orderId: orderIdValue,
+        customerEmail: "b2b-client@example.com", // TODO: Replace with real user email when Auth is added
+        items: JSON.stringify(cart),
+        totalAmount: finalTotal,
+        status: "処理中"
+      });
+      console.log("Order successfully created in MicroCMS");
+    } catch (error) {
+      console.error("Failed to push order to MicroCMS", error);
+      alert("発注の送信に失敗しました。時間をおいてもう一度お試しください。");
+      return; // Stop if it fails
+    }
+
     const newOrder = {
-      id: `ORD-${Math.floor(Math.random() * 10000) + 4000}`,
+      id: orderIdValue,
       date: new Date().toLocaleDateString('ja-JP'),
-      items: getCartTotalQuantity(),
-      total: Math.floor(getCartTotalPrice() * 1.1),
+      items: totalQty,
+      total: finalTotal,
       status: '処理中'
     }
 
@@ -90,6 +113,11 @@ function App() {
     }
     loadProducts()
   }, [])
+
+  // Sync cart to localStorage whenever it changes
+  useEffect(() => {
+    localStorage.setItem('bigrock_b2b_cart', JSON.stringify(cart));
+  }, [cart]);
 
   // Example filtering for quick access categories if needed
   const frames = products.filter(p => p.category === 'Frame')
