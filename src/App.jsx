@@ -76,7 +76,7 @@ function App() {
             }
           }
           return {
-            id: item.sku || item.id,
+            id: item.skuproducts || item.sku || item.id,
             name: item.title,
             category: item.category ? item.category[0] || item.category : 'General',
             price: item.basePrice || item.price || 0,

@@ -13,7 +13,7 @@ const products = JSON.parse(fs.readFileSync(productsDataPath, 'utf8'));
 async function scrapeVariants() {
     console.log('Starting to scrape variants for products...');
 
-    const csvLines = ['title,sku,category,basePrice,stock,variants'];
+    const csvLines = ['contentId,title,variants,skuproducts,category,basePrice,stock,image'];
 
     for (const product of products) {
         if (!product.originalUrl) {
@@ -57,11 +57,17 @@ async function scrapeVariants() {
             // If no tables or colors found, fallback to original variants in products.json
             let finalVariants = scrapedVariants.length > 0 ? scrapedVariants : product.variants;
 
+            const safeId = product.id.replace(/[^a-zA-Z0-9_\-]/g, '');
             const safeName = product.name.replace(/"/g, '""');
+            const safeSku = (product.sku || '').replace(/"/g, '""');
             const safeCategory = (product.category || '').replace(/"/g, '""');
             const safeVariants = JSON.stringify(finalVariants || []).replace(/"/g, '""');
+            const safePrice = product.price || 0;
+            const safeStock = product.stock || 100;
+            const emptyImage = "";
 
-            csvLines.push(`"${safeName}","${product.id}","${safeCategory}",${product.price},${product.stock || 100},"${safeVariants}"`);
+            // CSV Order: id,title,variants,sku,category,basePrice,stock,image
+            csvLines.push(`"${safeId}","${safeName}","${safeVariants}","${safeSku}","${safeCategory}",${safePrice},${safeStock},"${emptyImage}"`);
 
         } catch (e) {
             console.error(`Error scraping ${product.name}:`, e.message);
