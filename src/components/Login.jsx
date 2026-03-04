@@ -1,6 +1,19 @@
 import React from 'react';
 
-export default function Login({ onLogin }) {
+import { useAuth } from '../context/AuthContext';
+
+export default function Login() {
+    const { loginWithGoogle } = useAuth();
+
+    const handleGoogleLogin = async () => {
+        try {
+            await loginWithGoogle();
+        } catch (error) {
+            console.error("Google sign in failed:", error);
+            alert("ログインに失敗しました。もう一度お試しください。");
+        }
+    };
+
     return (
         <div className="font-display bg-background-dark text-slate-100 min-h-screen flex flex-col items-center justify-center p-4 relative overflow-hidden">
 
@@ -38,7 +51,7 @@ export default function Login({ onLogin }) {
                     {/* Google Sign-In */}
                     <button
                         type="button"
-                        onClick={onLogin}
+                        onClick={handleGoogleLogin}
                         className="w-full flex items-center justify-center gap-3 bg-white hover:bg-slate-100 text-slate-900 font-bold py-3 px-4 transition-colors duration-200"
                     >
                         <svg height="20" viewBox="0 0 24 24" width="20" xmlns="http://www.w3.org/2000/svg">
@@ -57,7 +70,7 @@ export default function Login({ onLogin }) {
                     </div>
 
                     {/* Traditional Login Form */}
-                    <form className="space-y-6" onSubmit={(e) => { e.preventDefault(); onLogin(); }}>
+                    <form className="space-y-6" onSubmit={(e) => { e.preventDefault(); alert("Currently only Google Sign-In is supported for B2B accounts."); }}>
                         <div className="space-y-2">
                             <label className="block text-xs font-mono font-medium text-primary/80 uppercase tracking-widest">Email Address</label>
                             <input

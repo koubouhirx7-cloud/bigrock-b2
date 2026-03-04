@@ -3,8 +3,10 @@ import productsDataFromJson from './data/products.json'
 import Login from './components/Login'
 import Admin from './components/Admin'
 import { fetchProducts, createOrder } from './services/microcms'
+import { useAuth } from './context/AuthContext'
 
 function App() {
+  const { currentUser, logout } = useAuth()
   const [appMode, setAppMode] = useState('login')
   const [activeTab, setActiveTab] = useState('dashboard')
   const [products, setProducts] = useState(productsDataFromJson)
@@ -124,8 +126,17 @@ function App() {
   const components = products.filter(p => p.category === 'Components')
   const apparel = products.filter(p => p.category === 'Apparel')
 
+  // Redirect if not logged in
+  useEffect(() => {
+    if (!currentUser) {
+      setAppMode('login')
+    } else if (appMode === 'login') {
+      setAppMode('store')
+    }
+  }, [currentUser, appMode])
+
   if (appMode === 'login') {
-    return <Login onLogin={() => setAppMode('store')} />
+    return <Login />
   }
 
   if (appMode === 'admin') {
@@ -189,13 +200,13 @@ function App() {
         {/* User Profile / Footer */}
         <div className="p-4 border-t border-border-subtle">
           <div className="flex items-center gap-3 p-2 rounded-sm bg-white/5 border border-border-subtle">
-            <div className="size-8 rounded-full bg-cover bg-center" style={{ backgroundImage: "url('/src/assets/avatar.png')" }}></div>
+            <div className="size-8 rounded-full bg-cover bg-center" style={{ backgroundImage: `url('${currentUser?.photoURL || '/src/assets/avatar.png'}')` }}></div>
             <div className="flex flex-col flex-1 min-w-0">
-              <span className="text-xs font-bold text-white truncate">MURAKAMI</span>
-              <span className="text-[10px] text-text-muted truncate">Murakami Cycle</span>
+              <span className="text-xs font-bold text-white truncate">{currentUser?.displayName || 'USER'}</span>
+              <span className="text-[10px] text-text-muted truncate">{currentUser?.email || 'B2B Client'}</span>
             </div>
             <button
-              onClick={() => setAppMode('login')}
+              onClick={() => logout()}
               className="text-text-muted hover:text-white transition-colors"
             >
               <span className="material-symbols-outlined text-lg">logout</span>
