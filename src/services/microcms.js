@@ -24,8 +24,25 @@ export const client = createClient({
  * - description (Rich Editor)
  */
 export const fetchProducts = async () => {
-    if (!serviceDomain || !apiKey) {
-        console.warn("[MicroCMS] Missing API keys. Returning empty array.");
+    // If no direct API key is available in the browser, fallback to the secure Vercel proxy
+    if (!apiKey) {
+        try {
+            console.log("Fetching products via secure proxy...");
+            const response = await fetch('/api/get-products');
+            if (!response.ok) {
+                throw new Error(`Proxy error: ${response.statusText}`);
+            }
+            const data = await response.json();
+            return data.contents || [];
+        } catch (err) {
+            console.error("Error fetching products from proxy:", err);
+            return [];
+        }
+    }
+
+    // Local dev mode with direct API Key
+    if (!serviceDomain) {
+        console.warn("[MicroCMS] Missing service domain. Returning empty array.");
         return [];
     }
 
