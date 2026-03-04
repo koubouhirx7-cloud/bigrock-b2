@@ -48,19 +48,24 @@ export const fetchProducts = async () => {
  * @param {Object} orderData 
  */
 export const createOrder = async (orderData) => {
-    if (!serviceDomain || !apiKey) {
-        console.warn("[MicroCMS] Missing API keys. Cannot create order.");
-        return null;
-    }
-
     try {
-        const response = await client.create({
-            endpoint: 'orders',
-            content: orderData,
+        const response = await fetch('/api/create-order', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(orderData)
         });
-        return response;
+
+        if (!response.ok) {
+            throw new Error(`Failed to create order via proxy: ${response.statusText}`);
+        }
+
+        const data = await response.json();
+        console.log("Order successfully created via secure proxy", data);
+        return data;
     } catch (err) {
-        console.error("Error creating order in MicroCMS:", err);
+        console.error("Error creating order:", err);
         throw err;
     }
 };
