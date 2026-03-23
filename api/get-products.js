@@ -15,7 +15,9 @@ export default async function handler(req, res) {
             method: 'GET',
             headers: {
                 'X-MICROCMS-API-KEY': API_KEY,
+                'Cache-Control': 'no-cache'
             },
+            cache: 'no-store'
         });
 
         if (!response.ok) {
@@ -26,6 +28,7 @@ export default async function handler(req, res) {
         const data = await response.json();
 
         // Return exactly what MicroCMS formats, the frontend `fetchProducts` expects { contents: [...] }
+        res.setHeader('Cache-Control', 'no-store, max-age=0');
         return res.status(200).json(data);
     } catch (error) {
         console.error("MicroCMS Proxy Error:", error);
