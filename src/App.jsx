@@ -95,7 +95,14 @@ function App() {
           let parsedVariants = null;
           if (item.variants) {
             try {
-              parsedVariants = typeof item.variants === 'string' ? JSON.parse(item.variants) : item.variants;
+              const rawVariants = typeof item.variants === 'string' ? JSON.parse(item.variants) : item.variants;
+              if (Array.isArray(rawVariants)) {
+                parsedVariants = rawVariants.map(v => ({
+                    id: v.id || v.name, // Fallback to name if id is missing in Custom Field
+                    name: v.name,
+                    stock: v.stock
+                }));
+              }
             } catch (e) {
               console.warn('Failed to parse variants for', item.title);
             }
