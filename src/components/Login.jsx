@@ -12,6 +12,7 @@ export default function Login() {
         companyName: '',
         contactName: '',
         phone: '',
+        shippingAddress: '',
     });
 
     const handleGoogleAuth = async (isRegistering) => {
@@ -39,7 +40,7 @@ export default function Login() {
                         phone: regForm.phone,
                         email: userEmail,
                         status: 'Inactive',
-                        shippingAddress: ''
+                        shippingAddress: regForm.shippingAddress
                     });
                     console.log("Customer record created successfully");
                 }
@@ -190,6 +191,17 @@ export default function Login() {
                                             placeholder="03-1234-5678"
                                         />
                                     </div>
+                                </div>
+
+                                <div className="space-y-1.5">
+                                    <label className="block text-xs font-bold text-text-main">配送先住所</label>
+                                    <input
+                                        type="text"
+                                        value={regForm.shippingAddress}
+                                        onChange={(e) => setRegForm({...regForm, shippingAddress: e.target.value})}
+                                        className="w-full p-2.5 text-sm text-text-main placeholder-slate-500 focus:ring-1 focus:ring-primary focus:border-primary bg-surface border border-border-dark transition-all"
+                                        placeholder="例: 東京都渋谷区..."
+                                    />
                                 </div>
 
                                 <div className="pt-4">
