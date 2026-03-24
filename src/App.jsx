@@ -174,10 +174,10 @@ function App() {
     }
   }, [activeTab]);
 
-  useEffect(() => {
-    const loadProducts = async () => {
-      const data = await fetchProducts()
-      if (data && data.length > 0) {
+  // Fetch products explicitly as a stable callback
+  const loadProducts = async () => {
+    const data = await fetchProducts()
+    if (data && data.length > 0) {
         // MicroCMS response mapped to our standard expected format
         const formattedData = data.map(item => {
           let parsedVariants = null;
@@ -207,7 +207,9 @@ function App() {
         })
         setProducts(formattedData)
       }
-    }
+  }
+
+  useEffect(() => {
     loadProducts()
   }, [])
 
@@ -310,7 +312,7 @@ function App() {
   }
 
   if (appMode === 'admin') {
-    return <Admin products={products} onExitAdmin={() => setAppMode('store')} />
+    return <Admin products={products} onExitAdmin={() => setAppMode('store')} refreshProducts={loadProducts} />
   }
 
   return (

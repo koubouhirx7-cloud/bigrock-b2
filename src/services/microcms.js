@@ -279,3 +279,35 @@ export const updateCustomer = async (id, data) => {
         throw err;
     }
 };
+
+/**
+ * Update an existing product record (price, stock, variants).
+ */
+export const updateProduct = async (id, data) => {
+    if (apiKey) {
+        try {
+            const response = await client.update({
+                endpoint: 'products',
+                contentId: id,
+                content: data,
+            });
+            return response;
+        } catch (err) {
+            console.error("Error updating product directly:", err);
+            throw err;
+        }
+    }
+
+    try {
+        const response = await fetch('/api/update-product', {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id, updates: data })
+        });
+        if (!response.ok) throw new Error(`Failed to update product: ${response.statusText}`);
+        return await response.json();
+    } catch (err) {
+        console.error("Error updating product:", err);
+        throw err;
+    }
+};

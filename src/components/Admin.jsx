@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { fetchOrders, updateOrder, fetchCustomers, createCustomer, updateCustomer } from '../services/microcms';
+import { fetchOrders, updateOrder, fetchCustomers, createCustomer, updateCustomer, updateProduct } from '../services/microcms';
 
-export default function Admin({ products, onExitAdmin }) {
+export default function Admin({ products, onExitAdmin, refreshProducts }) {
     const [adminTab, setAdminTab] = useState('products');
     const [ordersList, setOrdersList] = useState([]);
     const [isLoadingOrders, setIsLoadingOrders] = useState(false);
@@ -13,6 +13,12 @@ export default function Admin({ products, onExitAdmin }) {
     const [isCustomerModalOpen, setIsCustomerModalOpen] = useState(false);
     const [customerForm, setCustomerForm] = useState({ companyName: '', contactName: '', email: '', phone: '', shippingAddress: '', status: 'Active' });
     const [isSavingCustomer, setIsSavingCustomer] = useState(false);
+
+    // Product Editing State
+    const [editingProduct, setEditingProduct] = useState(null);
+    const [isProductModalOpen, setIsProductModalOpen] = useState(false);
+    const [productForm, setProductForm] = useState({ price: '', stock: '', variants: null });
+    const [isSavingProduct, setIsSavingProduct] = useState(false);
 
     // Order Editing State
     const [editingOrder, setEditingOrder] = useState(null);
@@ -104,6 +110,39 @@ export default function Admin({ products, onExitAdmin }) {
         }
     };
 
+    const openProductModal = (product) => {
+        setEditingProduct(product);
+        setProductForm({
+            price: product.price || 0,
+            stock: product.stock !== undefined ? product.stock : 100,
+            variants: product.variants ? JSON.parse(JSON.stringify(product.variants)) : null
+        });
+        setIsProductModalOpen(true);
+    };
+
+    const handleSaveProduct = async () => {
+        if (!editingProduct) return;
+        setIsSavingProduct(true);
+        try {
+            const updates = {};
+            if (productForm.variants) {
+                updates.variants = JSON.stringify(productForm.variants);
+            } else {
+                updates.price = Number(productForm.price);
+                updates.stock = Number(productForm.stock);
+            }
+            await updateProduct(editingProduct.id, updates);
+            if (refreshProducts) {
+                await refreshProducts(); // Update the products list locally
+            }
+            setIsProductModalOpen(false);
+        } catch (error) {
+            alert('製品の更新に失敗しました: ' + error.message);
+        } finally {
+            setIsSavingProduct(false);
+        }
+    };
+
     return (
         <div className="flex-1 flex overflow-hidden h-full bg-background-main text-text-main font-display">
             {/* Admin Sidebar */}
@@ -182,6 +221,7 @@ export default function Admin({ products, onExitAdmin }) {
                             <table className="w-full text-left border-collapse">
                                 <thead>
                                     <tr className="border-b border-border-dark bg-surface-highlight text-xs uppercase tracking-wider text-text-muted font-mono">
+                                        <th className="p-4 font-normal w-12"></th>
                                         <th className="p-4 font-normal">製品名</th>
                                         <th className="p-4 font-normal">SKU/ID</th>
                                         <th className="p-4 font-normal">カテゴリー</th>
@@ -196,8 +236,19 @@ export default function Admin({ products, onExitAdmin }) {
                                             {p.variants ? (
                                                 p.variants.map((v, i) => (
                                                     <tr key={`${p.id}-${v.id || i}`} className="border-b border-border-dark/50 hover:bg-black/5 transition-colors">
-                                                        <td className="p-4 font-bold text-text-main">
-                                                            {i === 0 ? p.name : (
+                                                        <td className="p-4">
+                                                            {i === 0 && (
+                                                                p.imageUrl ? (
+                                                                    <img src={p.imageUrl} alt={p.name} className="w-10 h-10 object-contain bg-white rounded border border-border-dark shrink-0" />
+                                                                ) : (
+                                                                    <div className="w-10 h-10 bg-black/5 rounded border border-border-dark flex items-center justify-center shrink-0">
+                                                                        <span className="material-symbols-outlined text-text-muted text-[20px]">image</span>
+                                                                    </div>
+                                                                )
+                                                            )}
+                                                        </td>
+                                                        <td className="p-4 font-bold text-text-main max-w-[200px]">
+                                                            {i === 0 ? <span className="truncate block" title={p.name}>{p.name}</span> : (
                                                                 <span className="text-text-muted ml-4">
                                                                     ↳ {v.type === 'color' ? 'Color' : 'Size'}: {v.name}
                                                                 </span>
@@ -212,7 +263,7 @@ export default function Admin({ products, onExitAdmin }) {
                                                             </span>
                                                         </td>
                                                         <td className="p-4 text-center">
-                                                            <button className="text-text-muted hover:text-text-main transition-colors">
+                                                            <button onClick={() => openProductModal(p)} className="text-text-muted hover:text-text-main transition-colors" title="製品を編集">
                                                                 <span className="material-symbols-outlined text-[18px]">edit</span>
                                                             </button>
                                                         </td>
@@ -220,7 +271,16 @@ export default function Admin({ products, onExitAdmin }) {
                                                 ))
                                             ) : (
                                                 <tr className="border-b border-border-dark hover:bg-black/5 transition-colors">
-                                                    <td className="p-4 font-bold text-text-main">{p.name}</td>
+                                                    <td className="p-4">
+                                                        {p.imageUrl ? (
+                                                            <img src={p.imageUrl} alt={p.name} className="w-10 h-10 object-contain bg-white rounded border border-border-dark shrink-0" />
+                                                        ) : (
+                                                            <div className="w-10 h-10 bg-black/5 rounded border border-border-dark flex items-center justify-center shrink-0">
+                                                                <span className="material-symbols-outlined text-text-muted text-[20px]">image</span>
+                                                            </div>
+                                                        )}
+                                                    </td>
+                                                    <td className="p-4 font-bold text-text-main max-w-[200px] truncate" title={p.name}>{p.name}</td>
                                                     <td className="p-4 font-mono text-text-muted text-xs">{p.id}</td>
                                                     <td className="p-4 text-text-muted">{p.category}</td>
                                                     <td className="p-4 text-right font-mono text-primary">¥{p.price.toLocaleString()}</td>
@@ -230,7 +290,7 @@ export default function Admin({ products, onExitAdmin }) {
                                                         </span>
                                                     </td>
                                                     <td className="p-4 text-center">
-                                                        <button className="text-text-muted hover:text-text-main transition-colors">
+                                                        <button onClick={() => openProductModal(p)} className="text-text-muted hover:text-text-main transition-colors" title="製品を編集">
                                                             <span className="material-symbols-outlined text-[18px]">edit</span>
                                                         </button>
                                                     </td>
@@ -544,6 +604,126 @@ export default function Admin({ products, onExitAdmin }) {
                     </div>
                 </div>
             )}
+        {/* Edit Product Modal */}
+        {isProductModalOpen && editingProduct && (
+            <div className="fixed inset-0 z-[60] bg-black/60 flex items-center justify-center p-4 backdrop-blur-sm animate-in fade-in duration-200" onClick={() => setIsProductModalOpen(false)}>
+                <div className="bg-surface rounded-xl shadow-2xl max-w-lg w-full font-display border border-border-dark flex flex-col max-h-[90vh] animate-in zoom-in-95 duration-200" onClick={e => e.stopPropagation()}>
+                    <div className="flex items-center justify-between p-6 border-b border-border-dark bg-background-main z-10 shrink-0 rounded-t-xl">
+                        <h3 className="text-xl font-bold font-display text-text-main flex items-center gap-2">
+                            <span className="material-symbols-outlined text-primary">inventory_2</span>
+                            製品情報の編集
+                        </h3>
+                        <button onClick={() => setIsProductModalOpen(false)} className="text-text-muted hover:text-text-main transition-colors p-1" disabled={isSavingProduct}>
+                            <span className="material-symbols-outlined text-[20px]">close</span>
+                        </button>
+                    </div>
+                    
+                    <div className="p-6 overflow-y-auto space-y-6">
+                        <div className="flex gap-4 items-center bg-black/5 p-4 rounded-lg border border-border-dark">
+                            {editingProduct.imageUrl ? (
+                                <img src={editingProduct.imageUrl} alt={editingProduct.name} className="w-16 h-16 object-contain bg-white rounded border border-border-dark shrink-0" />
+                            ) : (
+                                <div className="w-16 h-16 bg-background-main rounded border border-border-dark flex items-center justify-center shrink-0">
+                                    <span className="material-symbols-outlined text-text-muted">image</span>
+                                </div>
+                            )}
+                            <div>
+                                <div className="font-bold text-text-main mb-1 leading-tight">{editingProduct.name}</div>
+                                <div className="text-xs font-mono text-text-muted bg-background-main px-2 py-0.5 rounded-sm inline-block border border-border-dark">{editingProduct.id}</div>
+                            </div>
+                        </div>
+
+                        {productForm.variants ? (
+                            <div className="space-y-3">
+                                <p className="text-sm font-bold text-text-main border-l-2 border-primary pl-2 uppercase tracking-wide">バリエーション設定</p>
+                                <div className="grid gap-3">
+                                    {productForm.variants.map((v, i) => (
+                                        <div key={i} className="flex gap-4 p-4 border border-border-dark rounded-lg bg-background-main items-center relative">
+                                            <div className="w-24 shrink-0 font-bold text-sm text-text-main break-words">
+                                                {v.name}
+                                            </div>
+                                            <div className="flex gap-4 flex-1">
+                                                <div className="flex-1">
+                                                    <label className="block text-[10px] text-text-muted mb-1 font-mono uppercase tracking-wider">単価 (¥)</label>
+                                                    <input 
+                                                        type="number" 
+                                                        value={v.price !== undefined ? v.price : editingProduct.price}
+                                                        onChange={(e) => {
+                                                            const newV = [...productForm.variants];
+                                                            newV[i] = { ...newV[i], price: e.target.value !== '' ? Number(e.target.value) : '' };
+                                                            setProductForm({ ...productForm, variants: newV });
+                                                        }}
+                                                        className="w-full p-2.5 text-sm bg-surface border border-border-dark rounded focus:border-primary focus:ring-1 focus:ring-primary text-text-main font-mono transition-all"
+                                                        min="0"
+                                                    />
+                                                </div>
+                                                <div className="flex-1 max-w-[100px]">
+                                                    <label className="block text-[10px] text-text-muted mb-1 font-mono uppercase tracking-wider">在庫数</label>
+                                                    <input 
+                                                        type="number" 
+                                                        value={v.stock}
+                                                        onChange={(e) => {
+                                                            const newV = [...productForm.variants];
+                                                            newV[i] = { ...newV[i], stock: e.target.value !== '' ? Number(e.target.value) : '' };
+                                                            setProductForm({ ...productForm, variants: newV });
+                                                        }}
+                                                        className="w-full p-2.5 text-sm bg-surface border border-border-dark rounded focus:border-primary focus:ring-1 focus:ring-primary text-text-main font-mono transition-all"
+                                                        min="0"
+                                                    />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        ) : (
+                            <div className="flex gap-4 bg-background-main p-5 rounded-lg border border-border-dark">
+                                <div className="flex-1">
+                                    <label className="block text-[10px] text-text-muted mb-1.5 font-bold uppercase tracking-wider">単価 (卸価格)</label>
+                                    <div className="relative">
+                                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-text-muted font-mono font-bold">¥</span>
+                                        <input 
+                                            type="number" 
+                                            value={productForm.price}
+                                            onChange={(e) => setProductForm({...productForm, price: e.target.value !== '' ? Number(e.target.value) : ''})}
+                                            className="w-full p-3 pl-8 bg-surface border border-border-dark rounded focus:border-primary focus:ring-1 focus:ring-primary text-text-main font-mono transition-colors"
+                                            min="0"
+                                        />
+                                    </div>
+                                </div>
+                                <div className="flex-1 max-w-[120px]">
+                                    <label className="block text-[10px] text-text-muted mb-1.5 font-bold uppercase tracking-wider">在庫数</label>
+                                    <input 
+                                        type="number" 
+                                        value={productForm.stock}
+                                        onChange={(e) => setProductForm({...productForm, stock: e.target.value !== '' ? Number(e.target.value) : ''})}
+                                        className="w-full p-3 bg-surface border border-border-dark rounded focus:border-primary focus:ring-1 focus:ring-primary text-text-main font-mono transition-colors"
+                                        min="0"
+                                    />
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                    
+                    <div className="p-6 border-t border-border-dark bg-background-main flex justify-end gap-3 z-10 shrink-0 rounded-b-xl">
+                        <button 
+                            onClick={() => setIsProductModalOpen(false)}
+                            className="px-6 py-2.5 text-sm font-bold text-text-main border border-border-dark hover:bg-surface-highlight transition-colors rounded"
+                            disabled={isSavingProduct}
+                        >
+                            キャンセル
+                        </button>
+                        <button 
+                            onClick={handleSaveProduct}
+                            disabled={isSavingProduct}
+                            className="px-6 py-2.5 text-sm font-bold bg-primary text-background-main hover:bg-white transition-all rounded flex items-center justify-center min-w-[120px]"
+                        >
+                            {isSavingProduct ? <span className="material-symbols-outlined animate-spin text-[18px]">sync</span> : "保存する"}
+                        </button>
+                    </div>
+                </div>
+            </div>
+        )}
         </div>
     );
 }
