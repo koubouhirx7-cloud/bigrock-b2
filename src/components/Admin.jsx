@@ -126,9 +126,14 @@ export default function Admin({ products, onExitAdmin, refreshProducts }) {
         try {
             const updates = {};
             if (productForm.variants) {
-                updates.variants = JSON.stringify(productForm.variants);
+                // Return an array of objects to MicroCMS with the exact Custom Field schema
+                updates.variants = productForm.variants.map(v => ({
+                    fieldId: v.fieldId || "variantItemY",
+                    name: String(v.name),
+                    stock: Number(v.stock)
+                }));
             } else {
-                updates.price = Number(productForm.price);
+                updates.basePrice = Number(productForm.price);
                 updates.stock = Number(productForm.stock);
             }
             
@@ -647,20 +652,6 @@ export default function Admin({ products, onExitAdmin, refreshProducts }) {
                                                 {v.name}
                                             </div>
                                             <div className="flex gap-4 flex-1">
-                                                <div className="flex-1">
-                                                    <label className="block text-[10px] text-text-muted mb-1 font-mono uppercase tracking-wider">単価 (¥)</label>
-                                                    <input 
-                                                        type="number" 
-                                                        value={v.price !== undefined ? v.price : editingProduct.price}
-                                                        onChange={(e) => {
-                                                            const newV = [...productForm.variants];
-                                                            newV[i] = { ...newV[i], price: e.target.value !== '' ? Number(e.target.value) : '' };
-                                                            setProductForm({ ...productForm, variants: newV });
-                                                        }}
-                                                        className="w-full p-2.5 text-sm bg-surface border border-border-dark rounded focus:border-primary focus:ring-1 focus:ring-primary text-text-main font-mono transition-all"
-                                                        min="0"
-                                                    />
-                                                </div>
                                                 <div className="flex-1 max-w-[100px]">
                                                     <label className="block text-[10px] text-text-muted mb-1 font-mono uppercase tracking-wider">在庫数</label>
                                                     <input 
@@ -674,6 +665,9 @@ export default function Admin({ products, onExitAdmin, refreshProducts }) {
                                                         className="w-full p-2.5 text-sm bg-surface border border-border-dark rounded focus:border-primary focus:ring-1 focus:ring-primary text-text-main font-mono transition-all"
                                                         min="0"
                                                     />
+                                                </div>
+                                                <div className="flex-1 text-xs text-text-muted flex items-end pb-2 opacity-60">
+                                                    ※ バリエーションの価格設定は商品ページで共通になります。
                                                 </div>
                                             </div>
                                         </div>
