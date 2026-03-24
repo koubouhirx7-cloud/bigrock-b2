@@ -201,6 +201,20 @@ function App() {
             <span className="material-symbols-outlined">history</span>
             <span className="text-sm font-medium">注文履歴</span>
           </button>
+
+          {/* Cart Item */}
+          <button
+            className={`group flex items-center w-full gap-3 px-6 py-3 transition-colors ${activeTab === 'cart' ? 'bg-black/5 border-l-2 border-primary text-primary' : 'border-l-2 border-transparent text-text-muted hover:text-text-main hover:bg-black/5'}`}
+            onClick={() => setActiveTab('cart')}
+          >
+            <div className="relative flex items-center justify-center">
+              <span className="material-symbols-outlined">shopping_cart</span>
+              {getCartTotalQuantity() > 0 && (
+                <span className="absolute -top-1.5 -right-2 bg-accent-red text-white text-[9px] font-bold px-1 rounded-full">{getCartTotalQuantity()}</span>
+              )}
+            </div>
+            <span className="text-sm font-medium">カートを見る</span>
+          </button>
         </nav>
         {/* Admin Link (Test) */}
         <div className="px-4 pb-2">
@@ -243,12 +257,24 @@ function App() {
             <p className="text-xs text-text-muted font-mono">{new Date().toLocaleDateString('ja-JP').replace(/\//g, '.')} // SYSTEM ONLINE</p>
           </div>
           <div className="flex items-center gap-4">
+            <button 
+              onClick={() => setActiveTab('cart')}
+              className="relative flex items-center justify-center size-9 rounded-sm border border-border-subtle text-text-muted hover:text-primary hover:border-primary transition-all"
+            >
+              <span className="material-symbols-outlined text-[20px]">shopping_cart</span>
+              {getCartTotalQuantity() > 0 && (
+                <span className="absolute -top-1.5 -right-1.5 size-4 bg-accent-red text-white text-[9px] font-bold flex items-center justify-center rounded-full shadow-sm">
+                  {getCartTotalQuantity()}
+                </span>
+              )}
+            </button>
+
             <div className="flex items-center gap-2 px-3 py-1.5 rounded-sm bg-surface border border-border-subtle">
               <div className="size-2 rounded-full bg-accent-green animate-pulse"></div>
               <span className="text-xs font-mono text-text-muted">API: CONNECTED</span>
             </div>
             <button className="flex items-center justify-center size-9 rounded-sm border border-border-subtle text-text-muted hover:text-primary hover:border-primary transition-all">
-              <span className="material-symbols-outlined">notifications</span>
+              <span className="material-symbols-outlined text-[20px]">notifications</span>
             </button>
           </div>
         </header>
