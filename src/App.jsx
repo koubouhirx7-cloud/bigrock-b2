@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import productsDataFromJson from './data/products.json'
 import Login from './components/Login'
 import Admin from './components/Admin'
@@ -11,6 +11,8 @@ function App() {
   const [activeTab, setActiveTab] = useState('dashboard')
   const [products, setProducts] = useState(productsDataFromJson)
   const [selectedProduct, setSelectedProduct] = useState(null)
+  const [toastMessage, setToastMessage] = useState(null)
+  const toastTimer = useRef(null)
   // Check localStorage for existing cart
   const [cart, setCart] = useState(() => {
     const savedCart = localStorage.getItem('bigrock_b2b_cart');
@@ -32,6 +34,13 @@ function App() {
       }
       return [...prevCart, { ...product, cartItemId, variantId: variant?.id, variantName: variant?.name, quantity: 1 }]
     })
+
+    if (toastTimer.current) {
+      clearTimeout(toastTimer.current)
+    }
+    const variantStr = variant ? ` (${variant.name})` : ''
+    setToastMessage(`カートに追加しました：${product.name}${variantStr}`)
+    toastTimer.current = setTimeout(() => setToastMessage(null), 3000)
   }
 
   const updateCartItemQuantity = (cartItemId, delta) => {
@@ -696,6 +705,14 @@ function App() {
 
           </div>
         </div>
+
+        {/* Toast Notification */}
+        {toastMessage && (
+          <div className="fixed bottom-8 right-8 bg-background-dark/95 border border-border-subtle border-l-4 border-l-accent-green text-white px-6 py-4 rounded-sm shadow-2xl z-50 flex items-center gap-3 animate-fade-in">
+            <span className="material-symbols-outlined text-accent-green text-xl">check_circle</span>
+            <span className="text-sm font-medium tracking-wide">{toastMessage}</span>
+          </div>
+        )}
       </main>
     </div>
   )
