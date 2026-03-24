@@ -131,7 +131,11 @@ export default function Admin({ products, onExitAdmin, refreshProducts }) {
                 updates.price = Number(productForm.price);
                 updates.stock = Number(productForm.stock);
             }
-            await updateProduct(editingProduct.id, updates);
+            
+            // Use the native MicroCMS ID (microcmsId), NOT the frontend display ID (which might be the SKU)
+            const updateTargetId = editingProduct.microcmsId || editingProduct.id;
+            
+            await updateProduct(updateTargetId, updates);
             if (refreshProducts) {
                 await refreshProducts(); // Update the products list locally
             }
