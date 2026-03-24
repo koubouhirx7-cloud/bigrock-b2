@@ -1,10 +1,62 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { fetchOrders, updateOrder, fetchCustomers, createCustomer, updateCustomer, updateProduct } from '../services/microcms';
 
 export default function Admin({ products, onExitAdmin, refreshProducts }) {
     const [adminTab, setAdminTab] = useState('products');
     const [ordersList, setOrdersList] = useState([]);
     const [isLoadingOrders, setIsLoadingOrders] = useState(false);
+    
+    // Admin Orders Filtering State
+    const [ordersFilterTime, setOrdersFilterTime] = useState('all');
+    const [ordersFilterCustomer, setOrdersFilterCustomer] = useState('all');
+
+    const uniqueCustomers = useMemo(() => {
+        const names = ordersList.map(o => o.companyName || o.customerEmail || 'ゲスト');
+        return [...new Set(names)].sort();
+    }, [ordersList]);
+
+    const filteredOrdersList = useMemo(() => {
+        let list = ordersList;
+        
+        // 1. Filter by Customer
+        if (ordersFilterCustomer !== 'all') {
+            list = list.filter(o => {
+                const identifier = o.companyName || o.customerEmail || 'ゲスト';
+                return identifier === ordersFilterCustomer;
+            });
+        }
+
+        // 2. Filter by Time
+        if (ordersFilterTime !== 'all') {
+            const now = new Date();
+            const currentYear = now.getFullYear();
+            const currentMonth = now.getMonth();
+            
+            list = list.filter(order => {
+                const orderDate = new Date(order.createdAt);
+                if (ordersFilterTime === 'thisYear') {
+                    return orderDate.getFullYear() === currentYear;
+                }
+                if (ordersFilterTime === 'lastYear') {
+                    return orderDate.getFullYear() === currentYear - 1;
+                }
+                if (ordersFilterTime === 'thisMonth') {
+                    return orderDate.getFullYear() === currentYear && orderDate.getMonth() === currentMonth;
+                }
+                if (ordersFilterTime === 'lastMonth') {
+                    const lastMonthDate = new Date(currentYear, currentMonth - 1, 1);
+                    return orderDate.getFullYear() === lastMonthDate.getFullYear() && orderDate.getMonth() === lastMonthDate.getMonth();
+                }
+                if (ordersFilterTime === 'thisWeek') {
+                    const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+                    return orderDate >= sevenDaysAgo;
+                }
+                return true;
+            });
+        }
+
+        return list;
+    }, [ordersList, ordersFilterTime, ordersFilterCustomer]);
     
     // Customers State
     const [customersList, setCustomersList] = useState([]);
@@ -202,11 +254,52 @@ export default function Admin({ products, onExitAdmin, refreshProducts }) {
                 {/* Toolbar */}
                 <div className="flex-none p-6 border-b border-border-dark bg-background-main z-10">
                     <div className="flex items-center justify-between">
-                        <h1 className="text-2xl font-bold text-text-main tracking-tight">
-                            {adminTab === 'products' && '製品在庫一覧 (Inventory)'}
-                            {adminTab === 'orders' && '受注履歴 (Incoming Orders)'}
-                            {adminTab === 'users' && '登録顧客 (Users)'}
-                        </h1>
+                        {adminTab !== 'orders' && (
+                            <h1 className="text-2xl font-bold text-text-main tracking-tight">
+                                {adminTab === 'products' && '製品在庫一覧 (Inventory)'}
+                                {adminTab === 'users' && '登録顧客 (Users)'}
+                            </h1>
+                        )}
+                        
+                        {adminTab === 'orders' && (
+                            <div className="flex items-center gap-4 flex-1">
+                                <h1 className="text-2xl font-bold text-text-main tracking-tight mr-auto">
+                                    受注履歴 (Incoming Orders)
+                                </h1>
+                                
+                                {/* Customer Filter */}
+                                <div className="relative">
+                                    <select 
+                                        value={ordersFilterCustomer}
+                                        onChange={(e) => setOrdersFilterCustomer(e.target.value)}
+                                        className="appearance-none bg-surface border border-border-dark text-text-main py-2 pl-3 pr-8 rounded focus:outline-none focus:border-primary font-mono text-xs cursor-pointer h-10 w-48"
+                                    >
+                                        <option value="all">すべての顧客</option>
+                                        {uniqueCustomers.map(c => (
+                                            <option key={c} value={c}>{c}</option>
+                                        ))}
+                                    </select>
+                                    <span className="material-symbols-outlined absolute right-2 top-1/2 -translate-y-1/2 text-text-muted pointer-events-none text-[16px]">expand_more</span>
+                                </div>
+                                
+                                {/* Time Filter */}
+                                <div className="relative">
+                                    <select 
+                                        value={ordersFilterTime}
+                                        onChange={(e) => setOrdersFilterTime(e.target.value)}
+                                        className="appearance-none bg-surface border border-border-dark text-text-main py-2 pl-3 pr-8 rounded focus:outline-none focus:border-primary font-mono text-xs cursor-pointer h-10 w-40"
+                                    >
+                                        <option value="all">すべての期間</option>
+                                        <option value="thisWeek">過去7日間</option>
+                                        <option value="thisMonth">今月</option>
+                                        <option value="lastMonth">先月</option>
+                                        <option value="thisYear">今年</option>
+                                        <option value="lastYear">昨年</option>
+                                    </select>
+                                    <span className="material-symbols-outlined absolute right-2 top-1/2 -translate-y-1/2 text-text-muted pointer-events-none text-[16px]">expand_more</span>
+                                </div>
+                            </div>
+                        )}
 
                         {adminTab === 'products' && (
                             <button className="flex items-center gap-2 h-10 px-4 bg-primary text-background-main hover:bg-white transition-all text-sm font-bold uppercase tracking-wider">
@@ -319,7 +412,7 @@ export default function Admin({ products, onExitAdmin, refreshProducts }) {
                                     <span className="material-symbols-outlined text-[48px] text-primary animate-pulse mb-4">sync</span>
                                     <h3 className="text-lg font-bold text-text-main mb-2">データを読み込み中...</h3>
                                 </div>
-                            ) : ordersList.length === 0 ? (
+                            ) : filteredOrdersList.length === 0 ? (
                                 <div className="flex-1 flex flex-col items-center justify-center p-12 text-center">
                                     <span className="material-symbols-outlined text-[48px] text-text-muted mb-4 opacity-50">receipt_long</span>
                                     <h3 className="text-lg font-bold text-text-main mb-2">受注データなし</h3>
@@ -339,7 +432,7 @@ export default function Admin({ products, onExitAdmin, refreshProducts }) {
                                         </tr>
                                     </thead>
                                     <tbody className="text-sm">
-                                        {ordersList.map(order => {
+                                        {filteredOrdersList.map(order => {
                                             const items = JSON.parse(order.items || "[]");
                                             const totalItems = items.reduce((sum, item) => sum + (item.quantity || 1), 0);
                                             return (
