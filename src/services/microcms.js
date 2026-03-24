@@ -304,7 +304,19 @@ export const updateProduct = async (id, data) => {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ id, updates: data })
         });
-        if (!response.ok) throw new Error(`Failed to update product: ${response.statusText}`);
+        
+        if (!response.ok) {
+            let errorMsg = response.statusText;
+            try {
+                const errData = await response.json();
+                errorMsg = errData.message || errData.error || JSON.stringify(errData);
+            } catch (e) {
+                const text = await response.text();
+                errorMsg = text || errorMsg;
+            }
+            throw new Error(`${response.status} - ${errorMsg}`);
+        }
+        
         return await response.json();
     } catch (err) {
         console.error("Error updating product:", err);
