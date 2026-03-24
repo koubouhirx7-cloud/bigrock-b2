@@ -3,7 +3,7 @@ import { useAuth } from '../context/AuthContext';
 import { createCustomer, fetchCustomers } from '../services/microcms';
 
 export default function Login() {
-    const { loginWithGoogle } = useAuth();
+    const { loginWithGoogle, logout } = useAuth();
     const [tab, setTab] = useState('login'); // 'login' | 'register'
     const [isProcessing, setIsProcessing] = useState(false);
 
@@ -45,7 +45,25 @@ export default function Login() {
                 }
             } else {
                 // Normal Login
-                await loginWithGoogle();
+                const result = await loginWithGoogle();
+                const userEmail = result.user.email;
+
+                // Super Admin bypass check
+                if (userEmail === 'koubou.hi.rx7@gmail.com') {
+                    return;
+                }
+                
+                // Check if user exists in MicroCMS
+                const customers = await fetchCustomers();
+                const existing = customers.find(c => c.email === userEmail);
+                
+                if (!existing) {
+                    await logout();
+                    alert("このGoogleアカウントは登録されていません。「新規販売店登録」タブから登録手続きを行ってください。");
+                    setTab('register');
+                    setIsProcessing(false);
+                    return;
+                }
             }
         } catch (error) {
             console.error("Google auth process failed:", error);
