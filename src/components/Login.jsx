@@ -1,16 +1,60 @@
-import React from 'react';
-
+import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { createCustomer, fetchCustomers } from '../services/microcms';
 
 export default function Login() {
     const { loginWithGoogle } = useAuth();
+    const [tab, setTab] = useState('login'); // 'login' | 'register'
+    const [isProcessing, setIsProcessing] = useState(false);
 
-    const handleGoogleLogin = async () => {
+    // Registration Form State
+    const [regForm, setRegForm] = useState({
+        companyName: '',
+        contactName: '',
+        phone: '',
+    });
+
+    const handleGoogleAuth = async (isRegistering) => {
+        setIsProcessing(true);
         try {
-            await loginWithGoogle();
+            if (isRegistering) {
+                // Validate form first
+                if (!regForm.companyName) {
+                    alert("会社名 / 店舗名を入力してください。");
+                    setIsProcessing(false);
+                    return;
+                }
+
+                const result = await loginWithGoogle();
+                const userEmail = result.user.email;
+
+                // Check if user already exists
+                const customers = await fetchCustomers();
+                const existing = customers.find(c => c.email === userEmail);
+                
+                if (!existing) {
+                    await createCustomer({
+                        companyName: regForm.companyName,
+                        contactName: regForm.contactName,
+                        phone: regForm.phone,
+                        email: userEmail,
+                        status: 'Inactive',
+                        shippingAddress: ''
+                    });
+                    console.log("Customer record created successfully");
+                }
+            } else {
+                // Normal Login
+                await loginWithGoogle();
+            }
         } catch (error) {
-            console.error("Google sign in failed:", error);
-            alert("ログインに失敗しました。もう一度お試しください。");
+            console.error("Google auth process failed:", error);
+            // Ignore popup closed errors, but alert on true failures
+            if (error.code !== 'auth/popup-closed-by-user') {
+                alert("認証プロセスに失敗しました。もう一度お試しください。");
+            }
+        } finally {
+            setIsProcessing(false);
         }
     };
 
@@ -26,7 +70,7 @@ export default function Login() {
             </div>
 
             {/* Login Container */}
-            <div className="w-full max-w-[440px] flex flex-col gap-8 z-10">
+            <div className="w-full max-w-[440px] flex flex-col gap-8 z-10 animate-in fade-in zoom-in-95 duration-500">
 
                 {/* Logo Section */}
                 <div className="flex flex-col items-center gap-4">
@@ -42,109 +86,131 @@ export default function Login() {
                 </div>
 
                 {/* Auth Card */}
-                <div className="bg-background-main border border-primary/20 p-8 md:p-10 relative overflow-hidden shadow-2xl">
+                <div className="bg-background-main border border-border-dark p-8 md:p-10 relative overflow-hidden shadow-2xl">
                     {/* Decorative Accent Corner */}
                     <div className="absolute top-0 right-0 w-8 h-8 border-t-2 border-r-2 border-primary/40"></div>
 
-                    <h2 class="text-2xl font-bold mb-8 text-center tracking-tight font-display">ログイン</h2>
-
-                    {/* Google Sign-In */}
-                    <button
-                        type="button"
-                        onClick={handleGoogleLogin}
-                        className="w-full flex items-center justify-center gap-3 bg-white hover:bg-slate-100 text-slate-900 font-bold py-3 px-4 transition-colors duration-200"
-                    >
-                        <svg height="20" viewBox="0 0 24 24" width="20" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"></path>
-                            <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"></path>
-                            <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"></path>
-                            <path d="M12 5.38c1.62 0 3.06.56 4.21 1.66l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"></path>
-                        </svg>
-                        <span className="text-sm font-mono tracking-tight">Googleでログイン</span>
-                    </button>
-
-                    <div className="relative my-8 flex items-center">
-                        <div className="flex-grow border-t border-black/10"></div>
-                        <span className="flex-shrink mx-4 text-xs font-mono text-slate-500 uppercase tracking-widest">または</span>
-                        <div className="flex-grow border-t border-black/10"></div>
-                    </div>
-
-                    {/* Traditional Login Form */}
-                    <form className="space-y-6" onSubmit={(e) => { e.preventDefault(); alert("Currently only Google Sign-In is supported for B2B accounts."); }}>
-                        <div className="space-y-2">
-                            <label className="block text-xs font-mono font-medium text-primary/80 uppercase tracking-widest">Email Address</label>
-                            <input
-                                className="w-full p-3 text-sm text-text-main placeholder-slate-600 focus:ring-1 focus:ring-primary focus:border-primary bg-black/5 border border-primary/20"
-                                placeholder="name@company.com"
-                                type="email"
-                            />
-                        </div>
-
-                        <div className="space-y-2">
-                            <div className="flex justify-between items-center">
-                                <label className="block text-xs font-mono font-medium text-primary/80 uppercase tracking-widest">Password</label>
-                                <a className="text-[10px] font-mono text-slate-500 hover:text-primary transition-colors" href="#">パスワードを忘れた場合</a>
-                            </div>
-                            <div className="relative">
-                                <input
-                                    className="w-full p-3 text-sm text-text-main placeholder-slate-600 focus:ring-1 focus:ring-primary focus:border-primary bg-black/5 border border-primary/20"
-                                    placeholder="••••••••"
-                                    type="password"
-                                />
-                                <button className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-primary" type="button">
-                                    <span className="material-symbols-outlined !text-lg">visibility</span>
-                                </button>
-                            </div>
-                        </div>
-
-                        <div className="flex items-center gap-2 py-2">
-                            <input className="w-4 h-4 bg-black/5 rounded-none checked:bg-primary border-primary/40 focus:ring-0" id="remember" type="checkbox" />
-                            <label className="text-xs font-mono text-slate-400 cursor-pointer" htmlFor="remember">ログイン状態を保持する</label>
-                        </div>
-
-                        <button
-                            className="w-full bg-primary hover:bg-[#e0b93d] text-background-main font-bold py-3 px-4 transition-all duration-200 uppercase tracking-widest text-sm font-mono flex items-center justify-center gap-2 group"
-                            type="submit"
+                    {/* Tab Navigation */}
+                    <div className="flex border-b border-border-dark mb-8">
+                        <button 
+                            className={`flex-1 py-3 text-sm font-bold tracking-widest transition-colors ${tab === 'login' ? 'text-primary border-b-2 border-primary bg-primary/5' : 'text-text-muted hover:text-text-main'}`}
+                            onClick={() => setTab('login')}
                         >
                             ログイン
-                            <span className="material-symbols-outlined !text-lg group-hover:translate-x-1 transition-transform">arrow_forward</span>
                         </button>
-                    </form>
-                </div>
-
-                {/* Support Section */}
-                <div className="flex flex-col md:flex-row justify-between items-center gap-4 px-2">
-                    <div className="flex items-center gap-4">
-                        <a className="text-xs font-mono text-slate-500 hover:text-primary uppercase tracking-tighter" href="#">新規登録リクエスト</a>
-                        <span className="text-slate-800">|</span>
-                        <a className="text-xs font-mono text-slate-500 hover:text-primary uppercase tracking-tighter" href="#">ヘルプセンター</a>
+                        <button 
+                            className={`flex-1 py-3 text-sm font-bold tracking-widest transition-colors ${tab === 'register' ? 'text-primary border-b-2 border-primary bg-primary/5' : 'text-text-muted hover:text-text-main'}`}
+                            onClick={() => setTab('register')}
+                        >
+                            新規販売店登録
+                        </button>
                     </div>
-                    <div className="text-[10px] font-mono text-slate-600 uppercase tracking-widest">
-                        v2.4.0-STABLE
-                    </div>
+
+                    {tab === 'login' ? (
+                        /* LOGIN VIEW */
+                        <div className="animate-in fade-in duration-300">
+                            <h2 className="text-xl font-bold mb-6 text-center tracking-tight text-text-main">既存アカウントでログイン</h2>
+                            <p className="text-xs text-text-muted text-center mb-8 leading-relaxed">
+                                登録済みのGoogleアカウントを使用して<br/>B2B発注システムにアクセスします。
+                            </p>
+
+                            <button
+                                type="button"
+                                onClick={() => handleGoogleAuth(false)}
+                                disabled={isProcessing}
+                                className="w-full flex items-center justify-center gap-3 bg-white hover:bg-slate-100 text-slate-900 font-bold py-3.5 px-4 transition-colors duration-200 shadow-md disabled:opacity-50"
+                            >
+                                {isProcessing ? (
+                                    <span className="material-symbols-outlined animate-spin text-slate-500">sync</span>
+                                ) : (
+                                    <>
+                                        <svg height="20" viewBox="0 0 24 24" width="20" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"></path>
+                                            <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"></path>
+                                            <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"></path>
+                                            <path d="M12 5.38c1.62 0 3.06.56 4.21 1.66l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"></path>
+                                        </svg>
+                                        <span className="text-sm font-bold tracking-tight">Googleでログイン</span>
+                                    </>
+                                )}
+                            </button>
+                        </div>
+                    ) : (
+                        /* REGISTER VIEW */
+                        <div className="animate-in fade-in duration-300">
+                            <h2 className="text-xl font-bold mb-6 text-center tracking-tight text-text-main">新規販売店アカウントの発行</h2>
+                            <form className="space-y-5" onSubmit={(e) => e.preventDefault()}>
+                                <div className="space-y-1.5">
+                                    <label className="block text-xs font-bold text-text-main">会社名 / 店舗名 <span className="text-accent-red">*</span></label>
+                                    <input
+                                        type="text"
+                                        value={regForm.companyName}
+                                        onChange={(e) => setRegForm({...regForm, companyName: e.target.value})}
+                                        className="w-full p-2.5 text-sm text-text-main placeholder-slate-500 focus:ring-1 focus:ring-primary focus:border-primary bg-surface border border-border-dark transition-all"
+                                        placeholder="例: 株式会社ビッグロック"
+                                    />
+                                </div>
+                                
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div className="space-y-1.5">
+                                        <label className="block text-xs font-bold text-text-main">担当者名</label>
+                                        <input
+                                            type="text"
+                                            value={regForm.contactName}
+                                            onChange={(e) => setRegForm({...regForm, contactName: e.target.value})}
+                                            className="w-full p-2.5 text-sm text-text-main placeholder-slate-500 focus:ring-1 focus:ring-primary focus:border-primary bg-surface border border-border-dark transition-all"
+                                            placeholder="例: 山田太郎"
+                                        />
+                                    </div>
+                                    <div className="space-y-1.5">
+                                        <label className="block text-xs font-bold text-text-main">電話番号</label>
+                                        <input
+                                            type="tel"
+                                            value={regForm.phone}
+                                            onChange={(e) => setRegForm({...regForm, phone: e.target.value})}
+                                            className="w-full p-2.5 text-sm text-text-main placeholder-slate-500 focus:ring-1 focus:ring-primary focus:border-primary bg-surface border border-border-dark transition-all font-mono"
+                                            placeholder="03-1234-5678"
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="pt-4">
+                                    <p className="text-[10px] text-text-muted mb-3 leading-relaxed">
+                                        「Googleアカウントで連携して申請する」をクリックすると、選択したGoogleアカウントのメールアドレスがB2Bログイン用IDとして登録されます。※登録後、取引審査のため「承認待ち」となります。
+                                    </p>
+                                    <button
+                                        type="button"
+                                        onClick={() => handleGoogleAuth(true)}
+                                        disabled={isProcessing || !regForm.companyName}
+                                        className="w-full flex items-center justify-center gap-3 bg-white hover:bg-slate-100 text-slate-900 font-bold py-3.5 px-4 transition-colors duration-200 shadow-md disabled:opacity-50"
+                                    >
+                                        {isProcessing ? (
+                                            <span className="material-symbols-outlined animate-spin text-slate-500">sync</span>
+                                        ) : (
+                                            <>
+                                                <svg height="20" viewBox="0 0 24 24" width="20" xmlns="http://www.w3.org/2000/svg">
+                                                    <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"></path>
+                                                    <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"></path>
+                                                    <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"></path>
+                                                    <path d="M12 5.38c1.62 0 3.06.56 4.21 1.66l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"></path>
+                                                </svg>
+                                                <span className="text-sm font-bold tracking-tight">Google連携で申請する</span>
+                                            </>
+                                        )}
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    )}
+                </div>
+
+                {/* Footer Links */}
+                <div className="flex justify-center gap-6 mt-4">
+                    <a href="#" className="text-xs text-text-muted hover:text-primary transition-colors hover:underline decoration-dotted underline-offset-4 tracking-widest uppercase font-mono">B2B利用規約</a>
+                    <a href="#" className="text-xs text-text-muted hover:text-primary transition-colors hover:underline decoration-dotted underline-offset-4 tracking-widest uppercase font-mono">プライバシーポリシー</a>
+                    <a href="#" className="text-xs text-text-muted hover:text-primary transition-colors hover:underline decoration-dotted underline-offset-4 tracking-widest uppercase font-mono">公式ウェブサイト</a>
                 </div>
             </div>
-
-            {/* Decorative Schematic Background Elements */}
-            <div className="absolute bottom-10 left-10 opacity-10 pointer-events-none hidden lg:block z-0">
-                <div className="font-mono text-[10px] text-primary space-y-1">
-                    <p>// SYSTEM_STATUS: OPERATIONAL</p>
-                    <p>// AUTH_MODULE: READY</p>
-                    <p>// ENCRYPTION: AES-256-GCM</p>
-                </div>
-            </div>
-
-            <div className="absolute top-10 right-10 opacity-5 pointer-events-none z-0">
-                <svg fill="none" height="200" stroke="#f2c84a" strokeWidth="0.5" viewBox="0 0 100 100" width="200" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M10 10H90V90H10V10Z"></path>
-                    <path d="M10 50H90"></path>
-                    <path d="M50 10V90"></path>
-                    <circle cx="50" cy="50" r="30"></circle>
-                    <path d="M20 20L80 80"></path>
-                    <path d="M80 20L20 80"></path>
-                </svg>
-            </div>
-
         </div>
     );
 }
