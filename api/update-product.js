@@ -9,12 +9,19 @@ export default async function handler(req, res) {
     return res.status(400).json({ message: 'Missing product id or updates' });
   }
 
+  const apiKey = process.env.VITE_MICROCMS_API_KEY || process.env.MICROCMS_API_KEY;
+  const serviceDomain = process.env.VITE_MICROCMS_SERVICE_DOMAIN || process.env.MICROCMS_SERVICE_DOMAIN;
+
+  if (!apiKey || !serviceDomain) {
+    return res.status(500).json({ message: 'Server configuration missing' });
+  }
+
   try {
-    const response = await fetch(`https://${process.env.VITE_MICROCMS_SERVICE_DOMAIN}.microcms.io/api/v1/products/${id}`, {
+    const response = await fetch(`https://${serviceDomain}.microcms.io/api/v1/products/${id}`, {
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',
-        'X-MICROCMS-API-KEY': process.env.VITE_MICROCMS_API_KEY
+        'X-MICROCMS-API-KEY': apiKey
       },
       body: JSON.stringify(updates)
     });
