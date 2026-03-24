@@ -8,7 +8,7 @@ import { useAuth } from './context/AuthContext'
 function App() {
   const { currentUser, logout } = useAuth()
   const [appMode, setAppMode] = useState('login')
-  const [activeTab, setActiveTab] = useState('dashboard')
+  const [activeTab, setActiveTab] = useState('catalog')
   const [products, setProducts] = useState(productsDataFromJson)
   const [selectedProduct, setSelectedProduct] = useState(null)
   const [toastMessage, setToastMessage] = useState(null)
@@ -200,15 +200,6 @@ function App() {
 
         {/* Navigation Links */}
         <nav className="flex-1 overflow-y-auto py-6 flex flex-col gap-1">
-          {/* Dashboard Item */}
-          <button
-            className={`group flex items-center w-full gap-3 px-6 py-3 transition-colors ${activeTab === 'dashboard' ? 'bg-black/5 border-l-2 border-primary text-primary' : 'border-l-2 border-transparent text-text-muted hover:text-text-main hover:bg-black/5'}`}
-            onClick={() => setActiveTab('dashboard')}
-          >
-            <span className="material-symbols-outlined">dashboard</span>
-            <span className="text-sm font-bold tracking-wide">ダッシュボード</span>
-          </button>
-
           {/* Catalog Item */}
           <button
             className={`group flex items-center w-full gap-3 px-6 py-3 transition-colors ${activeTab === 'catalog' ? 'bg-black/5 border-l-2 border-primary text-primary' : 'border-l-2 border-transparent text-text-muted hover:text-text-main hover:bg-black/5'}`}
@@ -306,166 +297,6 @@ function App() {
         {/* Dashboard Content Grid */}
         <div className="flex-1 overflow-y-auto p-8 z-10">
           <div className="max-w-7xl mx-auto h-full">
-
-            {/* --- DASHBOARD VIEW --- */}
-            {activeTab === 'dashboard' && (
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                {/* Center/Main Column */}
-                <div className="lg:col-span-2 flex flex-col gap-6">
-                  {/* KPI Cards Row */}
-                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-                    <div className="bg-surface border border-border-subtle p-5 rounded-sm flex flex-col justify-between group hover:border-primary/50 transition-colors">
-                      <div className="flex justify-between items-start">
-                        <span className="text-text-muted text-xs font-bold uppercase tracking-wider">今月の支出</span>
-                        <span className="material-symbols-outlined text-text-muted group-hover:text-primary transition-colors">payments</span>
-                      </div>
-                      <div className="mt-2">
-                        <span className="text-2xl font-bold text-text-main font-mono tracking-tight">¥450,000</span>
-                        <div className="flex items-center gap-1 mt-1">
-                          <span className="text-[10px] text-accent-green font-mono bg-accent-green/10 px-1 rounded-sm">+12%</span>
-                          <span className="text-[10px] text-text-muted">vs last month</span>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="bg-surface border border-border-subtle p-5 rounded-sm flex flex-col justify-between group hover:border-primary/50 transition-colors">
-                      <div className="flex justify-between items-start">
-                        <span className="text-text-muted text-xs font-bold uppercase tracking-wider">進行中の注文</span>
-                        <span className="material-symbols-outlined text-text-muted group-hover:text-primary transition-colors">local_shipping</span>
-                      </div>
-                      <div className="mt-2">
-                        <span className="text-2xl font-bold text-text-main font-mono tracking-tight">12<span className="text-sm ml-1 text-text-muted">件</span></span>
-                        <div className="flex items-center gap-1 mt-1">
-                          <span className="text-[10px] text-primary font-mono bg-primary/10 px-1 rounded-sm">Processing</span>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="bg-surface border border-border-subtle p-5 rounded-sm flex flex-col justify-between group hover:border-primary/50 transition-colors cursor-pointer" onClick={() => setActiveTab('cart')}>
-                      <div className="flex justify-between items-start">
-                        <span className="text-text-muted text-xs font-bold uppercase tracking-wider">カート</span>
-                        <span className="material-symbols-outlined text-text-muted group-hover:text-primary transition-colors">shopping_cart</span>
-                      </div>
-                      <div className="mt-2">
-                        <span className="text-2xl font-bold text-text-main font-mono tracking-tight">{getCartTotalQuantity()}<span className="text-sm ml-1 text-text-muted">点</span></span>
-                        <div className="flex items-center gap-1 mt-1">
-                          <button className="text-[10px] text-primary underline decoration-primary/50 hover:decoration-primary" onClick={(e) => { e.stopPropagation(); setActiveTab('cart'); }}>確認する →</button>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Budget Meter & Recent Orders */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 flex-1">
-                    <div className="bg-surface border border-border-subtle rounded-sm p-6 flex flex-col items-center justify-center relative min-h-[320px]">
-                      <h3 className="absolute top-6 left-6 text-sm font-bold text-text-main uppercase tracking-wider flex items-center gap-2">
-                        <span className="size-2 bg-primary rounded-full"></span>
-                        今月の予算使用率
-                      </h3>
-                      <div className="relative size-48">
-                        <svg className="size-full" viewBox="0 0 100 100">
-                          <circle className="text-border-subtle stroke-current" cx="50" cy="50" fill="transparent" r="42" strokeWidth="8"></circle>
-                          <circle className="text-primary stroke-current" cx="50" cy="50" fill="transparent" r="42" strokeDasharray="264" strokeDashoffset="145" strokeLinecap="butt" strokeWidth="8"></circle>
-                        </svg>
-                        <div className="absolute inset-0 flex flex-col items-center justify-center">
-                          <span className="text-3xl font-bold text-text-main font-mono">45%</span>
-                          <span className="text-[10px] text-text-muted uppercase tracking-widest mt-1">USED</span>
-                        </div>
-                      </div>
-                      <div className="w-full mt-6 grid grid-cols-2 gap-4 border-t border-border-subtle pt-4">
-                        <div>
-                          <p className="text-[10px] text-text-muted uppercase tracking-wider">SPENT</p>
-                          <p className="text-lg font-mono text-text-main">¥450,000</p>
-                        </div>
-                        <div className="text-right">
-                          <p className="text-[10px] text-text-muted uppercase tracking-wider">LIMIT</p>
-                          <p className="text-lg font-mono text-text-muted">¥1,000,000</p>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="bg-surface border border-border-subtle rounded-sm flex flex-col min-h-[320px]">
-                      <div className="p-5 border-b border-border-subtle flex justify-between items-center">
-                        <h3 className="text-sm font-bold text-text-main uppercase tracking-wider">最近の注文</h3>
-                        <a className="text-xs text-primary hover:text-text-main transition-colors" href="#">すべて見る</a>
-                      </div>
-                      <div className="flex-1 overflow-x-auto">
-                        <table className="w-full text-left text-sm">
-                          <thead className="bg-surface-highlight text-text-muted text-xs uppercase font-mono border-b border-border-subtle">
-                            <tr>
-                              <th className="px-5 py-3 font-medium">ID</th>
-                              <th className="px-5 py-3 font-medium">Date</th>
-                              <th className="px-5 py-3 font-medium">Status</th>
-                              <th className="px-5 py-3 font-medium text-right">Total</th>
-                            </tr>
-                          </thead>
-                          <tbody className="divide-y divide-border-subtle">
-                            {orderHistory.slice(0, 3).map(order => (
-                              <tr key={order.id} className="hover:bg-black/5 transition-colors group cursor-pointer" onClick={() => setActiveTab('history')}>
-                                <td className="px-5 py-3 font-mono text-text-main group-hover:text-primary">#{order.id}</td>
-                                <td className="px-5 py-3 text-text-muted font-mono text-xs">{order.date}</td>
-                                <td className="px-5 py-3">
-                                  <span className={`inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium border ${order.status === '処理中' ? 'bg-primary/10 text-primary border-primary/20' : order.status === '発送済' ? 'bg-blue-500/10 text-blue-400 border-blue-500/20' : 'bg-accent-green/10 text-accent-green border-accent-green/20'}`}>{order.status}</span>
-                                </td>
-                                <td className="px-5 py-3 text-right font-mono text-text-main">¥{order.total.toLocaleString()}</td>
-                              </tr>
-                            ))}
-                          </tbody>
-                        </table>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Right Column (Sidebar Extras) */}
-                <div className="lg:col-span-1 flex flex-col gap-6">
-                  <div className="flex flex-col gap-3">
-                    <div className="flex justify-between items-center mb-1">
-                      <h3 className="text-xs font-bold text-text-muted uppercase tracking-wider">クイックアクセス</h3>
-                    </div>
-                    <div className="grid grid-cols-2 gap-3">
-                      {/* Component Quick Links */}
-                      <a className="group relative bg-surface border border-border-subtle p-4 rounded-sm hover:-translate-y-1 hover:border-primary transition-all duration-200" href="#">
-                        <div className="size-10 rounded bg-black/5 flex items-center justify-center mb-3 group-hover:bg-primary/20 transition-colors">
-                          <span className="material-symbols-outlined text-text-main group-hover:text-primary">directions_bike</span>
-                        </div>
-                        <p className="text-sm font-bold text-text-main">フレーム</p>
-                      </a>
-                      <a className="group relative bg-surface border border-border-subtle p-4 rounded-sm hover:-translate-y-1 hover:border-primary transition-all duration-200" href="#">
-                        <div className="size-10 rounded bg-black/5 flex items-center justify-center mb-3 group-hover:bg-primary/20 transition-colors">
-                          <span className="material-symbols-outlined text-text-main group-hover:text-primary">settings</span>
-                        </div>
-                        <p className="text-sm font-bold text-text-main">パーツ</p>
-                      </a>
-                    </div>
-                  </div>
-
-                  {/* Alerts */}
-                  <div className="flex flex-col gap-3">
-                    <div className="flex justify-between items-center mb-1">
-                      <h3 className="text-xs font-bold text-text-muted uppercase tracking-wider">アラート</h3>
-                    </div>
-                    <div className="bg-surface border border-accent-red/40 rounded-sm p-4 relative overflow-hidden group">
-                      <div className="absolute top-0 right-0 w-16 h-16 bg-accent-red/10 rounded-bl-full -mr-8 -mt-8 z-0"></div>
-                      <div className="relative z-10">
-                        <div className="flex items-start gap-3">
-                          <div className="p-2 bg-accent-red/10 rounded-sm text-accent-red shrink-0">
-                            <span className="material-symbols-outlined text-lg">warning</span>
-                          </div>
-                          <div>
-                            <p className="text-sm font-bold text-text-main">在庫切れ間近</p>
-                            <p className="text-xs text-text-muted mt-1 leading-snug">BR-HND-V2<br />SKYLINE V2 Handlebar</p>
-                            <div className="flex items-center gap-2 mt-2">
-                              <span className="text-[10px] font-mono text-accent-red">残り: {products.find(p => p.sku === 'BR-HND-V2')?.stock || 0} units</span>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
 
             {/* --- CART VIEW --- */}
             {activeTab === 'cart' && (
