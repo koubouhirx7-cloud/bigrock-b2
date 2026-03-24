@@ -207,7 +207,8 @@ function App() {
         if (currentUser.email === 'koubou.hi.rx7@gmail.com') {
             setCustomerProfile({ email: currentUser.email, companyName: 'サイト管理者 (Admin)', status: 'Active' });
             if (appMode === 'login' || appMode === 'pending') {
-                setAppMode('admin'); // Drop straight into admin panel
+                setAppMode('store'); // Change from admin to store so they see the catalog
+                setActiveTab('catalog'); // explicitly lock to catalog tab
             }
             setIsCheckingCustomer(false);
             return;
@@ -220,6 +221,7 @@ function App() {
           setCustomerProfile(profile);
           if (appMode === 'login' || appMode === 'pending') {
             setAppMode('store');
+            setActiveTab('catalog'); // explicitly lock to catalog tab
           }
         } else {
           setCustomerProfile(null);
