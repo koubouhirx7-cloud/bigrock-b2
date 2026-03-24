@@ -16,6 +16,25 @@ function App() {
   
   const [isConfirmingOrder, setIsConfirmingOrder] = useState(false)
   const [orderCompleteData, setOrderCompleteData] = useState(null)
+  
+  const [selectionQuantities, setSelectionQuantities] = useState({})
+
+  const handleVariantQuantityChange = (variantId, delta, maxStock) => {
+    setSelectionQuantities(prev => {
+      const current = prev[variantId] || 1;
+      let next = current + delta;
+      if (next < 1) next = 1;
+      if (next > maxStock) next = maxStock;
+      return { ...prev, [variantId]: next };
+    })
+  }
+
+  const handleVariantQuantityInput = (variantId, valStr, maxStock) => {
+    let next = parseInt(valStr, 10);
+    if (isNaN(next) || next < 1) next = 1;
+    if (next > maxStock) next = maxStock;
+    setSelectionQuantities(prev => ({ ...prev, [variantId]: next }))
+  }
 
   // Check localStorage for existing cart
   const [cart, setCart] = useState(() => {
@@ -27,16 +46,16 @@ function App() {
     { id: 'ORD-3920', date: '2023/10/20', items: 1, total: 45000, status: '完了' }
   ])
 
-  const addToCart = (product, variant) => {
+  const addToCart = (product, variant, addedQuantity = 1) => {
     setCart(prevCart => {
       const cartItemId = variant ? `${product.id}_${variant.id}` : product.id;
       const existingItem = prevCart.find(item => item.cartItemId === cartItemId)
       if (existingItem) {
         return prevCart.map(item =>
-          item.cartItemId === cartItemId ? { ...item, quantity: item.quantity + 1 } : item
+          item.cartItemId === cartItemId ? { ...item, quantity: item.quantity + addedQuantity } : item
         )
       }
-      return [...prevCart, { ...product, cartItemId, variantId: variant?.id, variantName: variant?.name, quantity: 1 }]
+      return [...prevCart, { ...product, cartItemId, variantId: variant?.id, variantName: variant?.name, quantity: addedQuantity }]
     })
 
     if (toastTimer.current) {
@@ -683,20 +702,47 @@ function App() {
                                 </span>
                               </td>
                               <td className="px-5 py-4 text-right">
-                                <button
-                                  onClick={() => {
-                                    addToCart(selectedProduct, variant)
-                                    // Optionally show a toast or feedback here
-                                  }}
-                                  disabled={variant.stock === 0}
-                                  className={`text-xs font-bold px-4 py-2 rounded-sm transition-colors flex items-center gap-1 ml-auto shadow-sm ${variant.stock > 0 ? 'bg-primary text-background-main hover:bg-primary-dim shadow-primary/20' : 'bg-surface-highlight text-text-muted cursor-not-allowed border border-border-subtle'}`}
-                                >
-                                  {variant.stock > 0 ? (
-                                    <>カートに追加 <span className="material-symbols-outlined text-sm">add_shopping_cart</span></>
-                                  ) : (
-                                    <>在庫なし <span className="material-symbols-outlined text-sm">block</span></>
+                                <div className="flex items-center justify-end gap-3">
+                                  {variant.stock > 0 && (
+                                    <div className="flex items-center border border-border-subtle rounded-sm bg-background-main shadow-sm">
+                                      <button 
+                                        onClick={() => handleVariantQuantityChange(variant.id, -1, variant.stock)} 
+                                        className="size-8 flex items-center justify-center text-text-muted hover:text-text-main hover:bg-black/5 transition-colors"
+                                      >
+                                        <span className="material-symbols-outlined text-[16px]">remove</span>
+                                      </button>
+                                      <input 
+                                        type="number" 
+                                        min="1" 
+                                        max={variant.stock} 
+                                        value={selectionQuantities[variant.id] || 1} 
+                                        onChange={(e) => handleVariantQuantityInput(variant.id, e.target.value, variant.stock)}
+                                        className="w-12 h-8 text-center bg-transparent border-none text-sm font-mono focus:ring-0 p-0 text-text-main"
+                                      />
+                                      <button 
+                                        onClick={() => handleVariantQuantityChange(variant.id, 1, variant.stock)} 
+                                        className="size-8 flex items-center justify-center text-text-muted hover:text-text-main hover:bg-black/5 transition-colors"
+                                      >
+                                        <span className="material-symbols-outlined text-[16px]">add</span>
+                                      </button>
+                                    </div>
                                   )}
-                                </button>
+                                  <button
+                                    onClick={() => {
+                                      const addQty = selectionQuantities[variant.id] || 1;
+                                      addToCart(selectedProduct, variant, addQty);
+                                      setSelectionQuantities(prev => ({ ...prev, [variant.id]: 1 }));
+                                    }}
+                                    disabled={variant.stock === 0}
+                                    className={`text-xs font-bold px-4 py-2 rounded-sm transition-colors flex items-center gap-1 shadow-sm ${variant.stock > 0 ? 'bg-primary text-background-main hover:bg-primary-dim shadow-primary/20' : 'bg-surface-highlight text-text-muted cursor-not-allowed border border-border-subtle'}`}
+                                  >
+                                    {variant.stock > 0 ? (
+                                      <>カートに追加 <span className="material-symbols-outlined text-sm">add_shopping_cart</span></>
+                                    ) : (
+                                      <>在庫なし <span className="material-symbols-outlined text-sm">block</span></>
+                                    )}
+                                  </button>
+                                </div>
                               </td>
                             </tr>
                           ))}
