@@ -16,6 +16,35 @@ function App() {
   const [toastMessage, setToastMessage] = useState(null)
   const toastTimer = useRef(null)
   
+  const [showAdminAuthModal, setShowAdminAuthModal] = useState(false)
+  const [adminPasswordInput, setAdminPasswordInput] = useState('')
+  const [isVerifyingAdmin, setIsVerifyingAdmin] = useState(false)
+
+  const verifyAdminAccess = async () => {
+    if (!adminPasswordInput) return;
+    setIsVerifyingAdmin(true);
+    try {
+      const res = await fetch('/api/verify-admin', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password: adminPasswordInput })
+      });
+      const data = await res.json();
+      if (data.success) {
+        setAppMode('admin');
+        setShowAdminAuthModal(false);
+        setAdminPasswordInput('');
+      } else {
+        alert('パスワードが間違っています。');
+        setAdminPasswordInput('');
+      }
+    } catch(e) {
+      alert('認証エラーが発生しました。インターネット接続を確認してください。');
+    } finally {
+      setIsVerifyingAdmin(false);
+    }
+  }
+
   const [isConfirmingOrder, setIsConfirmingOrder] = useState(false)
   const [orderCompleteData, setOrderCompleteData] = useState(null)
   
@@ -286,6 +315,49 @@ function App() {
 
   return (
     <div className="flex h-screen bg-background-main text-text-main">
+      {/* Admin Password Modal */}
+      {showAdminAuthModal && (
+        <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4 animate-in fade-in duration-200" onClick={() => setShowAdminAuthModal(false)}>
+          <div className="bg-surface rounded-xl shadow-2xl p-8 max-w-sm w-full font-display border border-border-dark animate-in zoom-in-95 duration-200" onClick={e => e.stopPropagation()}>
+            <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary mb-4 mx-auto">
+              <span className="material-symbols-outlined !text-[28px]">lock</span>
+            </div>
+            <h3 className="text-xl font-bold mb-2 text-center text-text-main">管理者認証</h3>
+            <p className="text-sm text-text-muted mb-6 text-center leading-relaxed">これより先は管理者専用エリアです。パスワードを入力してください。</p>
+            <input 
+              type="password" 
+              value={adminPasswordInput}
+              onChange={e => setAdminPasswordInput(e.target.value)}
+              placeholder="パスワード"
+              className="w-full p-3.5 bg-background-main border border-border-dark focus:border-primary focus:ring-1 focus:ring-primary rounded mb-6 text-text-main font-mono text-center tracking-widest shadow-inner shadow-black/5"
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && !isVerifyingAdmin) {
+                  verifyAdminAccess();
+                }
+              }}
+            />
+            <div className="flex gap-3">
+              <button 
+                className="flex-1 py-3.5 bg-background-main border border-border-dark text-text-main font-bold hover:bg-surface-highlight transition-colors rounded shadow-sm"
+                onClick={() => {
+                  setShowAdminAuthModal(false);
+                  setAdminPasswordInput('');
+                }}
+              >
+                キャンセル
+              </button>
+              <button 
+                className="flex-1 py-3.5 bg-primary text-background-main font-bold hover:bg-white transition-colors rounded flex items-center justify-center gap-2 shadow-sm"
+                onClick={verifyAdminAccess}
+                disabled={isVerifyingAdmin}
+              >
+                {isVerifyingAdmin ? <span className="material-symbols-outlined animate-spin">sync</span> : '認証する'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Sidebar Navigation */}
       <aside className="fixed left-0 top-0 bottom-0 w-64 bg-surface border-r border-border-subtle flex flex-col shrink-0 z-20">
         {/* Logo Area */}
@@ -335,7 +407,7 @@ function App() {
         {/* Admin Link (Test) */}
         <div className="px-4 pb-2">
           <button
-            onClick={() => setAppMode('admin')}
+            onClick={() => setShowAdminAuthModal(true)}
             className="w-full py-2 px-3 flex items-center gap-2 justify-center text-xs font-bold text-background-main bg-primary hover:bg-white transition-colors uppercase tracking-wider shadow-[0_0_10px_rgba(242,201,76,0.2)]"
           >
             <span className="material-symbols-outlined text-[16px]">settings_applications</span>
