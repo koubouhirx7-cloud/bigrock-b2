@@ -1,10 +1,42 @@
 import React, { useState, useEffect } from 'react';
-import { fetchOrders } from '../services/microcms';
+import { fetchOrders, updateOrder } from '../services/microcms';
 
 export default function Admin({ products, onExitAdmin }) {
     const [adminTab, setAdminTab] = useState('products');
     const [ordersList, setOrdersList] = useState([]);
     const [isLoadingOrders, setIsLoadingOrders] = useState(false);
+    
+    // Order Editing State
+    const [editingOrder, setEditingOrder] = useState(null);
+    const [editStatus, setEditStatus] = useState('');
+    const [editShippingInfo, setEditShippingInfo] = useState('');
+    const [isUpdatingOrder, setIsUpdatingOrder] = useState(false);
+
+    const openEditModal = (order) => {
+        setEditingOrder(order);
+        setEditStatus(order.status || '処理中');
+        setEditShippingInfo(order.shippingInfo || '');
+    };
+
+    const handleUpdateOrder = async () => {
+        if (!editingOrder) return;
+        setIsUpdatingOrder(true);
+        try {
+            await updateOrder(editingOrder.id, {
+                status: editStatus,
+                shippingInfo: editShippingInfo
+            });
+            // Re-fetch orders
+            const data = await fetchOrders();
+            const sortedOrders = data.sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt));
+            setOrdersList(sortedOrders);
+            setEditingOrder(null);
+        } catch (error) {
+            alert('Failed to update order: ' + error.message);
+        } finally {
+            setIsUpdatingOrder(false);
+        }
+    };
 
     useEffect(() => {
         if (adminTab === 'orders') {
@@ -193,9 +225,12 @@ export default function Admin({ products, onExitAdmin }) {
                                                     <td className="p-4 text-text-muted">{totalItems}点</td>
                                                     <td className="p-4 text-right font-mono font-bold text-primary">¥{(order.totalAmount || 0).toLocaleString()}</td>
                                                     <td className="p-4 text-center">
-                                                        <span className={`inline-flex items-center px-2 py-1 rounded text-[10px] font-bold tracking-wider uppercase font-mono border ${order.status === '処理中' ? 'bg-primary/10 text-primary border-primary/20' : order.status === '発送済' ? 'bg-blue-500/10 text-blue-400 border-blue-500/20' : 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20'}`}>
+                                                        <button 
+                                                            onClick={() => openEditModal(order)}
+                                                            className={`inline-flex items-center px-3 py-1.5 rounded text-[11px] font-bold tracking-wider uppercase font-mono border hover:opacity-80 transition-opacity cursor-pointer shadow-sm ${order.status === '処理中' ? 'bg-primary/5 text-primary border-primary/20' : order.status === '発送済' ? 'bg-blue-500/5 text-blue-500 border-blue-500/20' : 'bg-emerald-500/5 text-emerald-600 border-emerald-500/20'}`}>
                                                             {order.status || '未定義'}
-                                                        </span>
+                                                            <span className="material-symbols-outlined text-[14px] ml-1 opacity-70">edit</span>
+                                                        </button>
                                                     </td>
                                                 </tr>
                                             );
@@ -217,6 +252,82 @@ export default function Admin({ products, onExitAdmin }) {
                     )}
                 </div>
             </main>
+
+            {/* Order Edit Modal */}
+            {editingOrder && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-in fade-in duration-200">
+                    <div className="bg-surface w-full max-w-md rounded-xl shadow-2xl flex flex-col overflow-hidden border border-border-dark animate-in zoom-in-95 duration-200">
+                        <div className="p-6 border-b border-border-dark flex justify-between items-center bg-surface-highlight">
+                            <h2 className="text-xl font-bold font-display text-text-main flex items-center gap-2">
+                                <span className="material-symbols-outlined text-primary">local_shipping</span>
+                                ステータスの変更
+                            </h2>
+                            <button onClick={() => setEditingOrder(null)} className="text-text-muted hover:text-text-main transition-colors">
+                                <span className="material-symbols-outlined">close</span>
+                            </button>
+                        </div>
+                        <div className="p-6 flex flex-col gap-6">
+                            <div className="bg-background-main p-4 rounded-lg border border-border-dark font-mono text-sm shadow-inner flex justify-between items-center">
+                                <span className="text-text-muted text-xs">注文ID</span>
+                                <span className="font-bold text-text-main">{editingOrder.orderId}</span>
+                            </div>
+                            
+                            <div className="flex flex-col gap-2">
+                                <label className="text-sm font-bold text-text-main">ステータス <span className="text-red-500">*</span></label>
+                                <div className="relative">
+                                    <select 
+                                        value={editStatus}
+                                        onChange={(e) => setEditStatus(e.target.value)}
+                                        className="w-full bg-background-main border border-border-dark px-4 py-3 rounded text-text-main focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all appearance-none cursor-pointer font-bold"
+                                    >
+                                        <option value="処理中">処理中 (Processing)</option>
+                                        <option value="発送準備中">発送準備中 (Preparing to Ship)</option>
+                                        <option value="発送済">発送済 (Shipped)</option>
+                                    </select>
+                                    <span className="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-text-muted pointer-events-none">expand_more</span>
+                                </div>
+                            </div>
+
+                            <div className="flex flex-col gap-2">
+                                <label className="text-sm font-bold text-text-main flex items-center gap-2">
+                                    配送情報 (追跡番号など)
+                                </label>
+                                <input 
+                                    type="text"
+                                    value={editShippingInfo}
+                                    onChange={(e) => setEditShippingInfo(e.target.value)}
+                                    placeholder="例: ヤマト運輸 1234-5678-9012"
+                                    className="w-full bg-background-main border border-border-dark px-4 py-3 rounded text-text-main focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all placeholder:text-text-muted/50"
+                                />
+                                <p className="text-xs text-text-muted mt-1 leading-relaxed">
+                                    入力された情報は購入者の注文履歴画面に表示されます。配送後の追跡に利用されます。
+                                </p>
+                            </div>
+                        </div>
+                        
+                        <div className="p-6 border-t border-border-dark bg-background-main flex justify-end gap-3">
+                            <button 
+                                onClick={() => setEditingOrder(null)} 
+                                className="px-6 py-2.5 rounded font-bold text-text-main hover:bg-surface-highlight transition-colors border border-border-dark"
+                                disabled={isUpdatingOrder}
+                            >
+                                キャンセル
+                            </button>
+                            <button 
+                                onClick={handleUpdateOrder}
+                                className="px-6 py-2.5 rounded font-bold bg-primary text-white hover:bg-primary-hover shadow-lg transition-all flex items-center justify-center min-w-[120px]"
+                                disabled={isUpdatingOrder}
+                            >
+                                {isUpdatingOrder ? (
+                                    <span className="material-symbols-outlined animate-spin text-[20px]">sync</span>
+                                ) : (
+                                    "更新する"
+                                )}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

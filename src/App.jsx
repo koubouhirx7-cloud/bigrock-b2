@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import productsDataFromJson from './data/products.json'
 import Login from './components/Login'
 import Admin from './components/Admin'
-import { fetchProducts, createOrder } from './services/microcms'
+import { fetchProducts, createOrder, fetchOrders } from './services/microcms'
 import { useAuth } from './context/AuthContext'
 
 function App() {
@@ -41,10 +41,8 @@ function App() {
     const savedCart = localStorage.getItem('bigrock_b2b_cart');
     return savedCart ? JSON.parse(savedCart) : [];
   });
-  const [orderHistory, setOrderHistory] = useState([
-    { id: 'ORD-3921', date: '2023/10/22', items: 3, total: 128000, status: '発送済' },
-    { id: 'ORD-3920', date: '2023/10/20', items: 1, total: 45000, status: '完了' }
-  ])
+  const [orderHistory, setOrderHistory] = useState([])
+  const [isLoadingHistory, setIsLoadingHistory] = useState(false)
 
   const addToCart = (product, variant, addedQuantity = 1) => {
     setCart(prevCart => {
@@ -113,11 +111,35 @@ function App() {
       status: '処理中'
     }
 
-    setOrderHistory([newOrder, ...orderHistory])
+    // 注文後はそのまま再フェッチするか、単純にローカルに追加して待つ
+    // MicroCMSから再取得するため historyを開いた時に最新化される
     setCart([])
     setIsConfirmingOrder(false)
     setOrderCompleteData(newOrder)
   }
+
+  // Fetch real order history
+  useEffect(() => {
+    if (activeTab === 'history') {
+      const loadHistory = async () => {
+        setIsLoadingHistory(true);
+        try {
+          const allOrders = await fetchOrders();
+          // Filter by mock user (b2b-client@example.com) and sort descending
+          const myOrders = allOrders
+            .filter(o => o.customerEmail === "b2b-client@example.com")
+            .sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt));
+          
+          setOrderHistory(myOrders);
+        } catch (error) {
+          console.error("Failed to load history", error);
+        } finally {
+          setIsLoadingHistory(false);
+        }
+      };
+      loadHistory();
+    }
+  }, [activeTab]);
 
   useEffect(() => {
     const loadProducts = async () => {
@@ -596,38 +618,55 @@ function App() {
                 </div>
 
                 <div className="bg-surface border border-border-subtle rounded-sm overflow-hidden">
-                  <table className="w-full text-left text-sm">
-                    <thead className="bg-surface-highlight text-text-muted text-xs uppercase font-mono border-b border-border-subtle">
-                      <tr>
-                        <th className="px-6 py-4 font-medium">注文ID</th>
-                        <th className="px-6 py-4 font-medium">発注日</th>
-                        <th className="px-6 py-4 font-medium">商品点数</th>
-                        <th className="px-6 py-4 font-medium">ステータス</th>
-                        <th className="px-6 py-4 font-medium text-right">請求額</th>
-                        <th className="px-6 py-4 font-medium text-center">アクション</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-border-subtle">
-                      {orderHistory.map(order => (
-                        <tr key={order.id} className="hover:bg-black/5 transition-colors">
-                          <td className="px-6 py-4 font-mono text-text-main font-bold">#{order.id}</td>
-                          <td className="px-6 py-4 text-text-muted font-mono">{order.date}</td>
-                          <td className="px-6 py-4 text-text-main">{order.items}点</td>
-                          <td className="px-6 py-4">
-                            <span className={`inline-flex items-center px-2 py-1 rounded text-xs font-medium border ${order.status === '処理中' ? 'bg-primary/10 text-primary border-primary/20' : order.status === '発送済' ? 'bg-blue-500/10 text-blue-400 border-blue-500/20' : 'bg-accent-green/10 text-accent-green border-accent-green/20'}`}>
-                              {order.status}
-                            </span>
-                          </td>
-                          <td className="px-6 py-4 text-right font-mono text-text-main font-bold">¥{order.total.toLocaleString()}</td>
-                          <td className="px-6 py-4 text-center">
-                            <button className="text-primary hover:text-text-main transition-colors border border-border-subtle px-3 py-1 rounded-sm text-xs">
-                              詳細
-                            </button>
-                          </td>
+                  {isLoadingHistory ? (
+                    <div className="p-12 pl-6 pr-6 text-center text-text-muted">
+                      <span className="material-symbols-outlined animate-spin text-2xl mb-2 text-primary">sync</span>
+                      <p>注文履歴を読み込み中...</p>
+                    </div>
+                  ) : orderHistory.length === 0 ? (
+                    <div className="p-12 text-center text-text-muted">
+                      まだ注文履歴がありません。
+                    </div>
+                  ) : (
+                    <table className="w-full text-left text-sm">
+                      <thead className="bg-surface-highlight text-text-muted text-xs uppercase font-mono border-b border-border-subtle">
+                        <tr>
+                          <th className="px-6 py-4 font-medium">注文ID</th>
+                          <th className="px-6 py-4 font-medium">発注日</th>
+                          <th className="px-6 py-4 font-medium">商品点数</th>
+                          <th className="px-6 py-4 font-medium">ステータス / 配送情報</th>
+                          <th className="px-6 py-4 font-medium text-right">請求額</th>
                         </tr>
-                      ))}
-                    </tbody>
-                  </table>
+                      </thead>
+                      <tbody className="divide-y divide-border-subtle">
+                        {orderHistory.map(order => {
+                           const items = JSON.parse(order.items || "[]");
+                           const totalItems = items.reduce((sum, item) => sum + (item.quantity || 1), 0);
+                           return (
+                            <tr key={order.id} className="hover:bg-black/5 transition-colors">
+                              <td className="px-6 py-4 font-mono text-text-main font-bold">{order.orderId}</td>
+                              <td className="px-6 py-4 text-text-muted font-mono">{new Date(order.createdAt).toLocaleDateString('ja-JP')}</td>
+                              <td className="px-6 py-4 text-text-main">{totalItems}点</td>
+                              <td className="px-6 py-4">
+                                <div className="flex flex-col gap-1 items-start">
+                                  <span className={`inline-flex items-center px-2 py-1 rounded text-xs font-medium border ${order.status === '処理中' ? 'bg-primary/10 text-primary border-primary/20' : order.status === '発送済' ? 'bg-blue-500/10 text-blue-400 border-blue-500/20' : 'bg-accent-green/10 text-accent-green border-accent-green/20'}`}>
+                                    {order.status || '処理中'}
+                                  </span>
+                                  {order.shippingInfo && (
+                                    <span className="text-[11px] text-text-muted bg-black/5 px-2 py-0.5 rounded flex items-center gap-1 mt-1">
+                                      <span className="material-symbols-outlined text-[12px]">local_shipping</span>
+                                      {order.shippingInfo}
+                                    </span>
+                                  )}
+                                </div>
+                              </td>
+                              <td className="px-6 py-4 text-right font-mono text-text-main font-bold text-primary">¥{(order.totalAmount || 0).toLocaleString()}</td>
+                            </tr>
+                          )
+                        })}
+                      </tbody>
+                    </table>
+                  )}
                 </div>
               </div>
             )}

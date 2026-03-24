@@ -65,6 +65,20 @@ export const fetchProducts = async () => {
  * @param {Object} orderData 
  */
 export const createOrder = async (orderData) => {
+    if (apiKey) {
+        try {
+            const response = await client.create({
+                endpoint: 'orders',
+                content: orderData,
+            });
+            console.log("Order successfully created directly via SDK");
+            return response;
+        } catch (err) {
+            console.error("Error creating order directly:", err);
+            throw err;
+        }
+    }
+
     try {
         const response = await fetch('/api/create-order', {
             method: 'POST',
@@ -124,5 +138,49 @@ export const fetchOrders = async () => {
     } catch (err) {
         console.error("Error fetching orders from MicroCMS:", err);
         return [];
+    }
+};
+
+/**
+ * Update an existing order via the secure proxy.
+ * @param {string} id - The MicroCMS order ID
+ * @param {Object} data - payload (status, shippingInfo, etc.)
+ */
+export const updateOrder = async (id, data) => {
+    if (apiKey) {
+        try {
+            const response = await client.update({
+                endpoint: 'orders',
+                contentId: id,
+                content: data,
+            });
+            console.log("Order successfully updated directly via SDK");
+            return response;
+        } catch (err) {
+            console.error("Error updating order directly:", err);
+            throw err;
+        }
+    }
+
+    try {
+        const response = await fetch('/api/update-order', {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ id, ...data })
+        });
+
+        if (!response.ok) {
+            const errBody = await response.json().catch(() => ({}));
+            throw new Error(`Failed to update order: ${errBody.error || response.statusText}`);
+        }
+
+        const result = await response.json();
+        console.log("Order successfully updated via proxy");
+        return result;
+    } catch (err) {
+        console.error("Error updating order:", err);
+        throw err;
     }
 };
