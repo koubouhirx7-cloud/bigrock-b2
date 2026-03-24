@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useMemo } from 'react'
 import productsDataFromJson from './data/products.json'
 import Login from './components/Login'
 import Admin from './components/Admin'
@@ -74,6 +74,38 @@ function App() {
   });
   const [orderHistory, setOrderHistory] = useState([])
   const [isLoadingHistory, setIsLoadingHistory] = useState(false)
+  const [historyFilter, setHistoryFilter] = useState('all')
+
+  const filteredOrderHistory = useMemo(() => {
+    if (historyFilter === 'all') return orderHistory;
+    
+    const now = new Date();
+    const currentYear = now.getFullYear();
+    const currentMonth = now.getMonth();
+    
+    return orderHistory.filter(order => {
+      const orderDate = new Date(order.createdAt);
+      if (historyFilter === 'thisYear') {
+        return orderDate.getFullYear() === currentYear;
+      }
+      if (historyFilter === 'lastYear') {
+        return orderDate.getFullYear() === currentYear - 1;
+      }
+      if (historyFilter === 'thisMonth') {
+        return orderDate.getFullYear() === currentYear && orderDate.getMonth() === currentMonth;
+      }
+      if (historyFilter === 'lastMonth') {
+        const lastMonthDate = new Date(currentYear, currentMonth - 1, 1);
+        return orderDate.getFullYear() === lastMonthDate.getFullYear() && orderDate.getMonth() === lastMonthDate.getMonth();
+      }
+      if (historyFilter === 'thisWeek') {
+        // Last 7 days
+        const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+        return orderDate >= sevenDaysAgo;
+      }
+      return true;
+    });
+  }, [orderHistory, historyFilter]);
 
   const addToCart = (product, variant, addedQuantity = 1) => {
     setCart(prevCart => {
@@ -769,6 +801,21 @@ function App() {
                     <span className="material-symbols-outlined text-primary text-2xl">history</span>
                     注文履歴
                   </h3>
+                  <div className="relative">
+                    <select 
+                      value={historyFilter}
+                      onChange={(e) => setHistoryFilter(e.target.value)}
+                      className="appearance-none bg-surface border border-border-subtle text-text-main py-2 pl-4 pr-10 rounded shadow-sm focus:outline-none focus:border-primary font-mono text-sm cursor-pointer"
+                    >
+                      <option value="all">すべての期間</option>
+                      <option value="thisWeek">過去7日間</option>
+                      <option value="thisMonth">今月</option>
+                      <option value="lastMonth">先月</option>
+                      <option value="thisYear">今年</option>
+                      <option value="lastYear">昨年</option>
+                    </select>
+                    <span className="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-text-muted pointer-events-none text-[18px]">expand_more</span>
+                  </div>
                 </div>
 
                 <div className="bg-surface border border-border-subtle rounded-sm overflow-hidden">
@@ -777,7 +824,7 @@ function App() {
                       <span className="material-symbols-outlined animate-spin text-2xl mb-2 text-primary">sync</span>
                       <p>注文履歴を読み込み中...</p>
                     </div>
-                  ) : orderHistory.length === 0 ? (
+                  ) : filteredOrderHistory.length === 0 ? (
                     <div className="p-12 text-center text-text-muted">
                       まだ注文履歴がありません。
                     </div>
@@ -793,7 +840,7 @@ function App() {
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-border-subtle">
-                        {orderHistory.map(order => {
+                        {filteredOrderHistory.map(order => {
                            const items = JSON.parse(order.items || "[]");
                            const totalItems = items.reduce((sum, item) => sum + (item.quantity || 1), 0);
                            return (
