@@ -1,11 +1,19 @@
 import React, { useState, useEffect } from 'react';
-import { fetchOrders, updateOrder } from '../services/microcms';
+import { fetchOrders, updateOrder, fetchCustomers, createCustomer, updateCustomer } from '../services/microcms';
 
 export default function Admin({ products, onExitAdmin }) {
     const [adminTab, setAdminTab] = useState('products');
     const [ordersList, setOrdersList] = useState([]);
     const [isLoadingOrders, setIsLoadingOrders] = useState(false);
     
+    // Customers State
+    const [customersList, setCustomersList] = useState([]);
+    const [isLoadingCustomers, setIsLoadingCustomers] = useState(false);
+    const [editingCustomer, setEditingCustomer] = useState(null);
+    const [isCustomerModalOpen, setIsCustomerModalOpen] = useState(false);
+    const [customerForm, setCustomerForm] = useState({ companyName: '', contactName: '', email: '', phone: '', shippingAddress: '', status: 'Active' });
+    const [isSavingCustomer, setIsSavingCustomer] = useState(false);
+
     // Order Editing State
     const [editingOrder, setEditingOrder] = useState(null);
     const [editStatus, setEditStatus] = useState('');
@@ -38,6 +46,13 @@ export default function Admin({ products, onExitAdmin }) {
         }
     };
 
+    const loadCustomers = async () => {
+        setIsLoadingCustomers(true);
+        const data = await fetchCustomers();
+        setCustomersList(data);
+        setIsLoadingCustomers(false);
+    };
+
     useEffect(() => {
         if (adminTab === 'orders') {
             const loadOrders = async () => {
@@ -49,8 +64,45 @@ export default function Admin({ products, onExitAdmin }) {
                 setIsLoadingOrders(false);
             };
             loadOrders();
+        } else if (adminTab === 'users') {
+            loadCustomers();
         }
     }, [adminTab]);
+
+    const openCustomerModal = (customer = null) => {
+        if (customer) {
+            setEditingCustomer(customer);
+            setCustomerForm({
+                companyName: customer.companyName || '',
+                contactName: customer.contactName || '',
+                email: customer.email || '',
+                phone: customer.phone || '',
+                shippingAddress: customer.shippingAddress || '',
+                status: customer.status || 'Active'
+            });
+        } else {
+            setEditingCustomer(null);
+            setCustomerForm({ companyName: '', contactName: '', email: '', phone: '', shippingAddress: '', status: 'Active' });
+        }
+        setIsCustomerModalOpen(true);
+    };
+
+    const handleSaveCustomer = async () => {
+        setIsSavingCustomer(true);
+        try {
+            if (editingCustomer) {
+                await updateCustomer(editingCustomer.id, customerForm);
+            } else {
+                await createCustomer(customerForm);
+            }
+            await loadCustomers();
+            setIsCustomerModalOpen(false);
+        } catch (error) {
+            alert('Failed to save customer: ' + error.message);
+        } finally {
+            setIsSavingCustomer(false);
+        }
+    };
 
     return (
         <div className="flex-1 flex overflow-hidden h-full bg-background-main text-text-main font-display">
@@ -112,6 +164,12 @@ export default function Admin({ products, onExitAdmin }) {
                             <button className="flex items-center gap-2 h-10 px-4 bg-primary text-background-main hover:bg-white transition-all text-sm font-bold uppercase tracking-wider">
                                 <span className="material-symbols-outlined text-[20px]">upload_file</span>
                                 <span>製品インポート</span>
+                            </button>
+                        )}
+                        {adminTab === 'users' && (
+                            <button onClick={() => openCustomerModal()} className="flex items-center gap-2 h-10 px-4 bg-primary text-background-main hover:bg-white transition-all text-sm font-bold uppercase tracking-wider">
+                                <span className="material-symbols-outlined text-[20px]">person_add</span>
+                                <span>新規顧客登録</span>
                             </button>
                         )}
                     </div>
@@ -220,7 +278,8 @@ export default function Admin({ products, onExitAdmin }) {
                                                     <td className="p-4 font-mono font-bold text-text-main">{order.orderId}</td>
                                                     <td className="p-4">
                                                         <div className="text-xs text-text-muted">{new Date(order.createdAt).toLocaleString('ja-JP')}</div>
-                                                        <div className="text-sm font-bold text-text-main">{order.customerEmail}</div>
+                                                        <div className="text-sm font-bold text-text-main">{order.companyName || order.customerEmail || 'ゲスト'}</div>
+                                                        {order.companyName && order.customerEmail && <div className="text-[10px] text-text-muted/70">{order.customerEmail}</div>}
                                                     </td>
                                                     <td className="p-4 text-text-muted">{totalItems}点</td>
                                                     <td className="p-4 text-right font-mono font-bold text-primary">¥{(order.totalAmount || 0).toLocaleString()}</td>
@@ -242,12 +301,60 @@ export default function Admin({ products, onExitAdmin }) {
                     )}
 
                     {adminTab === 'users' && (
-                        <div className="bg-surface border border-border-dark overflow-hidden flex flex-col items-center justify-center p-12 text-center">
-                            <span className="material-symbols-outlined text-[48px] text-text-muted mb-4 opacity-50">group</span>
-                            <h3 className="text-lg font-bold text-text-main mb-2">顧客データ連携準備中</h3>
-                            <p className="text-sm text-text-muted max-w-sm">
-                                B2B顧客アカウントの管理機能は次のフェーズで実装予定です。
-                            </p>
+                        <div className="bg-surface border border-border-dark overflow-hidden flex flex-col min-h-[400px]">
+                            {isLoadingCustomers ? (
+                                <div className="flex-1 flex flex-col items-center justify-center p-12 text-center">
+                                    <span className="material-symbols-outlined text-[48px] text-primary animate-pulse mb-4">sync</span>
+                                    <h3 className="text-lg font-bold text-text-main mb-2">顧客データを読み込み中...</h3>
+                                </div>
+                            ) : customersList.length === 0 ? (
+                                <div className="flex-1 flex flex-col items-center justify-center p-12 text-center">
+                                    <span className="material-symbols-outlined text-[48px] text-text-muted mb-4 opacity-50">group</span>
+                                    <h3 className="text-lg font-bold text-text-main mb-2">顧客データなし</h3>
+                                    <p className="text-sm text-text-muted max-w-sm mb-6">
+                                        まだ登録されているB2B顧客がいません。新規顧客を登録してください。
+                                    </p>
+                                    <button onClick={() => openCustomerModal()} className="px-6 py-2.5 bg-primary text-background-main font-bold flex items-center gap-2 hover:bg-white transition-all">
+                                        <span className="material-symbols-outlined text-[20px]">person_add</span>
+                                        新規顧客を登録
+                                    </button>
+                                </div>
+                            ) : (
+                                <table className="w-full text-left border-collapse">
+                                    <thead>
+                                        <tr className="border-b border-border-dark bg-surface-highlight text-xs uppercase tracking-wider text-text-muted font-mono">
+                                            <th className="p-4 font-normal">会社名 / 担当者</th>
+                                            <th className="p-4 font-normal">連絡先</th>
+                                            <th className="p-4 font-normal">ステータス</th>
+                                            <th className="p-4 font-normal text-center">操作</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody className="text-sm">
+                                        {customersList.map(customer => (
+                                            <tr key={customer.id} className="border-b border-border-dark/50 hover:bg-black/5 transition-colors">
+                                                <td className="p-4">
+                                                    <div className="font-bold text-text-main">{customer.companyName}</div>
+                                                    <div className="text-xs text-text-muted mt-0.5">{customer.contactName || '担当者未設定'}</div>
+                                                </td>
+                                                <td className="p-4">
+                                                    <div className="text-sm text-text-main">{customer.email}</div>
+                                                    {customer.phone && <div className="text-xs text-text-muted font-mono mt-0.5">{customer.phone}</div>}
+                                                </td>
+                                                <td className="p-4">
+                                                    <span className={`inline-flex items-center px-2 py-1 rounded text-[11px] font-bold tracking-wider uppercase font-mono border ${customer.status === 'Active' ? 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20' : 'bg-text-muted/10 text-text-muted border-border-dark'}`}>
+                                                        {customer.status || 'Active'}
+                                                    </span>
+                                                </td>
+                                                <td className="p-4 text-center">
+                                                    <button onClick={() => openCustomerModal(customer)} className="text-text-muted hover:text-text-main transition-colors p-1">
+                                                        <span className="material-symbols-outlined text-[18px]">edit</span>
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            )}
                         </div>
                     )}
                 </div>
@@ -322,6 +429,115 @@ export default function Admin({ products, onExitAdmin }) {
                                     <span className="material-symbols-outlined animate-spin text-[20px]">sync</span>
                                 ) : (
                                     "更新する"
+                                )}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Customer Edit Modal */}
+            {isCustomerModalOpen && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-in fade-in duration-200">
+                    <div className="bg-surface w-full max-w-lg rounded-xl shadow-2xl flex flex-col overflow-hidden border border-border-dark animate-in zoom-in-95 duration-200">
+                        <div className="p-6 border-b border-border-dark flex justify-between items-center bg-surface-highlight">
+                            <h2 className="text-xl font-bold font-display text-text-main flex items-center gap-2">
+                                <span className="material-symbols-outlined text-primary">{editingCustomer ? 'edit' : 'person_add'}</span>
+                                {editingCustomer ? '顧客情報の編集' : '新規顧客登録'}
+                            </h2>
+                            <button onClick={() => setIsCustomerModalOpen(false)} className="text-text-muted hover:text-text-main transition-colors">
+                                <span className="material-symbols-outlined">close</span>
+                            </button>
+                        </div>
+                        <div className="p-6 flex flex-col gap-4 max-h-[70vh] overflow-y-auto">
+                            
+                            <div className="flex flex-col gap-2">
+                                <label className="text-sm font-bold text-text-main">会社名 / 店舗名 <span className="text-red-500">*</span></label>
+                                <input 
+                                    type="text"
+                                    value={customerForm.companyName}
+                                    onChange={(e) => setCustomerForm({...customerForm, companyName: e.target.value})}
+                                    placeholder="例: 株式会社ビッグロック"
+                                    className="w-full bg-background-main border border-border-dark px-4 py-3 rounded text-text-main focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all"
+                                />
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-4">
+                                <div className="flex flex-col gap-2">
+                                    <label className="text-sm font-bold text-text-main">担当者名</label>
+                                    <input 
+                                        type="text"
+                                        value={customerForm.contactName}
+                                        onChange={(e) => setCustomerForm({...customerForm, contactName: e.target.value})}
+                                        className="w-full bg-background-main border border-border-dark px-4 py-3 rounded text-text-main focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all"
+                                    />
+                                </div>
+                                <div className="flex flex-col gap-2">
+                                    <label className="text-sm font-bold text-text-main">電話番号</label>
+                                    <input 
+                                        type="text"
+                                        value={customerForm.phone}
+                                        onChange={(e) => setCustomerForm({...customerForm, phone: e.target.value})}
+                                        className="w-full bg-background-main border border-border-dark px-4 py-3 rounded text-text-main focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all font-mono text-sm"
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="flex flex-col gap-2">
+                                <label className="text-sm font-bold text-text-main">ログインメールアドレス <span className="text-red-500">*</span></label>
+                                <input 
+                                    type="email"
+                                    value={customerForm.email}
+                                    onChange={(e) => setCustomerForm({...customerForm, email: e.target.value})}
+                                    placeholder="ログインIDと一致する必要があります"
+                                    className="w-full bg-background-main border border-border-dark px-4 py-3 rounded text-text-main focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all font-mono text-sm"
+                                />
+                                <p className="text-xs text-text-muted">このメールアドレスでGoogleログインした際にアクセス可能になります。</p>
+                            </div>
+
+                            <div className="flex flex-col gap-2">
+                                <label className="text-sm font-bold text-text-main">初期配送先住所</label>
+                                <textarea 
+                                    value={customerForm.shippingAddress}
+                                    onChange={(e) => setCustomerForm({...customerForm, shippingAddress: e.target.value})}
+                                    className="w-full bg-background-main border border-border-dark px-4 py-3 rounded text-text-main focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all resize-y min-h-[80px]"
+                                />
+                            </div>
+
+                            <div className="flex flex-col gap-2">
+                                <label className="text-sm font-bold text-text-main">アカウント状態</label>
+                                <div className="relative">
+                                    <select 
+                                        value={customerForm.status}
+                                        onChange={(e) => setCustomerForm({...customerForm, status: e.target.value})}
+                                        className="w-full bg-background-main border border-border-dark px-4 py-3 rounded text-text-main focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all appearance-none cursor-pointer font-bold"
+                                    >
+                                        <option value="Active">有効 (Active)</option>
+                                        <option value="Inactive">無効 (Inactive - アクセス停止)</option>
+                                    </select>
+                                    <span className="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-text-muted pointer-events-none">expand_more</span>
+                                </div>
+                            </div>
+
+                        </div>
+                        
+                        <div className="p-6 border-t border-border-dark bg-background-main flex justify-end gap-3 z-10 shrink-0">
+                            <button 
+                                onClick={() => setIsCustomerModalOpen(false)} 
+                                className="px-6 py-2.5 rounded font-bold text-text-main hover:bg-surface-highlight transition-colors border border-border-dark"
+                                disabled={isSavingCustomer}
+                            >
+                                キャンセル
+                            </button>
+                            <button 
+                                onClick={handleSaveCustomer}
+                                className="px-6 py-2.5 rounded font-bold bg-primary text-white hover:bg-primary-hover shadow-lg transition-all flex items-center justify-center min-w-[120px]"
+                                disabled={isSavingCustomer || !customerForm.companyName || !customerForm.email}
+                            >
+                                {isSavingCustomer ? (
+                                    <span className="material-symbols-outlined animate-spin text-[20px]">sync</span>
+                                ) : (
+                                    "保存する"
                                 )}
                             </button>
                         </div>

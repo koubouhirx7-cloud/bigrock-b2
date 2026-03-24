@@ -184,3 +184,98 @@ export const updateOrder = async (id, data) => {
         throw err;
     }
 };
+
+/**
+ * Fetch all customers from MicroCMS.
+ */
+export const fetchCustomers = async () => {
+    if (!serviceDomain) {
+        return [];
+    }
+
+    if (!apiKey) {
+        try {
+            const response = await fetch('/api/get-customers');
+            if (!response.ok) throw new Error(`Proxy error: ${response.statusText}`);
+            const data = await response.json();
+            return data.contents || [];
+        } catch (err) {
+            console.error("Error fetching customers from proxy:", err);
+            return [];
+        }
+    }
+
+    try {
+        const response = await client.getList({
+            endpoint: 'customers',
+            queries: { limit: 100 }
+        });
+        return response.contents;
+    } catch (err) {
+        console.error("Error fetching customers from MicroCMS:", err);
+        return [];
+    }
+};
+
+/**
+ * Create a new customer record.
+ */
+export const createCustomer = async (customerData) => {
+    if (apiKey) {
+        try {
+            const response = await client.create({
+                endpoint: 'customers',
+                content: customerData,
+            });
+            return response;
+        } catch (err) {
+            console.error("Error creating customer directly:", err);
+            throw err;
+        }
+    }
+
+    try {
+        const response = await fetch('/api/create-customer', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(customerData)
+        });
+        if (!response.ok) throw new Error(`Failed to create customer: ${response.statusText}`);
+        return await response.json();
+    } catch (err) {
+        console.error("Error creating customer:", err);
+        throw err;
+    }
+};
+
+/**
+ * Update an existing customer record.
+ */
+export const updateCustomer = async (id, data) => {
+    if (apiKey) {
+        try {
+            const response = await client.update({
+                endpoint: 'customers',
+                contentId: id,
+                content: data,
+            });
+            return response;
+        } catch (err) {
+            console.error("Error updating customer directly:", err);
+            throw err;
+        }
+    }
+
+    try {
+        const response = await fetch('/api/update-customer', {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id, ...data })
+        });
+        if (!response.ok) throw new Error(`Failed to update customer: ${response.statusText}`);
+        return await response.json();
+    } catch (err) {
+        console.error("Error updating customer:", err);
+        throw err;
+    }
+};

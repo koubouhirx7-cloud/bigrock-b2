@@ -2,12 +2,14 @@ import { useState, useEffect, useRef } from 'react'
 import productsDataFromJson from './data/products.json'
 import Login from './components/Login'
 import Admin from './components/Admin'
-import { fetchProducts, createOrder, fetchOrders } from './services/microcms'
+import { fetchProducts, createOrder, fetchOrders, fetchCustomers } from './services/microcms'
 import { useAuth } from './context/AuthContext'
 
 function App() {
   const { currentUser, logout } = useAuth()
   const [appMode, setAppMode] = useState('login')
+  const [customerProfile, setCustomerProfile] = useState(null)
+  const [isCheckingCustomer, setIsCheckingCustomer] = useState(false)
   const [activeTab, setActiveTab] = useState('catalog')
   const [products, setProducts] = useState(productsDataFromJson)
   const [selectedProduct, setSelectedProduct] = useState(null)
@@ -91,7 +93,8 @@ function App() {
     try {
       await createOrder({
         orderId: orderIdValue,
-        customerEmail: "b2b-client@example.com", // TODO: Replace with real user email when Auth is added
+        customerEmail: customerProfile?.email || currentUser?.email || "b2b-client@example.com",
+        companyName: customerProfile?.companyName || "ゲスト",
         items: JSON.stringify(cart),
         totalAmount: finalTotal,
         status: "処理中"
@@ -125,9 +128,10 @@ function App() {
         setIsLoadingHistory(true);
         try {
           const allOrders = await fetchOrders();
-          // Filter by mock user (b2b-client@example.com) and sort descending
+          const userEmail = customerProfile?.email || currentUser?.email || "b2b-client@example.com";
+          // Filter by current user and sort descending
           const myOrders = allOrders
-            .filter(o => o.customerEmail === "b2b-client@example.com")
+            .filter(o => o.customerEmail === userEmail)
             .sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt));
           
           setOrderHistory(myOrders);
@@ -188,17 +192,80 @@ function App() {
   const components = products.filter(p => p.category === 'Components')
   const apparel = products.filter(p => p.category === 'Apparel')
 
-  // Redirect if not logged in
+  // Handle Authentication and Customer Profile check
   useEffect(() => {
-    if (!currentUser) {
-      setAppMode('login')
-    } else if (appMode === 'login') {
-      setAppMode('store')
-    }
-  }, [currentUser, appMode])
+    const checkAccess = async () => {
+      if (!currentUser) {
+        setAppMode('login');
+        setCustomerProfile(null);
+        return;
+      }
+
+      setIsCheckingCustomer(true);
+      try {
+        const customers = await fetchCustomers();
+        const profile = customers.find(c => c.email === currentUser.email);
+        
+        if (profile && profile.status === 'Active') {
+          setCustomerProfile(profile);
+          if (appMode === 'login' || appMode === 'pending') {
+            setAppMode('store');
+          }
+        } else {
+          setCustomerProfile(null);
+          setAppMode('pending');
+        }
+      } catch (err) {
+        console.error("Error checking customer access:", err);
+        setAppMode('pending');
+      } finally {
+        setIsCheckingCustomer(false);
+      }
+    };
+
+    checkAccess();
+  }, [currentUser]);
 
   if (appMode === 'login') {
     return <Login />
+  }
+
+  if (isCheckingCustomer) {
+    return (
+      <div className="flex items-center justify-center h-screen bg-background-main text-text-main font-display">
+        <div className="flex flex-col items-center gap-4">
+          <span className="material-symbols-outlined text-[48px] text-primary animate-spin">sync</span>
+          <p className="font-bold tracking-wider">アカウント情報を確認しています...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (appMode === 'pending') {
+    return (
+      <div className="flex items-center justify-center h-screen bg-background-main text-text-main font-display p-6 text-center">
+        <div className="max-w-md w-full bg-surface p-8 rounded-xl border border-border-dark flex flex-col items-center gap-6 shadow-2xl">
+          <div className="size-16 rounded-full bg-accent-red/10 flex items-center justify-center text-accent-red">
+            <span className="material-symbols-outlined text-[32px]">pending_actions</span>
+          </div>
+          <div>
+            <h1 className="text-xl font-bold mb-2">承認待ち、または未登録です</h1>
+            <p className="text-sm text-text-muted leading-relaxed">
+              現在のアカウント（{currentUser?.email}）は、B2B発注システムへのアクセス権限がありません。<br/><br/>
+              管理者の承認をお待ちいただくか、アカウント情報が正しく登録されているかご確認ください。
+            </p>
+          </div>
+          <div className="flex w-full gap-3 mt-4">
+            <button onClick={logout} className="flex-1 py-3 border border-border-dark rounded font-bold hover:bg-surface-highlight transition-colors text-text-main">
+              ログアウト
+            </button>
+            <button onClick={() => window.location.reload()} className="flex-1 py-3 bg-primary text-background-main rounded font-bold hover:bg-white transition-colors">
+              再確認する
+            </button>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   if (appMode === 'admin') {
