@@ -13,6 +13,10 @@ function App() {
   const [selectedProduct, setSelectedProduct] = useState(null)
   const [toastMessage, setToastMessage] = useState(null)
   const toastTimer = useRef(null)
+  
+  const [isConfirmingOrder, setIsConfirmingOrder] = useState(false)
+  const [orderCompleteData, setOrderCompleteData] = useState(null)
+
   // Check localStorage for existing cart
   const [cart, setCart] = useState(() => {
     const savedCart = localStorage.getItem('bigrock_b2b_cart');
@@ -92,7 +96,8 @@ function App() {
 
     setOrderHistory([newOrder, ...orderHistory])
     setCart([])
-    setActiveTab('history')
+    setIsConfirmingOrder(false)
+    setOrderCompleteData(newOrder)
   }
 
   useEffect(() => {
@@ -445,9 +450,29 @@ function App() {
 
             {/* --- CART VIEW --- */}
             {activeTab === 'cart' && (
-              <div className="flex flex-col gap-6">
-                <div className="flex items-center justify-between border-b border-border-subtle pb-4">
-                  <h3 className="text-xl font-bold text-text-main uppercase tracking-wider flex items-center gap-2">
+              <div className="flex flex-col gap-6 animate-fade-in-up">
+                {orderCompleteData ? (
+                  <div className="max-w-xl mx-auto mt-12 bg-surface border border-border-subtle p-12 text-center rounded-sm w-full">
+                    <div className="size-20 bg-accent-green/10 rounded-full flex items-center justify-center mx-auto mb-6">
+                      <span className="material-symbols-outlined text-4xl text-accent-green">check_circle</span>
+                    </div>
+                    <h3 className="text-2xl font-bold text-text-main mb-2">発注が完了しました</h3>
+                    <p className="text-text-muted mb-8 text-sm leading-relaxed">
+                      注文ID: <span className="font-mono bg-black/5 px-2 py-1 rounded">{orderCompleteData.id}</span>
+                      <br/>ご注文ありがとうございます。近日中に担当者より確認のご連絡を差し上げます。
+                    </p>
+                    <button 
+                      onClick={() => { setOrderCompleteData(null); setActiveTab('history'); }}
+                      className="bg-surface-highlight border border-border-subtle text-text-main font-bold py-3 px-8 rounded-sm hover:border-primary hover:text-primary transition-colors flex items-center justify-center gap-2 mx-auto"
+                    >
+                      <span className="material-symbols-outlined text-[18px]">history</span>
+                      注文履歴へ進む
+                    </button>
+                  </div>
+                ) : (
+                  <>
+                    <div className="flex items-center justify-between border-b border-border-subtle pb-4">
+                      <h3 className="text-xl font-bold text-text-main uppercase tracking-wider flex items-center gap-2">
                     <span className="material-symbols-outlined text-primary text-2xl">shopping_cart</span>
                     現在のカート
                   </h3>
@@ -531,17 +556,19 @@ function App() {
                           </div>
                         </div>
 
-                        <button onClick={placeOrder} className="w-full bg-primary text-background-main font-bold py-3 rounded-sm hover:bg-primary-dim transition-colors flex items-center justify-center gap-2 shadow-lg shadow-primary/20">
+                        <button onClick={() => setIsConfirmingOrder(true)} className="w-full bg-primary text-background-main font-bold py-3 rounded-sm hover:bg-primary-dim transition-colors flex items-center justify-center gap-2 shadow-lg shadow-primary/20">
                           <span className="material-symbols-outlined">send</span>
                           発注を実行する
                         </button>
 
                         <p className="text-[10px] text-text-muted text-center mt-4">
-                          発注を確定すると、登録メールアドレスに確認が送信されます。
+                          発注を実行する前に確認画面が表示されます。
                         </p>
                       </div>
                     </div>
                   </div>
+                )}
+                </>
                 )}
               </div>
             )}
@@ -731,6 +758,50 @@ function App() {
 
           </div>
         </div>
+
+        {/* Order Confirmation Modal */}
+        {isConfirmingOrder && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-text-main/20 backdrop-blur-sm animate-fade-in">
+            <div className="bg-surface border border-border-subtle w-full max-w-md rounded-sm shadow-2xl overflow-hidden">
+              <div className="p-6 border-b border-border-subtle bg-background-main">
+                <h3 className="text-lg font-bold text-text-main flex items-center gap-2">
+                  <span className="material-symbols-outlined text-primary">gavel</span>
+                  発注内容の最終確認
+                </h3>
+              </div>
+              <div className="p-6">
+                <p className="text-text-main text-sm mb-4">
+                  以下の内容で発注を確定します。<br/>よろしいでしょうか？
+                </p>
+                <div className="bg-black/5 p-4 rounded-sm mb-6 border border-border-subtle">
+                  <div className="flex justify-between text-sm mb-2">
+                    <span className="text-text-muted">合計点数:</span>
+                    <span className="font-bold text-text-main">{getCartTotalQuantity()} 点</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-text-muted">合計金額 (税込):</span>
+                    <span className="font-bold text-text-main">¥{Math.floor(getCartTotalPrice() * 1.1).toLocaleString()}</span>
+                  </div>
+                </div>
+                <div className="flex gap-3">
+                  <button 
+                    onClick={() => setIsConfirmingOrder(false)}
+                    className="flex-1 py-3 text-sm font-bold text-text-main bg-surface-highlight border border-border-subtle rounded-sm hover:bg-black/5 transition-colors"
+                  >
+                    キャンセル
+                  </button>
+                  <button 
+                    onClick={placeOrder}
+                    className="flex-1 py-3 text-sm font-bold text-background-main bg-primary rounded-sm hover:bg-primary-dim transition-colors flex items-center justify-center gap-2"
+                  >
+                    <span className="material-symbols-outlined text-[18px]">send</span>
+                    確定する
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Toast Notification */}
         {toastMessage && (
