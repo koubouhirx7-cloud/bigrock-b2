@@ -203,6 +203,16 @@ function App() {
 
       setIsCheckingCustomer(true);
       try {
+        // Super Admin Bypass
+        if (currentUser.email === 'koubou.hi.rx7@gmail.com') {
+            setCustomerProfile({ email: currentUser.email, companyName: 'サイト管理者 (Admin)', status: 'Active' });
+            if (appMode === 'login' || appMode === 'pending') {
+                setAppMode('admin'); // Drop straight into admin panel
+            }
+            setIsCheckingCustomer(false);
+            return;
+        }
+
         const customers = await fetchCustomers();
         const profile = customers.find(c => c.email === currentUser.email);
         
