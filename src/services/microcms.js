@@ -86,3 +86,43 @@ export const createOrder = async (orderData) => {
         throw err;
     }
 };
+
+/**
+ * Fetch all orders from MicroCMS.
+ */
+export const fetchOrders = async () => {
+    // Local dev mode with direct API Key
+    if (!serviceDomain) {
+        console.warn("[MicroCMS] Missing service domain. Returning empty array.");
+        return [];
+    }
+
+    // Use the proxy if no direct API key is available
+    if (!apiKey) {
+        try {
+            console.log("Fetching orders via secure proxy...");
+            const response = await fetch('/api/get-orders');
+            if (!response.ok) {
+                throw new Error(`Proxy error: ${response.statusText}`);
+            }
+            const data = await response.json();
+            return data.contents || [];
+        } catch (err) {
+            console.error("Error fetching orders from proxy:", err);
+            return [];
+        }
+    }
+
+    try {
+        const response = await client.getList({
+            endpoint: 'orders',
+            queries: {
+                limit: 100, // Adjust this based on volume
+            }
+        });
+        return response.contents;
+    } catch (err) {
+        console.error("Error fetching orders from MicroCMS:", err);
+        return [];
+    }
+};

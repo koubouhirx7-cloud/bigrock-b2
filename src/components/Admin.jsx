@@ -1,7 +1,24 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { fetchOrders } from '../services/microcms';
 
 export default function Admin({ products, onExitAdmin }) {
     const [adminTab, setAdminTab] = useState('products');
+    const [ordersList, setOrdersList] = useState([]);
+    const [isLoadingOrders, setIsLoadingOrders] = useState(false);
+
+    useEffect(() => {
+        if (adminTab === 'orders') {
+            const loadOrders = async () => {
+                setIsLoadingOrders(true);
+                const data = await fetchOrders();
+                // order by creation date descending
+                const sortedOrders = data.sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt));
+                setOrdersList(sortedOrders);
+                setIsLoadingOrders(false);
+            };
+            loadOrders();
+        }
+    }, [adminTab]);
 
     return (
         <div className="flex-1 flex overflow-hidden h-full bg-background-main text-text-main font-display">
@@ -137,12 +154,55 @@ export default function Admin({ products, onExitAdmin }) {
                     )}
 
                     {adminTab === 'orders' && (
-                        <div className="bg-surface border border-border-dark overflow-hidden flex flex-col items-center justify-center p-12 text-center">
-                            <span className="material-symbols-outlined text-[48px] text-text-muted mb-4 opacity-50">receipt_long</span>
-                            <h3 className="text-lg font-bold text-text-main mb-2">受注データなし</h3>
-                            <p className="text-sm text-text-muted max-w-sm">
-                                現在、新しい受注記録はありません。ダッシュボード（購入者側）から発注が行われるとここに表示されます。
-                            </p>
+                        <div className="bg-surface border border-border-dark overflow-hidden flex flex-col min-h-[400px]">
+                            {isLoadingOrders ? (
+                                <div className="flex-1 flex flex-col items-center justify-center p-12 text-center">
+                                    <span className="material-symbols-outlined text-[48px] text-primary animate-pulse mb-4">sync</span>
+                                    <h3 className="text-lg font-bold text-text-main mb-2">データを読み込み中...</h3>
+                                </div>
+                            ) : ordersList.length === 0 ? (
+                                <div className="flex-1 flex flex-col items-center justify-center p-12 text-center">
+                                    <span className="material-symbols-outlined text-[48px] text-text-muted mb-4 opacity-50">receipt_long</span>
+                                    <h3 className="text-lg font-bold text-text-main mb-2">受注データなし</h3>
+                                    <p className="text-sm text-text-muted max-w-sm">
+                                        現在、新しい受注記録はありません。ダッシュボード（購入者側）から発注が行われるとここに表示されます。
+                                    </p>
+                                </div>
+                            ) : (
+                                <table className="w-full text-left border-collapse">
+                                    <thead>
+                                        <tr className="border-b border-border-dark bg-surface-highlight text-xs uppercase tracking-wider text-text-muted font-mono">
+                                            <th className="p-4 font-normal">注文ID</th>
+                                            <th className="p-4 font-normal">作成日時 / 顧客</th>
+                                            <th className="p-4 font-normal">商品数</th>
+                                            <th className="p-4 font-normal text-right">合計金額</th>
+                                            <th className="p-4 font-normal text-center">ステータス</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody className="text-sm">
+                                        {ordersList.map(order => {
+                                            const items = JSON.parse(order.items || "[]");
+                                            const totalItems = items.reduce((sum, item) => sum + (item.quantity || 1), 0);
+                                            return (
+                                                <tr key={order.id} className="border-b border-border-dark/50 hover:bg-black/5 transition-colors">
+                                                    <td className="p-4 font-mono font-bold text-text-main">{order.orderId}</td>
+                                                    <td className="p-4">
+                                                        <div className="text-xs text-text-muted">{new Date(order.createdAt).toLocaleString('ja-JP')}</div>
+                                                        <div className="text-sm font-bold text-text-main">{order.customerEmail}</div>
+                                                    </td>
+                                                    <td className="p-4 text-text-muted">{totalItems}点</td>
+                                                    <td className="p-4 text-right font-mono font-bold text-primary">¥{(order.totalAmount || 0).toLocaleString()}</td>
+                                                    <td className="p-4 text-center">
+                                                        <span className={`inline-flex items-center px-2 py-1 rounded text-[10px] font-bold tracking-wider uppercase font-mono border ${order.status === '処理中' ? 'bg-primary/10 text-primary border-primary/20' : order.status === '発送済' ? 'bg-blue-500/10 text-blue-400 border-blue-500/20' : 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20'}`}>
+                                                            {order.status || '未定義'}
+                                                        </span>
+                                                    </td>
+                                                </tr>
+                                            );
+                                        })}
+                                    </tbody>
+                                </table>
+                            )}
                         </div>
                     )}
 
