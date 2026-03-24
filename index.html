@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="ja" class="dark">
+<html lang="ja" >
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
@@ -18,23 +18,23 @@
             theme: {
                 extend: {
                     colors: {
-                        "primary": "#f2c84a",
-                        "primary-dim": "#b39020",
-                        "background-dark": "#111113",
-                        "surface": "#1E1E21",
-                        "surface-highlight": "#2a2a2d",
-                        "text-main": "#EAEAEA",
-                        "text-muted": "#888888",
-                        "border-subtle": "#333336",
-                        "accent-red": "#EB5757",
-                        "accent-green": "#27AE60",
+                        "primary": "#2D4A22",
+                        "primary-dim": "#1F3318",
+                        "background-main": "#F7F9F6",
+                        "surface": "#FFFFFF",
+                        "surface-highlight": "#F0F2EE",
+                        "text-main": "#1A2016",
+                        "text-muted": "#687163",
+                        "border-subtle": "#E2E6DF",
+                        "accent-red": "#E11D48",
+                        "accent-green": "#16A34A",
                     },
                     fontFamily: {
                         "display": ["Inter", "Noto Sans JP", "sans-serif"],
                         "mono": ["JetBrains Mono", "monospace"],
                     },
                     backgroundImage: {
-                        "grid-pattern": "linear-gradient(to right, #333336 1px, transparent 1px), linear-gradient(to bottom, #333336 1px, transparent 1px)",
+                        "grid-pattern": "linear-gradient(to right, #E2E6DF 1px, transparent 1px), linear-gradient(to bottom, #E2E6DF 1px, transparent 1px)",
                     }
                 },
             },
@@ -43,8 +43,8 @@
     <style>
         /* Custom scrollbar for industrial feel */
         ::-webkit-scrollbar { width: 8px; height: 8px; }
-        ::-webkit-scrollbar-track { background: #111113; }
-        ::-webkit-scrollbar-thumb { background: #333336; border-radius: 2px; }
+        ::-webkit-scrollbar-track { background: #F7F9F6; }
+        ::-webkit-scrollbar-thumb { background: #D1D5CB; border-radius: 2px; }
         ::-webkit-scrollbar-thumb:hover { background: #555; }
         .technical-grid {
             background-size: 40px 40px;
@@ -60,7 +60,7 @@
         }
     </style>
   </head>
-  <body class="bg-background-dark text-text-main font-display antialiased overflow-hidden h-screen flex">
+  <body class="bg-background-main text-text-main font-display antialiased overflow-hidden h-screen flex">
     <div id="root" class="w-full h-full"></div>
     <script type="module" src="/src/main.jsx"></script>
   </body>

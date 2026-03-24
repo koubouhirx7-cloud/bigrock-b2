@@ -4,12 +4,12 @@ export default function Admin({ products, onExitAdmin }) {
     const [adminTab, setAdminTab] = useState('products');
 
     return (
-        <div className="flex-1 flex overflow-hidden h-full bg-background-dark text-text-main font-display">
+        <div className="flex-1 flex overflow-hidden h-full bg-background-main text-text-main font-display">
             {/* Admin Sidebar */}
             <aside className="w-[280px] flex-none border-r border-border-dark bg-surface overflow-y-auto flex flex-col">
                 <div className="p-5 border-b border-border-dark flex items-center justify-between">
                     <h3 className="font-bold text-sm text-primary uppercase tracking-wider">Admin Panel</h3>
-                    <button onClick={onExitAdmin} className="text-xs text-text-muted hover:text-white underline decoration-dotted">
+                    <button onClick={onExitAdmin} className="text-xs text-text-muted hover:text-text-main underline decoration-dotted">
                         ストアに戻る
                     </button>
                 </div>
@@ -17,7 +17,7 @@ export default function Admin({ products, onExitAdmin }) {
                 <div className="flex-1 p-5 space-y-2">
                     <button
                         onClick={() => setAdminTab('products')}
-                        className={`w-full text-left p-3 flex items-center gap-3 transition-colors ${adminTab === 'products' ? 'bg-primary/10 text-primary border-r-2 border-primary' : 'text-text-muted hover:text-white hover:bg-surface-highlight'}`}
+                        className={`w-full text-left p-3 flex items-center gap-3 transition-colors ${adminTab === 'products' ? 'bg-primary/10 text-primary border-r-2 border-primary' : 'text-text-muted hover:text-text-main hover:bg-surface-highlight'}`}
                     >
                         <span className="material-symbols-outlined text-[20px]">inventory_2</span>
                         <span className="text-sm font-bold">製品管理</span>
@@ -25,7 +25,7 @@ export default function Admin({ products, onExitAdmin }) {
 
                     <button
                         onClick={() => setAdminTab('orders')}
-                        className={`w-full text-left p-3 flex items-center gap-3 transition-colors ${adminTab === 'orders' ? 'bg-primary/10 text-primary border-r-2 border-primary' : 'text-text-muted hover:text-white hover:bg-surface-highlight'}`}
+                        className={`w-full text-left p-3 flex items-center gap-3 transition-colors ${adminTab === 'orders' ? 'bg-primary/10 text-primary border-r-2 border-primary' : 'text-text-muted hover:text-text-main hover:bg-surface-highlight'}`}
                     >
                         <span className="material-symbols-outlined text-[20px]">receipt_long</span>
                         <span className="text-sm font-bold">受注管理</span>
@@ -33,7 +33,7 @@ export default function Admin({ products, onExitAdmin }) {
 
                     <button
                         onClick={() => setAdminTab('users')}
-                        className={`w-full text-left p-3 flex items-center gap-3 transition-colors ${adminTab === 'users' ? 'bg-primary/10 text-primary border-r-2 border-primary' : 'text-text-muted hover:text-white hover:bg-surface-highlight'}`}
+                        className={`w-full text-left p-3 flex items-center gap-3 transition-colors ${adminTab === 'users' ? 'bg-primary/10 text-primary border-r-2 border-primary' : 'text-text-muted hover:text-text-main hover:bg-surface-highlight'}`}
                     >
                         <span className="material-symbols-outlined text-[20px]">group</span>
                         <span className="text-sm font-bold">顧客管理</span>
@@ -51,16 +51,16 @@ export default function Admin({ products, onExitAdmin }) {
                 <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{ backgroundImage: "url('data:image/svg+xml,%3Csvg width=\\'6\\' height=\\'6\\' viewBox=\\'0 0 6 6\\' xmlns=\\'http://www.w3.org/2000/svg\\'%3E%3Cg fill=\\'%23ffffff\\' fill-opacity=\\'1\\' fill-rule=\\'evenodd\\'%3E%3Cpath d=\\'M5 0h1L0 6V5zM6 5v1H5z\\'/%3E%3C/g%3E%3C/svg%3E')" }}></div>
 
                 {/* Toolbar */}
-                <div className="flex-none p-6 border-b border-border-dark bg-background-dark z-10">
+                <div className="flex-none p-6 border-b border-border-dark bg-background-main z-10">
                     <div className="flex items-center justify-between">
-                        <h1 className="text-2xl font-bold text-white tracking-tight">
+                        <h1 className="text-2xl font-bold text-text-main tracking-tight">
                             {adminTab === 'products' && '製品在庫一覧 (Inventory)'}
                             {adminTab === 'orders' && '受注履歴 (Incoming Orders)'}
                             {adminTab === 'users' && '登録顧客 (Users)'}
                         </h1>
 
                         {adminTab === 'products' && (
-                            <button className="flex items-center gap-2 h-10 px-4 bg-primary text-background-dark hover:bg-white transition-all text-sm font-bold uppercase tracking-wider">
+                            <button className="flex items-center gap-2 h-10 px-4 bg-primary text-background-main hover:bg-white transition-all text-sm font-bold uppercase tracking-wider">
                                 <span className="material-symbols-outlined text-[20px]">upload_file</span>
                                 <span>製品インポート</span>
                             </button>
@@ -88,8 +88,8 @@ export default function Admin({ products, onExitAdmin }) {
                                         <React.Fragment key={p.id}>
                                             {p.variants ? (
                                                 p.variants.map((v, i) => (
-                                                    <tr key={`${p.id}-${v.id || i}`} className="border-b border-border-dark/50 hover:bg-white/5 transition-colors">
-                                                        <td className="p-4 font-bold text-white">
+                                                    <tr key={`${p.id}-${v.id || i}`} className="border-b border-border-dark/50 hover:bg-black/5 transition-colors">
+                                                        <td className="p-4 font-bold text-text-main">
                                                             {i === 0 ? p.name : (
                                                                 <span className="text-text-muted ml-4">
                                                                     ↳ {v.type === 'color' ? 'Color' : 'Size'}: {v.name}
@@ -105,15 +105,15 @@ export default function Admin({ products, onExitAdmin }) {
                                                             </span>
                                                         </td>
                                                         <td className="p-4 text-center">
-                                                            <button className="text-text-muted hover:text-white transition-colors">
+                                                            <button className="text-text-muted hover:text-text-main transition-colors">
                                                                 <span className="material-symbols-outlined text-[18px]">edit</span>
                                                             </button>
                                                         </td>
                                                     </tr>
                                                 ))
                                             ) : (
-                                                <tr className="border-b border-border-dark hover:bg-white/5 transition-colors">
-                                                    <td className="p-4 font-bold text-white">{p.name}</td>
+                                                <tr className="border-b border-border-dark hover:bg-black/5 transition-colors">
+                                                    <td className="p-4 font-bold text-text-main">{p.name}</td>
                                                     <td className="p-4 font-mono text-text-muted text-xs">{p.id}</td>
                                                     <td className="p-4 text-text-muted">{p.category}</td>
                                                     <td className="p-4 text-right font-mono text-primary">¥{p.price.toLocaleString()}</td>
@@ -123,7 +123,7 @@ export default function Admin({ products, onExitAdmin }) {
                                                         </span>
                                                     </td>
                                                     <td className="p-4 text-center">
-                                                        <button className="text-text-muted hover:text-white transition-colors">
+                                                        <button className="text-text-muted hover:text-text-main transition-colors">
                                                             <span className="material-symbols-outlined text-[18px]">edit</span>
                                                         </button>
                                                     </td>
@@ -139,7 +139,7 @@ export default function Admin({ products, onExitAdmin }) {
                     {adminTab === 'orders' && (
                         <div className="bg-surface border border-border-dark overflow-hidden flex flex-col items-center justify-center p-12 text-center">
                             <span className="material-symbols-outlined text-[48px] text-text-muted mb-4 opacity-50">receipt_long</span>
-                            <h3 className="text-lg font-bold text-white mb-2">受注データなし</h3>
+                            <h3 className="text-lg font-bold text-text-main mb-2">受注データなし</h3>
                             <p className="text-sm text-text-muted max-w-sm">
                                 現在、新しい受注記録はありません。ダッシュボード（購入者側）から発注が行われるとここに表示されます。
                             </p>
@@ -149,7 +149,7 @@ export default function Admin({ products, onExitAdmin }) {
                     {adminTab === 'users' && (
                         <div className="bg-surface border border-border-dark overflow-hidden flex flex-col items-center justify-center p-12 text-center">
                             <span className="material-symbols-outlined text-[48px] text-text-muted mb-4 opacity-50">group</span>
-                            <h3 className="text-lg font-bold text-white mb-2">顧客データ連携準備中</h3>
+                            <h3 className="text-lg font-bold text-text-main mb-2">顧客データ連携準備中</h3>
                             <p className="text-sm text-text-muted max-w-sm">
                                 B2B顧客アカウントの管理機能は次のフェーズで実装予定です。
                             </p>

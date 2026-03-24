@@ -15,7 +15,7 @@ export default function Login() {
     };
 
     return (
-        <div className="font-display bg-background-dark text-slate-100 min-h-screen flex flex-col items-center justify-center p-4 relative overflow-hidden">
+        <div className="font-display bg-background-main text-slate-100 min-h-screen flex flex-col items-center justify-center p-4 relative overflow-hidden">
 
             {/* Background Effect */}
             <div className="absolute inset-0 pointer-events-none z-0"
@@ -31,18 +31,18 @@ export default function Login() {
                 {/* Logo Section */}
                 <div className="flex flex-col items-center gap-4">
                     <div className="flex items-center gap-3">
-                        <div className="w-12 h-12 bg-primary flex items-center justify-center text-background-dark">
+                        <div className="w-12 h-12 bg-primary flex items-center justify-center text-background-main">
                             <span className="material-symbols-outlined !text-4xl font-bold">architecture</span>
                         </div>
                         <div className="flex flex-col">
-                            <h1 className="text-2xl font-bold tracking-tighter uppercase leading-none text-white">Big Rock</h1>
+                            <h1 className="text-2xl font-bold tracking-tighter uppercase leading-none text-text-main">Big Rock</h1>
                             <span className="text-primary font-mono text-sm tracking-widest leading-none mt-1 font-bold">B2B PROCUREMENT</span>
                         </div>
                     </div>
                 </div>
 
                 {/* Auth Card */}
-                <div className="bg-background-dark border border-primary/20 p-8 md:p-10 relative overflow-hidden shadow-2xl">
+                <div className="bg-background-main border border-primary/20 p-8 md:p-10 relative overflow-hidden shadow-2xl">
                     {/* Decorative Accent Corner */}
                     <div className="absolute top-0 right-0 w-8 h-8 border-t-2 border-r-2 border-primary/40"></div>
 
@@ -64,9 +64,9 @@ export default function Login() {
                     </button>
 
                     <div className="relative my-8 flex items-center">
-                        <div className="flex-grow border-t border-white/10"></div>
+                        <div className="flex-grow border-t border-black/10"></div>
                         <span className="flex-shrink mx-4 text-xs font-mono text-slate-500 uppercase tracking-widest">または</span>
-                        <div className="flex-grow border-t border-white/10"></div>
+                        <div className="flex-grow border-t border-black/10"></div>
                     </div>
 
                     {/* Traditional Login Form */}
@@ -74,7 +74,7 @@ export default function Login() {
                         <div className="space-y-2">
                             <label className="block text-xs font-mono font-medium text-primary/80 uppercase tracking-widest">Email Address</label>
                             <input
-                                className="w-full p-3 text-sm text-white placeholder-slate-600 focus:ring-1 focus:ring-primary focus:border-primary bg-white/5 border border-primary/20"
+                                className="w-full p-3 text-sm text-text-main placeholder-slate-600 focus:ring-1 focus:ring-primary focus:border-primary bg-black/5 border border-primary/20"
                                 placeholder="name@company.com"
                                 type="email"
                             />
@@ -87,7 +87,7 @@ export default function Login() {
                             </div>
                             <div className="relative">
                                 <input
-                                    className="w-full p-3 text-sm text-white placeholder-slate-600 focus:ring-1 focus:ring-primary focus:border-primary bg-white/5 border border-primary/20"
+                                    className="w-full p-3 text-sm text-text-main placeholder-slate-600 focus:ring-1 focus:ring-primary focus:border-primary bg-black/5 border border-primary/20"
                                     placeholder="••••••••"
                                     type="password"
                                 />
@@ -98,12 +98,12 @@ export default function Login() {
                         </div>
 
                         <div className="flex items-center gap-2 py-2">
-                            <input className="w-4 h-4 bg-white/5 rounded-none checked:bg-primary border-primary/40 focus:ring-0" id="remember" type="checkbox" />
+                            <input className="w-4 h-4 bg-black/5 rounded-none checked:bg-primary border-primary/40 focus:ring-0" id="remember" type="checkbox" />
                             <label className="text-xs font-mono text-slate-400 cursor-pointer" htmlFor="remember">ログイン状態を保持する</label>
                         </div>
 
                         <button
-                            className="w-full bg-primary hover:bg-[#e0b93d] text-background-dark font-bold py-3 px-4 transition-all duration-200 uppercase tracking-widest text-sm font-mono flex items-center justify-center gap-2 group"
+                            className="w-full bg-primary hover:bg-[#e0b93d] text-background-main font-bold py-3 px-4 transition-all duration-200 uppercase tracking-widest text-sm font-mono flex items-center justify-center gap-2 group"
                             type="submit"
                         >
                             ログイン
