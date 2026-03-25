@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { fetchOrders, updateOrder, fetchCustomers, createCustomer, updateCustomer, updateProduct } from '../services/microcms';
+import { fetchOrders, updateOrder, deleteOrder, fetchCustomers, createCustomer, updateCustomer, updateProduct } from '../services/microcms';
 
 export default function Admin({ products, onExitAdmin, refreshProducts }) {
     const [adminTab, setAdminTab] = useState('products');
@@ -101,6 +101,20 @@ export default function Admin({ products, onExitAdmin, refreshProducts }) {
             alert('Failed to update order: ' + error.message);
         } finally {
             setIsUpdatingOrder(false);
+        }
+    };
+
+    const handleDeleteOrder = async (orderId) => {
+        if (!window.confirm("本当にこの注文を削除しますか？\nこの操作は元に戻せません。")) return;
+        
+        setIsLoadingOrders(true);
+        try {
+            await deleteOrder(orderId);
+            setOrdersList(prev => prev.filter(o => o.id !== orderId));
+        } catch (error) {
+            alert('注文の削除に失敗しました: ' + error.message);
+        } finally {
+            setIsLoadingOrders(false);
         }
     };
 
@@ -446,12 +460,21 @@ export default function Admin({ products, onExitAdmin, refreshProducts }) {
                                                     <td className="p-4 text-text-muted">{totalItems}点</td>
                                                     <td className="p-4 text-right font-mono font-bold text-primary">¥{(order.totalAmount || 0).toLocaleString()}</td>
                                                     <td className="p-4 text-center">
-                                                        <button 
-                                                            onClick={() => openEditModal(order)}
-                                                            className={`inline-flex items-center px-3 py-1.5 rounded text-[11px] font-bold tracking-wider uppercase font-mono border hover:opacity-80 transition-opacity cursor-pointer shadow-sm ${order.status === '処理中' ? 'bg-primary/5 text-primary border-primary/20' : order.status === '発送済' ? 'bg-blue-500/5 text-blue-500 border-blue-500/20' : 'bg-emerald-500/5 text-emerald-600 border-emerald-500/20'}`}>
-                                                            {order.status || '未定義'}
-                                                            <span className="material-symbols-outlined text-[14px] ml-1 opacity-70">edit</span>
-                                                        </button>
+                                                        <div className="flex items-center justify-center gap-2">
+                                                            <button 
+                                                                onClick={() => openEditModal(order)}
+                                                                className={`inline-flex items-center px-3 py-1.5 rounded text-[11px] font-bold tracking-wider uppercase font-mono border hover:opacity-80 transition-opacity cursor-pointer shadow-sm ${order.status === '処理中' ? 'bg-primary/5 text-primary border-primary/20' : order.status === '発送済' ? 'bg-blue-500/5 text-blue-500 border-blue-500/20' : 'bg-emerald-500/5 text-emerald-600 border-emerald-500/20'}`}>
+                                                                {order.status || '未定義'}
+                                                                <span className="material-symbols-outlined text-[14px] ml-1 opacity-70">edit</span>
+                                                            </button>
+                                                            <button 
+                                                                onClick={() => handleDeleteOrder(order.id)}
+                                                                className="inline-flex items-center p-1.5 rounded text-text-muted hover:text-accent-red hover:bg-accent-red/10 transition-colors"
+                                                                title="注文を削除"
+                                                            >
+                                                                <span className="material-symbols-outlined text-[16px]">delete</span>
+                                                            </button>
+                                                        </div>
                                                     </td>
                                                 </tr>
                                             );
