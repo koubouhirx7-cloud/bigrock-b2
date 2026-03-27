@@ -235,6 +235,7 @@ function App() {
             price: item.basePrice || item.price || 0,
             stock: item.stock || 0,
             imageUrl: item.externalImageUrl || item.image?.url || '',
+            originalUrl: item.originalUrl || '',
             variants: parsedVariants
           };
         })
