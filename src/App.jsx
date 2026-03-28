@@ -61,7 +61,8 @@ function App() {
       const current = prev[variantId] || 1;
       let next = current + delta;
       if (next < 1) next = 1;
-      if (next > maxStock) next = maxStock;
+      const limit = maxStock > 0 ? maxStock : 999;
+      if (next > limit) next = limit;
       return { ...prev, [variantId]: next };
     })
   }
@@ -69,7 +70,8 @@ function App() {
   const handleVariantQuantityInput = (variantId, valStr, maxStock) => {
     let next = parseInt(valStr, 10);
     if (isNaN(next) || next < 1) next = 1;
-    if (next > maxStock) next = maxStock;
+    const limit = maxStock > 0 ? maxStock : 999;
+    if (next > limit) next = limit;
     setSelectionQuantities(prev => ({ ...prev, [variantId]: next }))
   }
 
@@ -113,16 +115,16 @@ function App() {
     });
   }, [orderHistory, historyFilter]);
 
-  const addToCart = (product, variant, addedQuantity = 1) => {
+  const addToCart = (product, variant, addedQuantity = 1, isBO = false) => {
     setCart(prevCart => {
       const cartItemId = variant ? `${product.id}_${variant.id}` : product.id;
       const existingItem = prevCart.find(item => item.cartItemId === cartItemId)
       if (existingItem) {
         return prevCart.map(item =>
-          item.cartItemId === cartItemId ? { ...item, quantity: item.quantity + addedQuantity } : item
+          item.cartItemId === cartItemId ? { ...item, quantity: item.quantity + addedQuantity, isBO: isBO || item.isBO } : item
         )
       }
-      return [...prevCart, { ...product, cartItemId, variantId: variant?.id, variantName: variant?.name, quantity: addedQuantity }]
+      return [...prevCart, { ...product, cartItemId, variantId: variant?.id, variantName: variant?.name, quantity: addedQuantity, isBO }]
     })
 
     if (toastTimer.current) {
@@ -755,49 +757,47 @@ function App() {
                             <tr key={variant.id} className="hover:bg-black/5 transition-colors group">
                               <td className="px-5 py-4 font-bold text-text-main text-sm">{variant.name}</td>
                               <td className="px-5 py-4 text-center">
-                                <span className={`inline-flex items-center px-2 py-0.5 rounded text-[10px] font-mono border ${variant.stock > 5 ? 'bg-accent-green/10 text-accent-green border-accent-green/20' : variant.stock > 0 ? 'bg-yellow-500/10 text-yellow-500 border-yellow-500/20' : 'bg-text-muted/10 text-text-muted border-border-subtle'}`}>
-                                  {variant.stock > 0 ? `${variant.stock} units` : 'Out of Stock'}
+                                <span className={`inline-flex items-center px-2 py-0.5 rounded text-[10px] font-mono border ${variant.stock > 5 ? 'bg-accent-green/10 text-accent-green border-accent-green/20' : variant.stock > 0 ? 'bg-yellow-500/10 text-yellow-500 border-yellow-500/20' : 'bg-red-500/10 text-red-500 border-red-500/20'}`}>
+                                  {variant.stock > 0 ? `${variant.stock} units` : 'Out of Stock (BO)'}
                                 </span>
                               </td>
                               <td className="px-5 py-4 text-right">
                                 <div className="flex items-center justify-end gap-3">
-                                  {variant.stock > 0 && (
-                                    <div className="flex items-center border border-border-subtle rounded-sm bg-background-main shadow-sm">
-                                      <button 
-                                        onClick={() => handleVariantQuantityChange(variant.id, -1, variant.stock)} 
-                                        className="size-8 flex items-center justify-center text-text-muted hover:text-text-main hover:bg-black/5 transition-colors"
-                                      >
-                                        <span className="material-symbols-outlined text-[16px]">remove</span>
-                                      </button>
-                                      <input 
-                                        type="number" 
-                                        min="1" 
-                                        max={variant.stock} 
-                                        value={selectionQuantities[variant.id] || 1} 
-                                        onChange={(e) => handleVariantQuantityInput(variant.id, e.target.value, variant.stock)}
-                                        className="w-12 h-8 text-center bg-transparent border-none text-sm font-mono focus:ring-0 p-0 text-text-main"
-                                      />
-                                      <button 
-                                        onClick={() => handleVariantQuantityChange(variant.id, 1, variant.stock)} 
-                                        className="size-8 flex items-center justify-center text-text-muted hover:text-text-main hover:bg-black/5 transition-colors"
-                                      >
-                                        <span className="material-symbols-outlined text-[16px]">add</span>
-                                      </button>
-                                    </div>
-                                  )}
+                                  <div className="flex items-center border border-border-subtle rounded-sm bg-background-main shadow-sm">
+                                    <button 
+                                      onClick={() => handleVariantQuantityChange(variant.id, -1, variant.stock)} 
+                                      className="size-8 flex items-center justify-center text-text-muted hover:text-text-main hover:bg-black/5 transition-colors"
+                                    >
+                                      <span className="material-symbols-outlined text-[16px]">remove</span>
+                                    </button>
+                                    <input 
+                                      type="number" 
+                                      min="1" 
+                                      max={variant.stock > 0 ? variant.stock : 999} 
+                                      value={selectionQuantities[variant.id] || 1} 
+                                      onChange={(e) => handleVariantQuantityInput(variant.id, e.target.value, variant.stock)}
+                                      className="w-12 h-8 text-center bg-transparent border-none text-sm font-mono focus:ring-0 p-0 text-text-main focus:outline-none"
+                                    />
+                                    <button 
+                                      onClick={() => handleVariantQuantityChange(variant.id, 1, variant.stock)} 
+                                      className="size-8 flex items-center justify-center text-text-muted hover:text-text-main hover:bg-black/5 transition-colors"
+                                    >
+                                      <span className="material-symbols-outlined text-[16px]">add</span>
+                                    </button>
+                                  </div>
                                   <button
                                     onClick={() => {
                                       const addQty = selectionQuantities[variant.id] || 1;
-                                      addToCart(selectedProduct, variant, addQty);
+                                      const isBO = variant.stock <= 0;
+                                      addToCart(selectedProduct, variant, addQty, isBO);
                                       setSelectionQuantities(prev => ({ ...prev, [variant.id]: 1 }));
                                     }}
-                                    disabled={variant.stock === 0}
-                                    className={`text-xs font-bold px-4 py-2 rounded-sm transition-colors flex items-center gap-1 shadow-sm ${variant.stock > 0 ? 'bg-primary text-background-main hover:bg-primary-dim shadow-primary/20' : 'bg-surface-highlight text-text-muted cursor-not-allowed border border-border-subtle'}`}
+                                    className={`text-xs font-bold px-4 py-2 rounded-sm transition-colors flex items-center gap-1 shadow-sm ${variant.stock > 0 ? 'bg-primary text-background-main hover:bg-primary-dim shadow-primary/20' : 'bg-[#e65c00] text-white hover:bg-[#cc5200] shadow-[#e65c00]/20'}`}
                                   >
                                     {variant.stock > 0 ? (
                                       <>カートに追加 <span className="material-symbols-outlined text-sm">add_shopping_cart</span></>
                                     ) : (
-                                      <>在庫なし <span className="material-symbols-outlined text-sm">block</span></>
+                                      <>BO希望 <span className="material-symbols-outlined text-sm">inventory_2</span></>
                                     )}
                                   </button>
                                 </div>
