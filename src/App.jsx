@@ -244,7 +244,7 @@ function App() {
             id: item.skuproducts || item.sku || item.id,
             microcmsId: item.id,
             name: item.title,
-            category: item.category ? item.category[0] || item.category : 'General',
+            category: Array.isArray(item.category) ? item.category[0] : (item.category || 'General'),
             price: item.basePrice || item.price || 0,
             stock: item.stock || 0,
             imageUrl: item.externalImageUrl || item.image?.url || '',
