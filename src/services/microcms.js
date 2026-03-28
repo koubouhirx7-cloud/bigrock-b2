@@ -186,6 +186,47 @@ export const updateOrder = async (id, data) => {
 };
 
 /**
+ * Delete a specific order record.
+ */
+export const deleteOrder = async (orderId) => {
+    if (apiKey) {
+        try {
+            const response = await client.delete({
+                endpoint: 'orders',
+                contentId: orderId,
+            });
+            console.log("Order successfully deleted directly via SDK");
+            return response;
+        } catch (err) {
+            console.error("Error deleting order directly:", err);
+            throw err;
+        }
+    }
+
+    try {
+        const response = await fetch('/api/delete-order', {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ id: orderId })
+        });
+
+        if (!response.ok) {
+            const errBody = await response.json().catch(() => ({}));
+            throw new Error(`Failed to delete order: ${errBody.error || response.statusText}`);
+        }
+
+        const result = await response.json();
+        console.log("Order successfully deleted via proxy");
+        return result;
+    } catch (err) {
+        console.error("Error deleting order:", err);
+        throw err;
+    }
+};
+
+/**
  * Fetch all customers from MicroCMS.
  */
 export const fetchCustomers = async () => {
