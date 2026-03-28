@@ -14,17 +14,10 @@ function App() {
   const [products, setProducts] = useState(productsDataFromJson)
   const [selectedProduct, setSelectedProduct] = useState(null)
   
-  const [catalogCategoryFilter, setCatalogCategoryFilter] = useState('All');
-
   const uniqueCategories = useMemo(() => {
     const cats = products.map(p => p.category || 'Uncategorized');
-    return ['All', ...new Set(cats)].filter(Boolean);
+    return [...new Set(cats)].filter(Boolean).sort();
   }, [products]);
-
-  const filteredCatalogProducts = useMemo(() => {
-    if (catalogCategoryFilter === 'All') return products;
-    return products.filter(p => (p.category || 'Uncategorized') === catalogCategoryFilter);
-  }, [products, catalogCategoryFilter]);
 
   const [toastMessage, setToastMessage] = useState(null)
   const toastTimer = useRef(null)
@@ -647,57 +640,54 @@ function App() {
 
             {/* --- CATALOG VIEW --- */}
             {activeTab === 'catalog' && (
-              <div className="flex flex-col gap-6">
-                {/* Category Filter */}
-                <div className="flex flex-wrap items-center gap-2">
-                  {uniqueCategories.map(cat => (
-                    <button
-                      key={cat}
-                      onClick={() => setCatalogCategoryFilter(cat)}
-                      className={`px-4 py-1.5 text-xs font-bold font-mono tracking-wider rounded transition-colors border ${catalogCategoryFilter === cat ? 'bg-primary text-background-main border-primary shadow-sm' : 'bg-surface border-border-subtle text-text-muted hover:border-primary/50 hover:text-text-main hover:bg-surface-highlight'}`}
-                    >
-                      {cat}
-                    </button>
-                  ))}
-                </div>
-                
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                  {filteredCatalogProducts.map(product => (
-                  <div key={product.id} className="bg-surface border border-border-subtle rounded-sm flex flex-col group hover:border-primary/50 transition-colors overflow-hidden">
-                    {/* Thumbnail Image */}
-                    <div className="h-40 w-full bg-background-main relative border-b border-border-subtle overflow-hidden">
-                      <img src={product.imageUrl} alt={product.name} className="w-full h-full object-cover opacity-80 group-hover:opacity-100 group-hover:scale-105 transition-all duration-500" />
-                      <div className="absolute top-2 right-2">
-                        <span className="text-[10px] font-mono uppercase tracking-wider bg-background-main/80 backdrop-blur-sm px-2 py-1 rounded-sm text-text-muted border border-black/10">
-                          {product.category}
-                        </span>
+              <div className="flex flex-col gap-16">
+                {uniqueCategories.map(category => {
+                  const categoryProducts = products.filter(p => (p.category || 'Uncategorized') === category);
+                  if (categoryProducts.length === 0) return null;
+                  
+                  return (
+                    <div key={category} className="flex flex-col gap-6">
+                      <div className="border-b border-border-subtle pb-2 flex items-center gap-3">
+                        <div className="w-2 h-6 bg-primary"></div>
+                        <h2 className="text-2xl font-bold font-mono tracking-widest uppercase text-text-main drop-shadow-sm">{category}</h2>
+                        <span className="text-text-muted font-mono ml-2 text-sm">({categoryProducts.length})</span>
+                      </div>
+                      
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                        {categoryProducts.map(product => (
+                          <div key={product.id} className="bg-surface border border-border-subtle rounded-sm flex flex-col group hover:border-primary/50 transition-colors overflow-hidden">
+                            {/* Thumbnail Image */}
+                            <div className="h-40 w-full bg-background-main relative border-b border-border-subtle overflow-hidden">
+                              <img src={product.imageUrl} alt={product.name} className="w-full h-full object-cover opacity-80 group-hover:opacity-100 group-hover:scale-105 transition-all duration-500" />
+                            </div>
+
+                            <div className="p-5 flex flex-col flex-1">
+                              <h3 className="text-base font-bold text-text-main mb-2 leading-tight">{product.name}</h3>
+                              <div className="flex items-center gap-2 mb-4">
+                                <p className="text-xs font-mono text-primary/80 bg-primary/10 inline-block w-fit px-1.5 py-0.5 rounded-sm border border-primary/20">{product.sku}</p>
+                                <p className="text-sm font-bold font-mono text-text-main">¥{product.price.toLocaleString()}</p>
+                              </div>
+
+                              <div className="mt-auto pt-4 border-t border-border-subtle flex items-center justify-between">
+                                <div className="flex flex-col">
+                                  <span className="text-[10px] text-text-muted uppercase">Variants</span>
+                                  <span className="text-xs font-mono text-text-main">
+                                    {product.variants?.length || 0} Options
+                                  </span>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                  <button onClick={() => { setSelectedProduct(product); setActiveTab('productDetail'); }} className="text-xs bg-surface-highlight border border-border-subtle text-text-main font-bold px-4 py-2 rounded-sm hover:border-primary hover:text-primary transition-colors flex items-center gap-1 group-hover:bg-primary/10">
+                                    詳細を見る <span className="material-symbols-outlined text-sm">arrow_forward</span>
+                                  </button>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
                       </div>
                     </div>
-
-                    <div className="p-5 flex flex-col flex-1">
-                      <h3 className="text-base font-bold text-text-main mb-2 leading-tight">{product.name}</h3>
-                      <div className="flex items-center gap-2 mb-4">
-                        <p className="text-xs font-mono text-primary/80 bg-primary/10 inline-block w-fit px-1.5 py-0.5 rounded-sm border border-primary/20">{product.sku}</p>
-                        <p className="text-sm font-bold font-mono text-text-main">¥{product.price.toLocaleString()}</p>
-                      </div>
-
-                      <div className="mt-auto pt-4 border-t border-border-subtle flex items-center justify-between">
-                        <div className="flex flex-col">
-                          <span className="text-[10px] text-text-muted uppercase">Variants</span>
-                          <span className="text-xs font-mono text-text-main">
-                            {product.variants?.length || 0} Options
-                          </span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <button onClick={() => { setSelectedProduct(product); setActiveTab('productDetail'); }} className="text-xs bg-surface-highlight border border-border-subtle text-text-main font-bold px-4 py-2 rounded-sm hover:border-primary hover:text-primary transition-colors flex items-center gap-1 group-hover:bg-primary/10">
-                            詳細を見る <span className="material-symbols-outlined text-sm">arrow_forward</span>
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  ))}
-                </div>
+                  );
+                })}
               </div>
             )}
 
