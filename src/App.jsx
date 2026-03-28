@@ -13,6 +13,19 @@ function App() {
   const [activeTab, setActiveTab] = useState('catalog')
   const [products, setProducts] = useState(productsDataFromJson)
   const [selectedProduct, setSelectedProduct] = useState(null)
+  
+  const [catalogCategoryFilter, setCatalogCategoryFilter] = useState('All');
+
+  const uniqueCategories = useMemo(() => {
+    const cats = products.map(p => p.category || 'Uncategorized');
+    return ['All', ...new Set(cats)].filter(Boolean);
+  }, [products]);
+
+  const filteredCatalogProducts = useMemo(() => {
+    if (catalogCategoryFilter === 'All') return products;
+    return products.filter(p => (p.category || 'Uncategorized') === catalogCategoryFilter);
+  }, [products, catalogCategoryFilter]);
+
   const [toastMessage, setToastMessage] = useState(null)
   const toastTimer = useRef(null)
   
@@ -634,8 +647,22 @@ function App() {
 
             {/* --- CATALOG VIEW --- */}
             {activeTab === 'catalog' && (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                {products.map(product => (
+              <div className="flex flex-col gap-6">
+                {/* Category Filter */}
+                <div className="flex flex-wrap items-center gap-2">
+                  {uniqueCategories.map(cat => (
+                    <button
+                      key={cat}
+                      onClick={() => setCatalogCategoryFilter(cat)}
+                      className={`px-4 py-1.5 text-xs font-bold font-mono tracking-wider rounded transition-colors border ${catalogCategoryFilter === cat ? 'bg-primary text-background-main border-primary shadow-sm' : 'bg-surface border-border-subtle text-text-muted hover:border-primary/50 hover:text-text-main hover:bg-surface-highlight'}`}
+                    >
+                      {cat}
+                    </button>
+                  ))}
+                </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                  {filteredCatalogProducts.map(product => (
                   <div key={product.id} className="bg-surface border border-border-subtle rounded-sm flex flex-col group hover:border-primary/50 transition-colors overflow-hidden">
                     {/* Thumbnail Image */}
                     <div className="h-40 w-full bg-background-main relative border-b border-border-subtle overflow-hidden">
@@ -669,7 +696,8 @@ function App() {
                       </div>
                     </div>
                   </div>
-                ))}
+                  ))}
+                </div>
               </div>
             )}
 
