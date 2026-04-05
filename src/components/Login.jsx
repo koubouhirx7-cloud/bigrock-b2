@@ -12,8 +12,33 @@ export default function Login() {
         companyName: '',
         contactName: '',
         phone: '',
-        shippingAddress: '',
+        postalCode: '',
+        addressLine1: '',
+        addressLine2: '',
     });
+
+    const handlePostalCodeChange = async (e) => {
+        const val = e.target.value;
+        setRegForm(prev => ({ ...prev, postalCode: val }));
+        
+        const cleanCode = val.replace(/-/g, '');
+        if (cleanCode.length === 7) {
+            try {
+                const response = await fetch(`https://zipcloud.ibsnet.co.jp/api/search?zipcode=${cleanCode}`);
+                const data = await response.json();
+                if (data.status === 200 && data.results) {
+                    const result = data.results[0];
+                    const address = `${result.address1}${result.address2}${result.address3}`;
+                    setRegForm(prev => ({
+                        ...prev,
+                        addressLine1: address
+                    }));
+                }
+            } catch (error) {
+                console.error("Postal code search failed:", error);
+            }
+        }
+    };
 
     const handleGoogleAuth = async (isRegistering) => {
         setIsProcessing(true);
@@ -40,7 +65,7 @@ export default function Login() {
                         phone: regForm.phone,
                         email: userEmail,
                         status: 'Inactive',
-                        shippingAddress: regForm.shippingAddress
+                        shippingAddress: `〒${regForm.postalCode} ${regForm.addressLine1} ${regForm.addressLine2}`.trim()
                     });
                     console.log("Customer record created successfully");
                 }
@@ -193,15 +218,38 @@ export default function Login() {
                                     </div>
                                 </div>
 
-                                <div className="space-y-1.5">
-                                    <label className="block text-xs font-bold text-text-main">配送先住所</label>
-                                    <input
-                                        type="text"
-                                        value={regForm.shippingAddress}
-                                        onChange={(e) => setRegForm({...regForm, shippingAddress: e.target.value})}
-                                        className="w-full p-2.5 text-sm text-text-main placeholder-slate-500 focus:ring-1 focus:ring-primary focus:border-primary bg-surface border border-border-dark transition-all"
-                                        placeholder="例: 東京都渋谷区..."
-                                    />
+                                <div className="space-y-4">
+                                    <div className="space-y-1.5">
+                                        <label className="block text-xs font-bold text-text-main">郵便番号 (自動入力)</label>
+                                        <input
+                                            type="text"
+                                            value={regForm.postalCode}
+                                            onChange={handlePostalCodeChange}
+                                            className="w-full p-2.5 text-sm text-text-main placeholder-slate-500 focus:ring-1 focus:ring-primary focus:border-primary bg-surface border border-border-dark transition-all font-mono"
+                                            placeholder="例: 1500001"
+                                            maxLength={8}
+                                        />
+                                    </div>
+                                    <div className="space-y-1.5">
+                                        <label className="block text-xs font-bold text-text-main">都道府県・市区町村・番地</label>
+                                        <input
+                                            type="text"
+                                            value={regForm.addressLine1}
+                                            onChange={(e) => setRegForm({...regForm, addressLine1: e.target.value})}
+                                            className="w-full p-2.5 text-sm text-text-main placeholder-slate-500 focus:ring-1 focus:ring-primary focus:border-primary bg-surface border border-border-dark transition-all"
+                                            placeholder="例: 東京都渋谷区神宮前1-1-1"
+                                        />
+                                    </div>
+                                    <div className="space-y-1.5">
+                                        <label className="block text-xs font-bold text-text-main">建物名・部屋番号など</label>
+                                        <input
+                                            type="text"
+                                            value={regForm.addressLine2}
+                                            onChange={(e) => setRegForm({...regForm, addressLine2: e.target.value})}
+                                            className="w-full p-2.5 text-sm text-text-main placeholder-slate-500 focus:ring-1 focus:ring-primary focus:border-primary bg-surface border border-border-dark transition-all"
+                                            placeholder="例: ビッグロックビル 1F"
+                                        />
+                                    </div>
                                 </div>
 
                                 <div className="pt-4">
