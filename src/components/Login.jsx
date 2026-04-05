@@ -1,95 +1,35 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { createCustomer, fetchCustomers } from '../services/microcms';
+import Register from './Register';
 
 export default function Login() {
     const { loginWithGoogle, logout } = useAuth();
     const [tab, setTab] = useState('login'); // 'login' | 'register'
     const [isProcessing, setIsProcessing] = useState(false);
 
-    // Registration Form State
-    const [regForm, setRegForm] = useState({
-        companyName: '',
-        contactName: '',
-        phone: '',
-        postalCode: '',
-        addressLine1: '',
-        addressLine2: '',
-    });
-
-    const handlePostalCodeChange = async (e) => {
-        const val = e.target.value;
-        setRegForm(prev => ({ ...prev, postalCode: val }));
-        
-        const cleanCode = val.replace(/-/g, '');
-        if (cleanCode.length === 7) {
-            try {
-                const response = await fetch(`https://zipcloud.ibsnet.co.jp/api/search?zipcode=${cleanCode}`);
-                const data = await response.json();
-                if (data.status === 200 && data.results) {
-                    const result = data.results[0];
-                    const address = `${result.address1}${result.address2}${result.address3}`;
-                    setRegForm(prev => ({
-                        ...prev,
-                        addressLine1: address
-                    }));
-                }
-            } catch (error) {
-                console.error("Postal code search failed:", error);
-            }
-        }
-    };
-
     const handleGoogleAuth = async (isRegistering) => {
         setIsProcessing(true);
         try {
-            if (isRegistering) {
-                // Validate form first
-                if (!regForm.companyName) {
-                    alert("会社名 / 店舗名を入力してください。");
-                    setIsProcessing(false);
-                    return;
-                }
+            // Normal Login
+            const result = await loginWithGoogle();
+            const userEmail = result.user.email;
 
-                const result = await loginWithGoogle();
-                const userEmail = result.user.email;
-
-                // Check if user already exists
-                const customers = await fetchCustomers();
-                const existing = customers.find(c => c.email === userEmail);
-                
-                if (!existing) {
-                    await createCustomer({
-                        companyName: regForm.companyName,
-                        contactName: regForm.contactName,
-                        phone: regForm.phone,
-                        email: userEmail,
-                        status: 'Inactive',
-                        shippingAddress: `〒${regForm.postalCode} ${regForm.addressLine1} ${regForm.addressLine2}`.trim()
-                    });
-                    console.log("Customer record created successfully");
-                }
-            } else {
-                // Normal Login
-                const result = await loginWithGoogle();
-                const userEmail = result.user.email;
-
-                // Super Admin bypass check
-                if (userEmail === 'koubou.hi.rx7@gmail.com') {
-                    return;
-                }
-                
-                // Check if user exists in MicroCMS
-                const customers = await fetchCustomers();
-                const existing = customers.find(c => c.email === userEmail);
-                
-                if (!existing) {
-                    await logout();
-                    alert("このGoogleアカウントは登録されていません。「新規販売店登録」タブから登録手続きを行ってください。");
-                    setTab('register');
-                    setIsProcessing(false);
-                    return;
-                }
+            // Super Admin bypass check
+            if (userEmail === 'koubou.hi.rx7@gmail.com') {
+                return;
+            }
+            
+            // Check if user exists in MicroCMS
+            const customers = await fetchCustomers();
+            const existing = customers.find(c => c.email === userEmail);
+            
+            if (!existing) {
+                await logout();
+                alert("このGoogleアカウントは登録されていません。「新規販売店登録」タブから登録手続きを行ってください。");
+                setTab('register');
+                setIsProcessing(false);
+                return;
             }
         } catch (error) {
             console.error("Google auth process failed:", error);
@@ -114,7 +54,7 @@ export default function Login() {
             </div>
 
             {/* Login Container */}
-            <div className="w-full max-w-[440px] flex flex-col gap-8 z-10 animate-in fade-in zoom-in-95 duration-500">
+            <div className={`w-full ${tab === 'register' ? 'max-w-[700px]' : 'max-w-[440px]'} flex flex-col gap-8 z-10 animate-in fade-in zoom-in-95 duration-500`}>
 
                 {/* Logo Section */}
                 <div className="flex flex-col items-center gap-4">
@@ -181,104 +121,7 @@ export default function Login() {
                         </div>
                     ) : (
                         /* REGISTER VIEW */
-                        <div className="animate-in fade-in duration-300">
-                            <h2 className="text-xl font-bold mb-6 text-center tracking-tight text-text-main">新規販売店アカウントの発行</h2>
-                            <form className="space-y-5" onSubmit={(e) => e.preventDefault()}>
-                                <div className="space-y-1.5">
-                                    <label className="block text-xs font-bold text-text-main">会社名 / 店舗名 <span className="text-accent-red">*</span></label>
-                                    <input
-                                        type="text"
-                                        value={regForm.companyName}
-                                        onChange={(e) => setRegForm({...regForm, companyName: e.target.value})}
-                                        className="w-full p-2.5 text-sm text-text-main placeholder-slate-500 focus:ring-1 focus:ring-primary focus:border-primary bg-surface border border-border-dark transition-all"
-                                        placeholder="例: 株式会社ビッグロック"
-                                    />
-                                </div>
-                                
-                                <div className="grid grid-cols-2 gap-4">
-                                    <div className="space-y-1.5">
-                                        <label className="block text-xs font-bold text-text-main">担当者名</label>
-                                        <input
-                                            type="text"
-                                            value={regForm.contactName}
-                                            onChange={(e) => setRegForm({...regForm, contactName: e.target.value})}
-                                            className="w-full p-2.5 text-sm text-text-main placeholder-slate-500 focus:ring-1 focus:ring-primary focus:border-primary bg-surface border border-border-dark transition-all"
-                                            placeholder="例: 山田太郎"
-                                        />
-                                    </div>
-                                    <div className="space-y-1.5">
-                                        <label className="block text-xs font-bold text-text-main">電話番号</label>
-                                        <input
-                                            type="tel"
-                                            value={regForm.phone}
-                                            onChange={(e) => setRegForm({...regForm, phone: e.target.value})}
-                                            className="w-full p-2.5 text-sm text-text-main placeholder-slate-500 focus:ring-1 focus:ring-primary focus:border-primary bg-surface border border-border-dark transition-all font-mono"
-                                            placeholder="03-1234-5678"
-                                        />
-                                    </div>
-                                </div>
-
-                                <div className="space-y-4">
-                                    <div className="space-y-1.5">
-                                        <label className="block text-xs font-bold text-text-main">郵便番号 (自動入力)</label>
-                                        <input
-                                            type="text"
-                                            value={regForm.postalCode}
-                                            onChange={handlePostalCodeChange}
-                                            className="w-full p-2.5 text-sm text-text-main placeholder-slate-500 focus:ring-1 focus:ring-primary focus:border-primary bg-surface border border-border-dark transition-all font-mono"
-                                            placeholder="例: 1500001"
-                                            maxLength={8}
-                                        />
-                                    </div>
-                                    <div className="space-y-1.5">
-                                        <label className="block text-xs font-bold text-text-main">都道府県・市区町村・番地</label>
-                                        <input
-                                            type="text"
-                                            value={regForm.addressLine1}
-                                            onChange={(e) => setRegForm({...regForm, addressLine1: e.target.value})}
-                                            className="w-full p-2.5 text-sm text-text-main placeholder-slate-500 focus:ring-1 focus:ring-primary focus:border-primary bg-surface border border-border-dark transition-all"
-                                            placeholder="例: 東京都渋谷区神宮前1-1-1"
-                                        />
-                                    </div>
-                                    <div className="space-y-1.5">
-                                        <label className="block text-xs font-bold text-text-main">建物名・部屋番号など</label>
-                                        <input
-                                            type="text"
-                                            value={regForm.addressLine2}
-                                            onChange={(e) => setRegForm({...regForm, addressLine2: e.target.value})}
-                                            className="w-full p-2.5 text-sm text-text-main placeholder-slate-500 focus:ring-1 focus:ring-primary focus:border-primary bg-surface border border-border-dark transition-all"
-                                            placeholder="例: ビッグロックビル 1F"
-                                        />
-                                    </div>
-                                </div>
-
-                                <div className="pt-4">
-                                    <p className="text-[10px] text-text-muted mb-3 leading-relaxed">
-                                        「Googleアカウントで連携して申請する」をクリックすると、選択したGoogleアカウントのメールアドレスがB2Bログイン用IDとして登録されます。※登録後、取引審査のため「承認待ち」となります。
-                                    </p>
-                                    <button
-                                        type="button"
-                                        onClick={() => handleGoogleAuth(true)}
-                                        disabled={isProcessing || !regForm.companyName}
-                                        className="w-full flex items-center justify-center gap-3 bg-white hover:bg-slate-100 text-slate-900 font-bold py-3.5 px-4 transition-colors duration-200 shadow-md disabled:opacity-50"
-                                    >
-                                        {isProcessing ? (
-                                            <span className="material-symbols-outlined animate-spin text-slate-500">sync</span>
-                                        ) : (
-                                            <>
-                                                <svg height="20" viewBox="0 0 24 24" width="20" xmlns="http://www.w3.org/2000/svg">
-                                                    <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"></path>
-                                                    <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"></path>
-                                                    <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"></path>
-                                                    <path d="M12 5.38c1.62 0 3.06.56 4.21 1.66l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"></path>
-                                                </svg>
-                                                <span className="text-sm font-bold tracking-tight">Google連携で申請する</span>
-                                            </>
-                                        )}
-                                    </button>
-                                </div>
-                            </form>
-                        </div>
+                        <Register setParentTab={setTab} />
                     )}
                 </div>
 
