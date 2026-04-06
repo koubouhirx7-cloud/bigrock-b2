@@ -30,6 +30,22 @@ function App() {
     }, {});
   }, [selectedProduct]);
 
+  // Initial group expanded state based on collapseByDefault
+  useEffect(() => {
+    if (selectedProduct) {
+      if (selectedProduct.collapseByDefault === false) {
+        const allExpanded = Object.keys(variantGroups).reduce((acc, key) => {
+          acc[key] = true;
+          return acc;
+        }, {});
+        setExpandedVariantGroups(allExpanded);
+      } else {
+        setExpandedVariantGroups({});
+      }
+    }
+  }, [selectedProduct, variantGroups]);
+
+
   const uniqueCategories = useMemo(() => {
     const cats = products.map(p => p.category || 'Uncategorized');
     return [...new Set(cats)].filter(Boolean).sort();
@@ -260,6 +276,7 @@ function App() {
             stock: item.stock || 0,
             imageUrl: item.externalImageUrl || item.image?.url || '',
             originalUrl: item.originalUrl || '',
+            collapseByDefault: typeof item.collapseByDefault === 'boolean' ? item.collapseByDefault : true,
             variants: parsedVariants
           };
         })
