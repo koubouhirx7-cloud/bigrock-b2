@@ -13,10 +13,10 @@ function App() {
   const [activeTab, setActiveTab] = useState('catalog')
   const [products, setProducts] = useState(productsDataFromJson)
   const [selectedProduct, setSelectedProduct] = useState(null)
-  const [collapsedVariantGroups, setCollapsedVariantGroups] = useState({})
+  const [expandedVariantGroups, setExpandedVariantGroups] = useState({})
   
   const toggleVariantGroup = (groupName) => {
-    setCollapsedVariantGroups(prev => ({ ...prev, [groupName]: !prev[groupName] }))
+    setExpandedVariantGroups(prev => ({ ...prev, [groupName]: !prev[groupName] }))
   }
 
   const variantGroups = useMemo(() => {
@@ -769,18 +769,18 @@ function App() {
                           </tr>
                         </thead>
                         {Object.entries(variantGroups).map(([groupName, variantsInGroup]) => {
-                          const isCollapsed = collapsedVariantGroups[groupName];
+                          const isExpanded = expandedVariantGroups[groupName];
                           return (
                             <tbody key={groupName} className="divide-y divide-border-subtle">
                                 <tr className="bg-surface-highlight hover:bg-black/5 cursor-pointer transition-colors" onClick={() => toggleVariantGroup(groupName)}>
                                   <td colSpan="3" className="px-5 py-3 font-bold text-sm text-text-main">
                                     <div className="flex items-center gap-2">
-                                      <span className={`material-symbols-outlined transition-transform duration-200 ${isCollapsed ? '-rotate-90' : 'rotate-0'}`}>expand_more</span>
+                                      <span className={`material-symbols-outlined transition-transform duration-200 ${!isExpanded ? '-rotate-90' : 'rotate-0'}`}>expand_more</span>
                                       {groupName} ({variantsInGroup.length})
                                     </div>
                                   </td>
                                 </tr>
-                                {!isCollapsed && variantsInGroup.map(variant => (
+                                {isExpanded && variantsInGroup.map(variant => (
                                   <tr key={variant.id} className="hover:bg-black/5 transition-colors group">
                                     <td className="px-5 py-4 font-bold text-text-main text-sm pl-10">{variant.name}</td>
                                     <td className="px-5 py-4 text-center">
