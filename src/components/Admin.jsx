@@ -141,6 +141,25 @@ export default function Admin({ products, onExitAdmin, refreshProducts }) {
         }
     }, [adminTab]);
 
+    const handleSendNewsletter = () => {
+        const recipients = customersList
+            .filter(c => c.status === 'Active' && c.newsletter === true)
+            .map(c => c.email)
+            .filter(email => !!email);
+
+        if (recipients.length === 0) {
+            alert('メルマガ配信を希望している有効な顧客(Active)が見つかりません。');
+            return;
+        }
+
+        const bccString = recipients.join(',');
+        const subject = encodeURIComponent('【お知らせ】BIGROCKより');
+        const body = encodeURIComponent('各位\n\n平素は格別のお引き立てを賜り厚く御礼申し上げます。\n\n----\n株式会社ビッグロック');
+        
+        // Use mailto link
+        window.location.href = `mailto:?bcc=${bccString}&subject=${subject}&body=${body}`;
+    };
+
     const openCustomerModal = (customer = null) => {
         if (customer) {
             setEditingCustomer(customer);
@@ -322,10 +341,16 @@ export default function Admin({ products, onExitAdmin, refreshProducts }) {
                             </button>
                         )}
                         {adminTab === 'users' && (
-                            <button onClick={() => openCustomerModal()} className="flex items-center gap-2 h-10 px-4 bg-primary text-background-main hover:bg-white transition-all text-sm font-bold uppercase tracking-wider">
-                                <span className="material-symbols-outlined text-[20px]">person_add</span>
-                                <span>新規顧客登録</span>
-                            </button>
+                            <div className="flex items-center gap-3">
+                                <button onClick={handleSendNewsletter} className="flex items-center gap-2 h-10 px-4 bg-background-main border border-border-dark text-text-main hover:bg-surface-highlight transition-all text-sm font-bold uppercase tracking-wider">
+                                    <span className="material-symbols-outlined text-[20px]">mail</span>
+                                    <span>メルマガ一斉作成</span>
+                                </button>
+                                <button onClick={() => openCustomerModal()} className="flex items-center gap-2 h-10 px-4 bg-primary text-background-main hover:bg-white transition-all text-sm font-bold uppercase tracking-wider">
+                                    <span className="material-symbols-outlined text-[20px]">person_add</span>
+                                    <span>新規顧客登録</span>
+                                </button>
+                            </div>
                         )}
                     </div>
                 </div>

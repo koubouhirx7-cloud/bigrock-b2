@@ -112,7 +112,8 @@ export default function Register({ setParentTab }) {
                     websiteUrl: regForm.websiteUrl,
                     email: userEmail,
                     status: 'Inactive',
-                    shippingAddress: fullAddress
+                    shippingAddress: fullAddress,
+                    newsletter: regForm.newsletter
                 });
                 console.log("Customer record created successfully");
                 // The parent component or global state will trigger re-render on auth state change
