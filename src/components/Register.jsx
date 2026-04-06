@@ -157,22 +157,22 @@ export default function Register({ setParentTab }) {
                     <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-1.5">
                             <label className="block text-xs font-bold text-text-main">代表者姓 <span className="text-accent-red">*</span></label>
-                            <input type="text" name="representativeLastName" value={regForm.representativeLastName} onChange={handleChange} className="w-full p-2.5 text-sm bg-surface border border-border-dark" placeholder="例: 山田" />
+                            <input type="text" name="representativeLastName" value={regForm.representativeLastName} onChange={handleChange} className="w-full p-2.5 text-sm bg-surface border border-border-dark text-text-main focus:border-primary focus:ring-1 focus:ring-primary transition-all" placeholder="例: 山田" />
                         </div>
                         <div className="space-y-1.5">
                             <label className="block text-xs font-bold text-text-main">代表者名 <span className="text-accent-red">*</span></label>
-                            <input type="text" name="representativeFirstName" value={regForm.representativeFirstName} onChange={handleChange} className="w-full p-2.5 text-sm bg-surface border border-border-dark" placeholder="例: 太郎" />
+                            <input type="text" name="representativeFirstName" value={regForm.representativeFirstName} onChange={handleChange} className="w-full p-2.5 text-sm bg-surface border border-border-dark text-text-main focus:border-primary focus:ring-1 focus:ring-primary transition-all" placeholder="例: 太郎" />
                         </div>
                     </div>
 
                     <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-1.5">
                             <label className="block text-xs font-bold text-text-main">代表者姓カナ <span className="text-accent-red">*</span></label>
-                            <input type="text" name="representativeLastNameKana" value={regForm.representativeLastNameKana} onChange={handleChange} className="w-full p-2.5 text-sm bg-surface border border-border-dark" placeholder="例: ヤマダ" />
+                            <input type="text" name="representativeLastNameKana" value={regForm.representativeLastNameKana} onChange={handleChange} className="w-full p-2.5 text-sm bg-surface border border-border-dark text-text-main focus:border-primary focus:ring-1 focus:ring-primary transition-all" placeholder="例: ヤマダ" />
                         </div>
                         <div className="space-y-1.5">
                             <label className="block text-xs font-bold text-text-main">代表者名カナ <span className="text-accent-red">*</span></label>
-                            <input type="text" name="representativeFirstNameKana" value={regForm.representativeFirstNameKana} onChange={handleChange} className="w-full p-2.5 text-sm bg-surface border border-border-dark" placeholder="例: タロウ" />
+                            <input type="text" name="representativeFirstNameKana" value={regForm.representativeFirstNameKana} onChange={handleChange} className="w-full p-2.5 text-sm bg-surface border border-border-dark text-text-main focus:border-primary focus:ring-1 focus:ring-primary transition-all" placeholder="例: タロウ" />
                         </div>
                     </div>
                 </div>
@@ -183,28 +183,28 @@ export default function Register({ setParentTab }) {
                     
                     <div className="space-y-1.5">
                         <label className="block text-xs font-bold text-text-main">部署名</label>
-                        <input type="text" name="department" value={regForm.department} onChange={handleChange} className="w-full p-2.5 text-sm bg-surface border border-border-dark" placeholder="例: 営業部" />
+                        <input type="text" name="department" value={regForm.department} onChange={handleChange} className="w-full p-2.5 text-sm bg-surface border border-border-dark text-text-main focus:border-primary focus:ring-1 focus:ring-primary transition-all" placeholder="例: 営業部" />
                     </div>
 
                     <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-1.5">
                             <label className="block text-xs font-bold text-text-main">担当者姓 <span className="text-accent-red">*</span></label>
-                            <input type="text" name="contactLastName" value={regForm.contactLastName} onChange={handleChange} className="w-full p-2.5 text-sm bg-surface border border-border-dark" placeholder="例: 佐藤" />
+                            <input type="text" name="contactLastName" value={regForm.contactLastName} onChange={handleChange} className="w-full p-2.5 text-sm bg-surface border border-border-dark text-text-main focus:border-primary focus:ring-1 focus:ring-primary transition-all" placeholder="例: 佐藤" />
                         </div>
                         <div className="space-y-1.5">
                             <label className="block text-xs font-bold text-text-main">担当者名 <span className="text-accent-red">*</span></label>
-                            <input type="text" name="contactFirstName" value={regForm.contactFirstName} onChange={handleChange} className="w-full p-2.5 text-sm bg-surface border border-border-dark" placeholder="例: 次郎" />
+                            <input type="text" name="contactFirstName" value={regForm.contactFirstName} onChange={handleChange} className="w-full p-2.5 text-sm bg-surface border border-border-dark text-text-main focus:border-primary focus:ring-1 focus:ring-primary transition-all" placeholder="例: 次郎" />
                         </div>
                     </div>
 
                     <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-1.5">
                             <label className="block text-xs font-bold text-text-main">担当者姓カナ <span className="text-accent-red">*</span></label>
-                            <input type="text" name="contactLastNameKana" value={regForm.contactLastNameKana} onChange={handleChange} className="w-full p-2.5 text-sm bg-surface border border-border-dark" placeholder="例: サトウ" />
+                            <input type="text" name="contactLastNameKana" value={regForm.contactLastNameKana} onChange={handleChange} className="w-full p-2.5 text-sm bg-surface border border-border-dark text-text-main focus:border-primary focus:ring-1 focus:ring-primary transition-all" placeholder="例: サトウ" />
                         </div>
                         <div className="space-y-1.5">
                             <label className="block text-xs font-bold text-text-main">担当者名カナ <span className="text-accent-red">*</span></label>
-                            <input type="text" name="contactFirstNameKana" value={regForm.contactFirstNameKana} onChange={handleChange} className="w-full p-2.5 text-sm bg-surface border border-border-dark" placeholder="例: ジロウ" />
+                            <input type="text" name="contactFirstNameKana" value={regForm.contactFirstNameKana} onChange={handleChange} className="w-full p-2.5 text-sm bg-surface border border-border-dark text-text-main focus:border-primary focus:ring-1 focus:ring-primary transition-all" placeholder="例: ジロウ" />
                         </div>
                     </div>
                 </div>
@@ -215,31 +215,31 @@ export default function Register({ setParentTab }) {
 
                     <div className="space-y-1.5">
                         <label className="block text-xs font-bold text-text-main">郵便番号 <span className="text-accent-red">*</span></label>
-                        <input type="text" name="postalCode" value={regForm.postalCode} onChange={handlePostalCodeChange} className="w-full p-2.5 text-sm bg-surface border border-border-dark font-mono" placeholder="例: 1500001" maxLength={8} />
+                        <input type="text" name="postalCode" value={regForm.postalCode} onChange={handlePostalCodeChange} className="w-full p-2.5 text-sm bg-surface border border-border-dark text-text-main focus:border-primary focus:ring-1 focus:ring-primary transition-all" placeholder="例: 1500001" maxLength={8} />
                     </div>
                     <div className="space-y-1.5">
                         <label className="block text-xs font-bold text-text-main">都道府県・市区町村・番地 <span className="text-accent-red">*</span></label>
-                        <input type="text" name="addressLine1" value={regForm.addressLine1} onChange={handleChange} className="w-full p-2.5 text-sm bg-surface border border-border-dark" placeholder="例: 東京都渋谷区神宮前1-1-1" />
+                        <input type="text" name="addressLine1" value={regForm.addressLine1} onChange={handleChange} className="w-full p-2.5 text-sm bg-surface border border-border-dark text-text-main focus:border-primary focus:ring-1 focus:ring-primary transition-all" placeholder="例: 東京都渋谷区神宮前1-1-1" />
                     </div>
                     <div className="space-y-1.5">
                         <label className="block text-xs font-bold text-text-main">建物名・部屋番号など</label>
-                        <input type="text" name="addressLine2" value={regForm.addressLine2} onChange={handleChange} className="w-full p-2.5 text-sm bg-surface border border-border-dark" placeholder="例: ビッグロックビル 1F" />
+                        <input type="text" name="addressLine2" value={regForm.addressLine2} onChange={handleChange} className="w-full p-2.5 text-sm bg-surface border border-border-dark text-text-main focus:border-primary focus:ring-1 focus:ring-primary transition-all" placeholder="例: ビッグロックビル 1F" />
                     </div>
 
                     <div className="grid grid-cols-2 gap-4 pt-2">
                         <div className="space-y-1.5">
                             <label className="block text-xs font-bold text-text-main">電話番号 (固定優先) <span className="text-accent-red">*</span></label>
-                            <input type="tel" name="phone" value={regForm.phone} onChange={handleChange} className="w-full p-2.5 text-sm bg-surface border border-border-dark font-mono" placeholder="03-1234-5678" />
+                            <input type="tel" name="phone" value={regForm.phone} onChange={handleChange} className="w-full p-2.5 text-sm bg-surface border border-border-dark text-text-main focus:border-primary focus:ring-1 focus:ring-primary transition-all" placeholder="03-1234-5678" />
                         </div>
                         <div className="space-y-1.5">
                             <label className="block text-xs font-bold text-text-main">携帯番号</label>
-                            <input type="tel" name="mobilePhone" value={regForm.mobilePhone} onChange={handleChange} className="w-full p-2.5 text-sm bg-surface border border-border-dark font-mono" placeholder="090-1234-5678" />
+                            <input type="tel" name="mobilePhone" value={regForm.mobilePhone} onChange={handleChange} className="w-full p-2.5 text-sm bg-surface border border-border-dark text-text-main focus:border-primary focus:ring-1 focus:ring-primary transition-all" placeholder="090-1234-5678" />
                         </div>
                     </div>
                     
                     <div className="space-y-1.5 pt-2">
                         <label className="block text-xs font-bold text-text-main">FAX番号</label>
-                        <input type="tel" name="fax" value={regForm.fax} onChange={handleChange} className="w-full p-2.5 text-sm bg-surface border border-border-dark font-mono" placeholder="03-1234-5679" />
+                        <input type="tel" name="fax" value={regForm.fax} onChange={handleChange} className="w-full p-2.5 text-sm bg-surface border border-border-dark text-text-main focus:border-primary focus:ring-1 focus:ring-primary transition-all" placeholder="03-1234-5679" />
                     </div>
                 </div>
 
@@ -250,22 +250,22 @@ export default function Register({ setParentTab }) {
                     <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-1.5">
                             <label className="block text-xs font-bold text-text-main">設立年月</label>
-                            <input type="text" name="establishedYearMonth" value={regForm.establishedYearMonth} onChange={handleChange} className="w-full p-2.5 text-sm bg-surface border border-border-dark font-mono" placeholder="例: 2010年4月" />
+                            <input type="text" name="establishedYearMonth" value={regForm.establishedYearMonth} onChange={handleChange} className="w-full p-2.5 text-sm bg-surface border border-border-dark text-text-main focus:border-primary focus:ring-1 focus:ring-primary transition-all" placeholder="例: 2010年4月" />
                         </div>
                         <div className="space-y-1.5">
                             <label className="block text-xs font-bold text-text-main">業態 / 業種</label>
-                            <input type="text" name="industry" value={regForm.industry} onChange={handleChange} className="w-full p-2.5 text-sm bg-surface border border-border-dark" placeholder="例: 小売店 / プロショップ" />
+                            <input type="text" name="industry" value={regForm.industry} onChange={handleChange} className="w-full p-2.5 text-sm bg-surface border border-border-dark text-text-main focus:border-primary focus:ring-1 focus:ring-primary transition-all" placeholder="例: 小売店 / プロショップ" />
                         </div>
                     </div>
 
                     <div className="space-y-1.5">
                         <label className="block text-xs font-bold text-text-main">年商 (千円)</label>
-                        <input type="text" name="annualSales" value={regForm.annualSales} onChange={handleChange} className="w-full p-2.5 text-sm bg-surface border border-border-dark font-mono" placeholder="例: 10000" />
+                        <input type="text" name="annualSales" value={regForm.annualSales} onChange={handleChange} className="w-full p-2.5 text-sm bg-surface border border-border-dark text-text-main focus:border-primary focus:ring-1 focus:ring-primary transition-all" placeholder="例: 10000" />
                     </div>
 
                     <div className="space-y-1.5">
                         <label className="block text-xs font-bold text-text-main">ホームページURL</label>
-                        <input type="url" name="websiteUrl" value={regForm.websiteUrl} onChange={handleChange} className="w-full p-2.5 text-sm bg-surface border border-border-dark font-mono" placeholder="https://www.example.com" />
+                        <input type="url" name="websiteUrl" value={regForm.websiteUrl} onChange={handleChange} className="w-full p-2.5 text-sm bg-surface border border-border-dark text-text-main focus:border-primary focus:ring-1 focus:ring-primary transition-all" placeholder="https://www.example.com" />
                     </div>
                 </div>
 
