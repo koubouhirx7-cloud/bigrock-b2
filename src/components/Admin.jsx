@@ -63,7 +63,7 @@ export default function Admin({ products, onExitAdmin, refreshProducts }) {
     const [isLoadingCustomers, setIsLoadingCustomers] = useState(false);
     const [editingCustomer, setEditingCustomer] = useState(null);
     const [isCustomerModalOpen, setIsCustomerModalOpen] = useState(false);
-    const [customerForm, setCustomerForm] = useState({ companyName: '', contactName: '', email: '', phone: '', shippingAddress: '', status: 'Active' });
+    const [customerForm, setCustomerForm] = useState({ companyName: '', companyNameKana: '', repName: '', repNameKana: '', department: '', contactName: '', contactNameKana: '', email: '', phone: '', mobilePhone: '', fax: '', established: '', annualSales: '', industry: '', websiteUrl: '', shippingAddress: '', status: 'Active', newsletter: false });
     const [isSavingCustomer, setIsSavingCustomer] = useState(false);
 
     // Product Editing State
@@ -165,15 +165,32 @@ export default function Admin({ products, onExitAdmin, refreshProducts }) {
             setEditingCustomer(customer);
             setCustomerForm({
                 companyName: customer.companyName || '',
+                companyNameKana: customer.companyNameKana || '',
+                repName: customer.repName || '',
+                repNameKana: customer.repNameKana || '',
+                department: customer.department || '',
                 contactName: customer.contactName || '',
+                contactNameKana: customer.contactNameKana || '',
                 email: customer.email || '',
                 phone: customer.phone || '',
+                mobilePhone: customer.mobilePhone || '',
+                fax: customer.fax || '',
+                established: customer.established || '',
+                annualSales: customer.annualSales || '',
+                industry: customer.industry || '',
+                websiteUrl: customer.websiteUrl || '',
                 shippingAddress: customer.shippingAddress || '',
-                status: customer.status || 'Active'
+                status: customer.status || 'Active',
+                newsletter: customer.newsletter || false
             });
         } else {
             setEditingCustomer(null);
-            setCustomerForm({ companyName: '', contactName: '', email: '', phone: '', shippingAddress: '', status: 'Active' });
+            setCustomerForm({ 
+                companyName: '', companyNameKana: '', repName: '', repNameKana: '', 
+                department: '', contactName: '', contactNameKana: '', email: '', 
+                phone: '', mobilePhone: '', fax: '', established: '', annualSales: '', 
+                industry: '', websiteUrl: '', shippingAddress: '', status: 'Active', newsletter: false 
+            });
         }
         setIsCustomerModalOpen(true);
     };
@@ -659,73 +676,135 @@ export default function Admin({ products, onExitAdmin, refreshProducts }) {
                                 <span className="material-symbols-outlined">close</span>
                             </button>
                         </div>
-                        <div className="p-6 flex flex-col gap-4 max-h-[70vh] overflow-y-auto">
+                        <div className="p-6 flex flex-col gap-6 max-h-[70vh] overflow-y-auto custom-scrollbar">
                             
-                            <div className="flex flex-col gap-2">
-                                <label className="text-sm font-bold text-text-main">会社名 / 店舗名 <span className="text-red-500">*</span></label>
-                                <input 
-                                    type="text"
-                                    value={customerForm.companyName}
-                                    onChange={(e) => setCustomerForm({...customerForm, companyName: e.target.value})}
-                                    placeholder="例: 株式会社ビッグロック"
-                                    className="w-full bg-background-main border border-border-dark px-4 py-3 rounded text-text-main focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all"
-                                />
-                            </div>
-
-                            <div className="grid grid-cols-2 gap-4">
+                            {/* アカウント・必須項目 */}
+                            <div className="space-y-4">
+                                <h3 className="text-sm font-bold border-b border-border-dark pb-2 text-primary">アカウント情報</h3>
+                                
                                 <div className="flex flex-col gap-2">
-                                    <label className="text-sm font-bold text-text-main">担当者名</label>
+                                    <label className="text-xs font-bold text-text-main">ログインメールアドレス <span className="text-red-500">*</span></label>
                                     <input 
-                                        type="text"
-                                        value={customerForm.contactName}
-                                        onChange={(e) => setCustomerForm({...customerForm, contactName: e.target.value})}
-                                        className="w-full bg-background-main border border-border-dark px-4 py-3 rounded text-text-main focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all"
+                                        type="email"
+                                        value={customerForm.email}
+                                        onChange={(e) => setCustomerForm({...customerForm, email: e.target.value})}
+                                        placeholder="ログインIDと一致する必要があります"
+                                        className="w-full bg-surface border border-border-dark px-3 py-2.5 rounded text-text-main focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all font-mono text-sm"
                                     />
                                 </div>
+
                                 <div className="flex flex-col gap-2">
-                                    <label className="text-sm font-bold text-text-main">電話番号</label>
-                                    <input 
-                                        type="text"
-                                        value={customerForm.phone}
-                                        onChange={(e) => setCustomerForm({...customerForm, phone: e.target.value})}
-                                        className="w-full bg-background-main border border-border-dark px-4 py-3 rounded text-text-main focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all font-mono text-sm"
-                                    />
+                                    <label className="text-xs font-bold text-text-main">アカウント状態 <span className="text-red-500">*</span></label>
+                                    <div className="relative">
+                                        <select 
+                                            value={customerForm.status}
+                                            onChange={(e) => setCustomerForm({...customerForm, status: e.target.value})}
+                                            className="w-full bg-surface border border-border-dark px-3 py-2.5 rounded text-text-main focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all appearance-none cursor-pointer font-bold text-sm"
+                                        >
+                                            <option value="Active">有効 (Active)</option>
+                                            <option value="Inactive">無効 (Inactive - 承認待ち等)</option>
+                                        </select>
+                                        <span className="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-text-muted pointer-events-none text-base">expand_more</span>
+                                    </div>
+                                </div>
+                                
+                                <label className="flex items-center gap-2 cursor-pointer mt-2 p-2 bg-background-main border border-border-dark rounded">
+                                    <input type="checkbox" checked={customerForm.newsletter} onChange={(e) => setCustomerForm({...customerForm, newsletter: e.target.checked})} className="w-4 h-4 text-primary bg-surface border-border-dark rounded focus:ring-primary" />
+                                    <span className="text-xs font-bold text-text-main">メルマガ配信を希望する</span>
+                                </label>
+                            </div>
+
+                            {/* 会社情報 */}
+                            <div className="space-y-4">
+                                <h3 className="text-sm font-bold border-b border-border-dark pb-2 text-primary">会社情報</h3>
+                                
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div className="flex flex-col gap-2">
+                                        <label className="text-xs font-bold text-text-main">会社名 / 店舗名 <span className="text-red-500">*</span></label>
+                                        <input type="text" value={customerForm.companyName} onChange={e => setCustomerForm({...customerForm, companyName: e.target.value})} className="w-full bg-surface border border-border-dark px-3 py-2.5 rounded text-text-main focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all text-sm" />
+                                    </div>
+                                    <div className="flex flex-col gap-2">
+                                        <label className="text-xs font-bold text-text-main">会社名カナ</label>
+                                        <input type="text" value={customerForm.companyNameKana} onChange={e => setCustomerForm({...customerForm, companyNameKana: e.target.value})} className="w-full bg-surface border border-border-dark px-3 py-2.5 rounded text-text-main focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all text-sm" />
+                                    </div>
+                                </div>
+
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div className="flex flex-col gap-2">
+                                        <label className="text-xs font-bold text-text-main">代表者名</label>
+                                        <input type="text" value={customerForm.repName} onChange={e => setCustomerForm({...customerForm, repName: e.target.value})} className="w-full bg-surface border border-border-dark px-3 py-2.5 rounded text-text-main focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all text-sm" />
+                                    </div>
+                                    <div className="flex flex-col gap-2">
+                                        <label className="text-xs font-bold text-text-main">代表者カナ</label>
+                                        <input type="text" value={customerForm.repNameKana} onChange={e => setCustomerForm({...customerForm, repNameKana: e.target.value})} className="w-full bg-surface border border-border-dark px-3 py-2.5 rounded text-text-main focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all text-sm" />
+                                    </div>
                                 </div>
                             </div>
 
-                            <div className="flex flex-col gap-2">
-                                <label className="text-sm font-bold text-text-main">ログインメールアドレス <span className="text-red-500">*</span></label>
-                                <input 
-                                    type="email"
-                                    value={customerForm.email}
-                                    onChange={(e) => setCustomerForm({...customerForm, email: e.target.value})}
-                                    placeholder="ログインIDと一致する必要があります"
-                                    className="w-full bg-background-main border border-border-dark px-4 py-3 rounded text-text-main focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all font-mono text-sm"
-                                />
-                                <p className="text-xs text-text-muted">このメールアドレスでGoogleログインした際にアクセス可能になります。</p>
-                            </div>
+                            {/* 担当・連絡先 */}
+                            <div className="space-y-4">
+                                <h3 className="text-sm font-bold border-b border-border-dark pb-2 text-primary">担当・連絡先</h3>
+                                
+                                <div className="grid grid-cols-3 gap-4">
+                                    <div className="flex flex-col gap-2 col-span-1">
+                                        <label className="text-xs font-bold text-text-main">部署名</label>
+                                        <input type="text" value={customerForm.department} onChange={e => setCustomerForm({...customerForm, department: e.target.value})} className="w-full bg-surface border border-border-dark px-3 py-2.5 rounded text-text-main focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all text-sm" />
+                                    </div>
+                                    <div className="flex flex-col gap-2 col-span-1">
+                                        <label className="text-xs font-bold text-text-main">担当者名</label>
+                                        <input type="text" value={customerForm.contactName} onChange={e => setCustomerForm({...customerForm, contactName: e.target.value})} className="w-full bg-surface border border-border-dark px-3 py-2.5 rounded text-text-main focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all text-sm" />
+                                    </div>
+                                    <div className="flex flex-col gap-2 col-span-1">
+                                        <label className="text-xs font-bold text-text-main">担当者カナ</label>
+                                        <input type="text" value={customerForm.contactNameKana} onChange={e => setCustomerForm({...customerForm, contactNameKana: e.target.value})} className="w-full bg-surface border border-border-dark px-3 py-2.5 rounded text-text-main focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all text-sm" />
+                                    </div>
+                                </div>
 
-                            <div className="flex flex-col gap-2">
-                                <label className="text-sm font-bold text-text-main">初期配送先住所</label>
-                                <textarea 
-                                    value={customerForm.shippingAddress}
-                                    onChange={(e) => setCustomerForm({...customerForm, shippingAddress: e.target.value})}
-                                    className="w-full bg-background-main border border-border-dark px-4 py-3 rounded text-text-main focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all resize-y min-h-[80px]"
-                                />
+                                <div className="grid grid-cols-3 gap-4">
+                                    <div className="flex flex-col gap-2">
+                                        <label className="text-xs font-bold text-text-main">電話番号</label>
+                                        <input type="text" value={customerForm.phone} onChange={e => setCustomerForm({...customerForm, phone: e.target.value})} className="w-full bg-surface border border-border-dark px-3 py-2.5 rounded text-text-main focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all text-sm font-mono" />
+                                    </div>
+                                    <div className="flex flex-col gap-2">
+                                        <label className="text-xs font-bold text-text-main">携帯番号</label>
+                                        <input type="text" value={customerForm.mobilePhone} onChange={e => setCustomerForm({...customerForm, mobilePhone: e.target.value})} className="w-full bg-surface border border-border-dark px-3 py-2.5 rounded text-text-main focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all text-sm font-mono" />
+                                    </div>
+                                    <div className="flex flex-col gap-2">
+                                        <label className="text-xs font-bold text-text-main">FAX</label>
+                                        <input type="text" value={customerForm.fax} onChange={e => setCustomerForm({...customerForm, fax: e.target.value})} className="w-full bg-surface border border-border-dark px-3 py-2.5 rounded text-text-main focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all text-sm font-mono" />
+                                    </div>
+                                </div>
+                                
+                                <div className="flex flex-col gap-2">
+                                    <label className="text-xs font-bold text-text-main">初期配送先住所</label>
+                                    <textarea value={customerForm.shippingAddress} onChange={e => setCustomerForm({...customerForm, shippingAddress: e.target.value})} className="w-full bg-surface border border-border-dark px-3 py-2.5 rounded text-text-main focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all resize-y min-h-[60px] text-sm" />
+                                </div>
                             </div>
+                            
+                            {/* 企業付加情報 */}
+                            <div className="space-y-4">
+                                <h3 className="text-sm font-bold border-b border-border-dark pb-2 text-primary">企業付加情報</h3>
+                                
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div className="flex flex-col gap-2">
+                                        <label className="text-xs font-bold text-text-main">設立年月</label>
+                                        <input type="text" value={customerForm.established} onChange={e => setCustomerForm({...customerForm, established: e.target.value})} className="w-full bg-surface border border-border-dark px-3 py-2.5 rounded text-text-main focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all text-sm" />
+                                    </div>
+                                    <div className="flex flex-col gap-2">
+                                        <label className="text-xs font-bold text-text-main">業態 / 業種</label>
+                                        <input type="text" value={customerForm.industry} onChange={e => setCustomerForm({...customerForm, industry: e.target.value})} className="w-full bg-surface border border-border-dark px-3 py-2.5 rounded text-text-main focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all text-sm" />
+                                    </div>
+                                </div>
 
-                            <div className="flex flex-col gap-2">
-                                <label className="text-sm font-bold text-text-main">アカウント状態</label>
-                                <div className="relative">
-                                    <select 
-                                        value={customerForm.status}
-                                        onChange={(e) => setCustomerForm({...customerForm, status: e.target.value})}
-                                        className="w-full bg-background-main border border-border-dark px-4 py-3 rounded text-text-main focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all appearance-none cursor-pointer font-bold"
-                                    >
-                                        <option value="Active">有効 (Active)</option>
-                                        <option value="Inactive">無効 (Inactive - アクセス停止)</option>
-                                    </select>
-                                    <span className="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-text-muted pointer-events-none">expand_more</span>
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div className="flex flex-col gap-2">
+                                        <label className="text-xs font-bold text-text-main">年商 (千円)</label>
+                                        <input type="text" value={customerForm.annualSales} onChange={e => setCustomerForm({...customerForm, annualSales: e.target.value})} className="w-full bg-surface border border-border-dark px-3 py-2.5 rounded text-text-main focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all text-sm font-mono" />
+                                    </div>
+                                    <div className="flex flex-col gap-2">
+                                        <label className="text-xs font-bold text-text-main">サイトURL</label>
+                                        <input type="text" value={customerForm.websiteUrl} onChange={e => setCustomerForm({...customerForm, websiteUrl: e.target.value})} className="w-full bg-surface border border-border-dark px-3 py-2.5 rounded text-text-main focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all text-sm font-mono" />
+                                    </div>
                                 </div>
                             </div>
 
