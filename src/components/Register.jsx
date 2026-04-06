@@ -1,10 +1,13 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { createCustomer, fetchCustomers } from '../services/microcms';
+import TermsModal from './TermsModal';
 
 export default function Register({ setParentTab }) {
     const { loginWithGoogle, logout } = useAuth();
     const [isProcessing, setIsProcessing] = useState(false);
+    const [isTermsModalOpen, setIsTermsModalOpen] = useState(false);
+    const [termsModalView, setTermsModalView] = useState('terms');
 
     // Initial State for Comprehensive Registration Form
     const [regForm, setRegForm] = useState({
@@ -275,7 +278,7 @@ export default function Register({ setParentTab }) {
 
                     <label className="flex items-center gap-3 cursor-pointer p-3 bg-surface-highlight border border-border-dark rounded hover:bg-black/5 transition-colors">
                         <input type="checkbox" name="termsAgreed" checked={regForm.termsAgreed} onChange={handleChange} className="w-4 h-4 text-primary bg-background-main border-border-dark rounded focus:ring-primary" />
-                        <span className="text-sm text-text-main font-bold"><a href="#" className="text-primary hover:underline" onClick={(e) => e.preventDefault()}>B2B利用規約</a> および <a href="#" className="text-primary hover:underline" onClick={(e) => e.preventDefault()}>プライバシーポリシー</a> に同意する <span className="text-accent-red">*</span></span>
+                        <span className="text-sm text-text-main font-bold"><a href="#" className="text-primary hover:underline hover:text-primary-hover" onClick={(e) => { e.preventDefault(); setTermsModalView('terms'); setIsTermsModalOpen(true); }}>B2B利用規約</a> および <a href="#" className="text-primary hover:underline hover:text-primary-hover" onClick={(e) => { e.preventDefault(); setTermsModalView('privacy'); setIsTermsModalOpen(true); }}>プライバシーポリシー</a> に同意する <span className="text-accent-red">*</span></span>
                     </label>
                 </div>
 
@@ -302,6 +305,12 @@ export default function Register({ setParentTab }) {
                     </button>
                 </div>
             </form>
+            
+            <TermsModal 
+                isOpen={isTermsModalOpen} 
+                onClose={() => setIsTermsModalOpen(false)} 
+                initialView={termsModalView}
+            />
         </div>
     );
 }

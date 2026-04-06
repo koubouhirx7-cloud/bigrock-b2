@@ -2,11 +2,16 @@ import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { createCustomer, fetchCustomers } from '../services/microcms';
 import Register from './Register';
+import TermsModal from './TermsModal';
 
 export default function Login() {
     const { loginWithGoogle, logout } = useAuth();
     const [tab, setTab] = useState('login'); // 'login' | 'register'
     const [isProcessing, setIsProcessing] = useState(false);
+    
+    // Modal State for Footer Links
+    const [isTermsModalOpen, setIsTermsModalOpen] = useState(false);
+    const [termsModalView, setTermsModalView] = useState('terms');
 
     const handleGoogleAuth = async (isRegistering) => {
         setIsProcessing(true);
@@ -127,11 +132,17 @@ export default function Login() {
 
                 {/* Footer Links */}
                 <div className="flex justify-center gap-6 mt-4">
-                    <a href="#" className="text-xs text-text-muted hover:text-primary transition-colors hover:underline decoration-dotted underline-offset-4 tracking-widest uppercase font-mono">B2B利用規約</a>
-                    <a href="#" className="text-xs text-text-muted hover:text-primary transition-colors hover:underline decoration-dotted underline-offset-4 tracking-widest uppercase font-mono">プライバシーポリシー</a>
-                    <a href="#" className="text-xs text-text-muted hover:text-primary transition-colors hover:underline decoration-dotted underline-offset-4 tracking-widest uppercase font-mono">公式ウェブサイト</a>
+                    <a href="#" onClick={(e) => { e.preventDefault(); setTermsModalView('terms'); setIsTermsModalOpen(true); }} className="text-xs text-text-muted hover:text-primary transition-colors hover:underline decoration-dotted underline-offset-4 tracking-widest uppercase font-mono">B2B利用規約</a>
+                    <a href="#" onClick={(e) => { e.preventDefault(); setTermsModalView('privacy'); setIsTermsModalOpen(true); }} className="text-xs text-text-muted hover:text-primary transition-colors hover:underline decoration-dotted underline-offset-4 tracking-widest uppercase font-mono">プライバシーポリシー</a>
+                    <a href="#" onClick={(e) => e.preventDefault()} className="text-xs text-text-muted hover:text-primary transition-colors hover:underline decoration-dotted underline-offset-4 tracking-widest uppercase font-mono">公式ウェブサイト</a>
                 </div>
             </div>
+
+            <TermsModal 
+                isOpen={isTermsModalOpen} 
+                onClose={() => setIsTermsModalOpen(false)} 
+                initialView={termsModalView}
+            />
         </div>
     );
 }
