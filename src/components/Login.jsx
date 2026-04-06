@@ -43,7 +43,7 @@ export default function Login() {
     };
 
     return (
-        <div className="font-display bg-background-main text-slate-100 min-h-screen flex flex-col items-center justify-center p-4 relative overflow-hidden">
+        <div className="font-display bg-background-main text-slate-100 min-h-screen flex flex-col items-center justify-center py-12 px-4 relative overflow-x-hidden">
 
             {/* Background Effect */}
             <div className="absolute inset-0 pointer-events-none z-0"
@@ -70,7 +70,7 @@ export default function Login() {
                 </div>
 
                 {/* Auth Card */}
-                <div className="bg-background-main border border-border-dark p-8 md:p-10 relative overflow-hidden shadow-2xl">
+                <div className="bg-background-main border border-border-dark p-8 md:p-10 relative overflow-y-auto overflow-x-hidden max-h-[85vh] shadow-2xl">
                     {/* Decorative Accent Corner */}
                     <div className="absolute top-0 right-0 w-8 h-8 border-t-2 border-r-2 border-primary/40"></div>
 
