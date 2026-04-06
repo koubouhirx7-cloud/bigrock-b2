@@ -13,7 +13,23 @@ function App() {
   const [activeTab, setActiveTab] = useState('catalog')
   const [products, setProducts] = useState(productsDataFromJson)
   const [selectedProduct, setSelectedProduct] = useState(null)
+  const [collapsedVariantGroups, setCollapsedVariantGroups] = useState({})
   
+  const toggleVariantGroup = (groupName) => {
+    setCollapsedVariantGroups(prev => ({ ...prev, [groupName]: !prev[groupName] }))
+  }
+
+  const variantGroups = useMemo(() => {
+    if (!selectedProduct || !selectedProduct.variants) return {};
+    return selectedProduct.variants.reduce((acc, v) => {
+      const parts = v.name.split('/');
+      const groupName = parts.length > 1 ? parts[parts.length - 1].trim() : '全バリエーション';
+      if (!acc[groupName]) acc[groupName] = [];
+      acc[groupName].push(v);
+      return acc;
+    }, {});
+  }, [selectedProduct]);
+
   const uniqueCategories = useMemo(() => {
     const cats = products.map(p => p.category || 'Uncategorized');
     return [...new Set(cats)].filter(Boolean).sort();
@@ -752,59 +768,72 @@ function App() {
                             <th className="px-5 py-3 font-medium text-right">アクション</th>
                           </tr>
                         </thead>
-                        <tbody className="divide-y divide-border-subtle">
-                          {selectedProduct.variants?.map(variant => (
-                            <tr key={variant.id} className="hover:bg-black/5 transition-colors group">
-                              <td className="px-5 py-4 font-bold text-text-main text-sm">{variant.name}</td>
-                              <td className="px-5 py-4 text-center">
-                                <span className={`inline-flex items-center px-2 py-0.5 rounded text-[10px] font-mono border ${variant.stock > 5 ? 'bg-accent-green/10 text-accent-green border-accent-green/20' : variant.stock > 0 ? 'bg-yellow-500/10 text-yellow-500 border-yellow-500/20' : 'bg-red-500/10 text-red-500 border-red-500/20'}`}>
-                                  {variant.stock > 0 ? `${variant.stock} units` : 'Out of Stock (BO)'}
-                                </span>
-                              </td>
-                              <td className="px-5 py-4 text-right">
-                                <div className="flex items-center justify-end gap-3">
-                                  <div className="flex items-center border border-border-subtle rounded-sm bg-background-main shadow-sm">
-                                    <button 
-                                      onClick={() => handleVariantQuantityChange(variant.id, -1, variant.stock)} 
-                                      className="size-8 flex items-center justify-center text-text-muted hover:text-text-main hover:bg-black/5 transition-colors"
-                                    >
-                                      <span className="material-symbols-outlined text-[16px]">remove</span>
-                                    </button>
-                                    <input 
-                                      type="number" 
-                                      min="1" 
-                                      max={variant.stock > 0 ? variant.stock : 999} 
-                                      value={selectionQuantities[variant.id] || 1} 
-                                      onChange={(e) => handleVariantQuantityInput(variant.id, e.target.value, variant.stock)}
-                                      className="w-12 h-8 text-center bg-transparent border-none text-sm font-mono focus:ring-0 p-0 text-text-main focus:outline-none"
-                                    />
-                                    <button 
-                                      onClick={() => handleVariantQuantityChange(variant.id, 1, variant.stock)} 
-                                      className="size-8 flex items-center justify-center text-text-muted hover:text-text-main hover:bg-black/5 transition-colors"
-                                    >
-                                      <span className="material-symbols-outlined text-[16px]">add</span>
-                                    </button>
-                                  </div>
-                                  <button
-                                    onClick={() => {
-                                      const addQty = selectionQuantities[variant.id] || 1;
-                                      const isBO = variant.stock <= 0;
-                                      addToCart(selectedProduct, variant, addQty, isBO);
-                                      setSelectionQuantities(prev => ({ ...prev, [variant.id]: 1 }));
-                                    }}
-                                    className={`text-xs font-bold px-4 py-2 rounded-sm transition-colors flex items-center gap-1 shadow-sm ${variant.stock > 0 ? 'bg-primary text-background-main hover:bg-primary-dim shadow-primary/20' : 'bg-[#e65c00] text-white hover:bg-[#cc5200] shadow-[#e65c00]/20'}`}
-                                  >
-                                    {variant.stock > 0 ? (
-                                      <>カートに追加 <span className="material-symbols-outlined text-sm">add_shopping_cart</span></>
-                                    ) : (
-                                      <>BO希望 <span className="material-symbols-outlined text-sm">inventory_2</span></>
-                                    )}
-                                  </button>
-                                </div>
-                              </td>
-                            </tr>
-                          ))}
-                        </tbody>
+                        {Object.entries(variantGroups).map(([groupName, variantsInGroup]) => {
+                          const isCollapsed = collapsedVariantGroups[groupName];
+                          return (
+                            <tbody key={groupName} className="divide-y divide-border-subtle">
+                                <tr className="bg-surface-highlight hover:bg-black/5 cursor-pointer transition-colors" onClick={() => toggleVariantGroup(groupName)}>
+                                  <td colSpan="3" className="px-5 py-3 font-bold text-sm text-text-main">
+                                    <div className="flex items-center gap-2">
+                                      <span className={`material-symbols-outlined transition-transform duration-200 ${isCollapsed ? '-rotate-90' : 'rotate-0'}`}>expand_more</span>
+                                      {groupName} ({variantsInGroup.length})
+                                    </div>
+                                  </td>
+                                </tr>
+                                {!isCollapsed && variantsInGroup.map(variant => (
+                                  <tr key={variant.id} className="hover:bg-black/5 transition-colors group">
+                                    <td className="px-5 py-4 font-bold text-text-main text-sm pl-10">{variant.name}</td>
+                                    <td className="px-5 py-4 text-center">
+                                      <span className={`inline-flex items-center px-2 py-0.5 rounded text-[10px] font-mono border ${variant.stock > 5 ? 'bg-accent-green/10 text-accent-green border-accent-green/20' : variant.stock > 0 ? 'bg-yellow-500/10 text-yellow-500 border-yellow-500/20' : 'bg-red-500/10 text-red-500 border-red-500/20'}`}>
+                                        {variant.stock > 0 ? `${variant.stock} units` : 'Out of Stock (BO)'}
+                                      </span>
+                                    </td>
+                                    <td className="px-5 py-4 text-right">
+                                      <div className="flex items-center justify-end gap-3">
+                                        <div className="flex items-center border border-border-subtle rounded-sm bg-background-main shadow-sm">
+                                          <button 
+                                            onClick={() => handleVariantQuantityChange(variant.id, -1, variant.stock)} 
+                                            className="size-8 flex items-center justify-center text-text-muted hover:text-text-main hover:bg-black/5 transition-colors"
+                                          >
+                                            <span className="material-symbols-outlined text-[16px]">remove</span>
+                                          </button>
+                                          <input 
+                                            type="number" 
+                                            min="1" 
+                                            max={variant.stock > 0 ? variant.stock : 999} 
+                                            value={selectionQuantities[variant.id] || 1} 
+                                            onChange={(e) => handleVariantQuantityInput(variant.id, e.target.value, variant.stock)}
+                                            className="w-12 h-8 text-center bg-transparent border-none text-sm font-mono focus:ring-0 p-0 text-text-main focus:outline-none"
+                                          />
+                                          <button 
+                                            onClick={() => handleVariantQuantityChange(variant.id, 1, variant.stock)} 
+                                            className="size-8 flex items-center justify-center text-text-muted hover:text-text-main hover:bg-black/5 transition-colors"
+                                          >
+                                            <span className="material-symbols-outlined text-[16px]">add</span>
+                                          </button>
+                                        </div>
+                                        <button
+                                          onClick={() => {
+                                            const addQty = selectionQuantities[variant.id] || 1;
+                                            const isBO = variant.stock <= 0;
+                                            addToCart(selectedProduct, variant, addQty, isBO);
+                                            setSelectionQuantities(prev => ({ ...prev, [variant.id]: 1 }));
+                                          }}
+                                          className={`text-xs font-bold px-4 py-2 rounded-sm transition-colors flex items-center gap-1 shadow-sm ${variant.stock > 0 ? 'bg-primary text-background-main hover:bg-primary-dim shadow-primary/20' : 'bg-[#e65c00] text-white hover:bg-[#cc5200] shadow-[#e65c00]/20'}`}
+                                        >
+                                          {variant.stock > 0 ? (
+                                            <>カートに追加 <span className="material-symbols-outlined text-sm">add_shopping_cart</span></>
+                                          ) : (
+                                            <>BO希望 <span className="material-symbols-outlined text-sm">inventory_2</span></>
+                                          )}
+                                        </button>
+                                      </div>
+                                    </td>
+                                  </tr>
+                                ))}
+                            </tbody>
+                          );
+                        })}
                       </table>
                     </div>
                   </div>
