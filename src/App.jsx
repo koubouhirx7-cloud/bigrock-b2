@@ -628,8 +628,8 @@ function App() {
             className={`group flex items-center w-full gap-3 px-6 py-3 transition-colors ${activeTab === 'drafts' ? 'bg-black/5 border-l-2 border-primary text-primary' : 'border-l-2 border-transparent text-text-muted hover:text-text-main hover:bg-black/5'}`}
             onClick={() => setActiveTab('drafts')}
           >
-            <span className="material-symbols-outlined">edit_document</span>
-            <span className="text-sm font-medium">下書き一覧</span>
+            <span className="material-symbols-outlined">receipt_long</span>
+            <span className="text-sm font-medium">注文保留一覧</span>
             {drafts.length > 0 && <span className="ml-auto bg-primary text-white text-[10px] font-bold px-2 py-0.5 rounded-full">{drafts.length}</span>}
           </button>
 
