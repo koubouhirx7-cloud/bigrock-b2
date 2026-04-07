@@ -310,7 +310,7 @@ function App() {
         items: JSON.stringify(cart),
         totalAmount: finalTotal,
         status: "処理中",
-        shippingOption
+        shippingOption: [shippingOption]
       });
       console.log("Order successfully created in MicroCMS");
     } catch (error) {
@@ -350,6 +350,7 @@ function App() {
         totalAmount: finalTotal,
         status: "下書き",
         memo: draftMemo || "メモなし",
+        shippingOption: [shippingOption]
       });
       alert("下書きとして保存しました。");
       setCart([]);
