@@ -1072,12 +1072,22 @@ function App() {
                     </div>
                   ) : (
                     <div className="divide-y divide-border-subtle">
-                      {drafts.map(draft => (
-                        <div key={draft.id} className="p-6 hover:bg-black/5 transition-colors flex flex-col md:flex-row gap-4 items-start md:items-center justify-between">
+                      {drafts.map(draft => {
+                        const createdAtDate = new Date(draft.createdAt);
+                        const expirationDate = new Date(createdAtDate);
+                        expirationDate.setDate(expirationDate.getDate() + 7);
+                        const isExpired = new Date() > expirationDate;
+
+                        return (
+                        <div key={draft.id} className={`p-6 hover:bg-black/5 transition-colors flex flex-col md:flex-row gap-4 items-start md:items-center justify-between ${isExpired ? 'opacity-70' : ''}`}>
                           <div className="flex-1 min-w-0">
-                            <div className="flex items-center gap-3 mb-2">
+                            <div className="flex items-center gap-3 mb-2 flex-wrap">
                               <span className="text-sm font-bold text-text-main font-mono bg-black/5 px-2 py-0.5 rounded">{draft.id}</span>
-                              <span className="text-xs text-text-muted py-0.5">{new Date(draft.createdAt).toLocaleString('ja-JP')}</span>
+                              <span className="text-xs text-text-muted py-0.5">保存日: {createdAtDate.toLocaleDateString('ja-JP')}</span>
+                              <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold flex items-center gap-1 ${isExpired ? 'bg-accent-red text-white' : 'bg-primary/20 text-primary'}`}>
+                                  <span className="material-symbols-outlined text-[12px]">{isExpired ? 'error' : 'schedule'}</span>
+                                  {isExpired ? '取り置き期限切れ' : `期限: ${expirationDate.toLocaleDateString('ja-JP')}まで`}
+                              </span>
                             </div>
                             <p className="text-sm text-text-main mb-1">
                                 {draft.memo && draft.memo !== 'メモなし' ? (
@@ -1114,7 +1124,7 @@ function App() {
                             </button>
                           </div>
                         </div>
-                      ))}
+                      )})}
                     </div>
                   )}
                 </div>
@@ -1245,6 +1255,10 @@ function App() {
                               placeholder="例: A社 展示会用 / 〇〇様 発注分"
                               className="w-full bg-surface border border-border-subtle px-3 py-2 rounded-sm text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all font-mono"
                           />
+                          <p className="text-xs text-accent-red flex items-center gap-1 mt-3 font-bold bg-accent-red/10 px-2 py-1.5 rounded-sm">
+                            <span className="material-symbols-outlined text-[14px]">info</span>
+                            在庫の取り置き期限は本日より1週間となります
+                          </p>
                       </div>
                   )}
 
