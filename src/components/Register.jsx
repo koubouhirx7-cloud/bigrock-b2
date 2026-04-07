@@ -166,7 +166,7 @@ export default function Register({ setParentTab }) {
         } catch (error) {
             console.error("Registration process failed:", error);
             if (error.code !== 'auth/popup-closed-by-user') {
-                alert("認証プロセスに失敗しました。もう一度お試しください。");
+                alert(`処理に失敗しました。もう一度お試しください。\nエラー詳細: ${error.message || error}`);
             }
         } finally {
             setIsProcessing(false);
