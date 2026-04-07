@@ -467,7 +467,8 @@ function App() {
       setIsCheckingCustomer(true);
       try {
         // Super Admin Bypass
-        if (currentUser.email === 'koubou.hi.rx7@gmail.com') {
+        const adminEmail = import.meta.env.VITE_ADMIN_EMAIL;
+        if (adminEmail && currentUser.email === adminEmail) {
             setCustomerProfile({ email: currentUser.email, companyName: 'サイト管理者 (Admin)', status: 'Active' });
             if (appMode === 'login' || appMode === 'pending') {
                 setAppMode('store'); // Change from admin to store so they see the catalog

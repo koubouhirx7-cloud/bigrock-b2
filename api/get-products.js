@@ -1,10 +1,18 @@
+import { verifyToken } from './utils/verify-token.js';
+
 export default async function handler(req, res) {
     if (req.method !== 'GET') {
         return res.status(405).json({ message: 'Method Not Allowed' });
     }
 
+    try {
+        await verifyToken(req);
+    } catch (error) {
+        return res.status(401).json({ message: error.message });
+    }
+
     const API_KEY = process.env.MICROCMS_API_KEY;
-    const DOMAIN = process.env.VITE_MICROCMS_SERVICE_DOMAIN;
+    const DOMAIN = process.env.VITE_MICROCMS_SERVICE_DOMAIN || process.env.MICROCMS_SERVICE_DOMAIN;
 
     if (!API_KEY || !DOMAIN) {
         return res.status(500).json({ message: 'Server configuration error: Missing MicroCMS credentials' });

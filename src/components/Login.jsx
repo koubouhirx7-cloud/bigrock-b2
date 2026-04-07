@@ -21,7 +21,8 @@ export default function Login() {
             const userEmail = result.user.email;
 
             // Super Admin bypass check
-            if (userEmail === 'koubou.hi.rx7@gmail.com') {
+            const adminEmail = import.meta.env.VITE_ADMIN_EMAIL;
+            if (adminEmail && userEmail === adminEmail) {
                 return;
             }
             

@@ -11,10 +11,15 @@ export default async function handler(req, res) {
     return res.status(401).json({ message: error.message });
   }
 
-  const { id, updates } = req.body;
+  const { id, stock } = req.body;
 
-  if (!id || !updates) {
-    return res.status(400).json({ message: 'Missing product id or updates' });
+  // SECURITY: Only `stock` is allowed to be updated via this endpoint.
+  // Reject requests that don't provide a valid stock value.
+  if (!id) {
+    return res.status(400).json({ message: 'Product ID is required' });
+  }
+  if (stock === undefined || stock === null || typeof stock !== 'number') {
+    return res.status(400).json({ message: 'A valid numeric stock value is required' });
   }
 
   const apiKey = process.env.VITE_MICROCMS_API_KEY || process.env.MICROCMS_API_KEY;
@@ -31,7 +36,7 @@ export default async function handler(req, res) {
         'Content-Type': 'application/json',
         'X-MICROCMS-API-KEY': apiKey
       },
-      body: JSON.stringify(updates)
+      body: JSON.stringify({ stock })
     });
 
     if (!response.ok) {

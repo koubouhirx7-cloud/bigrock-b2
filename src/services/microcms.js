@@ -26,7 +26,8 @@ const getAuthHeaders = async () => {
 export const fetchProducts = async () => {
     try {
         console.log("Fetching products via secure proxy...");
-        const response = await fetch('/api/get-products');
+        const headers = await getAuthHeaders();
+        const response = await fetch('/api/get-products', { headers });
         if (!response.ok) {
             throw new Error(`Proxy error: ${response.statusText}`);
         }
