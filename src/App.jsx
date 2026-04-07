@@ -5,6 +5,52 @@ import Admin from './components/Admin'
 import { fetchProducts, createOrder, fetchOrders, fetchCustomers } from './services/microcms'
 import { useAuth } from './context/AuthContext'
 
+const ProductGallery = ({ product }) => {
+  const allImages = [product.imageUrl, ...(product.galleryImages || [])].filter(Boolean);
+  const [currentIndex, setCurrentIndex] = useState(0);
+
+  useEffect(() => {
+    setCurrentIndex(0);
+  }, [product.id]);
+
+  if (allImages.length === 0) {
+    return (
+      <div className="bg-background-main border border-border-subtle rounded-sm aspect-video flex justify-center items-center">
+         <span className="text-text-muted text-xs">No Image</span>
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex flex-col gap-3">
+      <div className="bg-background-main border border-border-subtle rounded-sm aspect-video overflow-hidden relative group">
+        <img src={allImages[currentIndex]} alt={product.name} className="w-full h-full object-cover opacity-90 group-hover:opacity-100 transition-opacity duration-500" />
+        <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-background-main to-transparent h-1/2 opacity-60 pointer-events-none"></div>
+        <div className="absolute inset-4 top-auto flex justify-between items-end">
+          <h2 className="text-2xl font-bold text-white drop-shadow-md">{product.name}</h2>
+          <a href={product.originalUrl} target="_blank" rel="noreferrer" className="flex items-center gap-1 text-xs font-medium text-white bg-black/30 backdrop-blur-md px-3 py-1.5 rounded-full hover:bg-primary hover:text-background-main transition-colors border border-white/20">
+            公式サイト <span className="material-symbols-outlined text-[14px]">open_in_new</span>
+          </a>
+        </div>
+      </div>
+      
+      {allImages.length > 1 && (
+        <div className="flex gap-2 overflow-x-auto pb-1 mt-1 hide-scrollbar">
+          {allImages.map((img, idx) => (
+            <button
+              key={idx}
+              onClick={() => setCurrentIndex(idx)}
+              className={`flex-shrink-0 w-24 h-16 rounded-sm border overflow-hidden transition-all ${currentIndex === idx ? 'border-primary ring-1 ring-primary opacity-100 scale-100' : 'border-border-subtle opacity-50 hover:opacity-100 hover:border-text-muted scale-95 hover:scale-100'}`}
+            >
+              <img src={img} alt={`Gallery ${idx + 1}`} className="w-full h-full object-cover" />
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+
 function App() {
   const { currentUser, logout } = useAuth()
   const [appMode, setAppMode] = useState('login')
@@ -277,6 +323,7 @@ function App() {
             imageUrl: item.externalImageUrl || item.image?.url || '',
             originalUrl: item.originalUrl || '',
             collapseByDefault: typeof item.collapseByDefault === 'boolean' ? item.collapseByDefault : true,
+            galleryImages: item.galleryImages?.map(img => img.url) || [],
             relatedProducts: item.relatedProducts?.map(rp => ({
               id: rp.skuproducts || rp.sku || rp.id,
               name: rp.title,
@@ -755,16 +802,7 @@ function App() {
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                   {/* Left: Product Info & Image */}
                   <div className="flex flex-col gap-6">
-                    <div className="bg-background-main border border-border-subtle rounded-sm aspect-video overflow-hidden relative group">
-                      <img src={selectedProduct.imageUrl} alt={selectedProduct.name} className="w-full h-full object-cover opacity-90 group-hover:opacity-100 transition-opacity duration-500" />
-                      <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-background-main to-transparent h-1/2 opacity-60"></div>
-                      <div className="absolute inset-4 top-auto flex justify-between items-end">
-                        <h2 className="text-2xl font-bold text-text-main drop-shadow-md">{selectedProduct.name}</h2>
-                        <a href={selectedProduct.originalUrl} target="_blank" rel="noreferrer" className="flex items-center gap-1 text-xs font-medium text-text-main bg-black/10 backdrop-blur-md text-text-main px-3 py-1.5 rounded-full hover:bg-primary hover:text-background-main transition-colors border border-black/20">
-                          公式サイト <span className="material-symbols-outlined text-[14px]">open_in_new</span>
-                        </a>
-                      </div>
-                    </div>
+                    <ProductGallery product={selectedProduct} />
 
                     <div className="bg-surface border border-border-subtle p-6 rounded-sm">
                       <h4 className="text-sm font-bold text-text-main uppercase tracking-wider mb-2 border-b border-border-subtle pb-2">Description</h4>
