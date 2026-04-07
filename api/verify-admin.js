@@ -5,8 +5,12 @@ export default function handler(req, res) {
 
   const { password } = req.body;
   
-  // Try to use environment variable, fallback to default if not set (for local dev safety)
-  const adminPassword = process.env.ADMIN_PASSWORD || 'bigrock2026';
+  const adminPassword = process.env.ADMIN_PASSWORD;
+
+  if (!adminPassword) {
+    console.error("ADMIN_PASSWORD environment variable is not configured.");
+    return res.status(500).json({ success: false, message: 'Server configuration error' });
+  }
 
   if (password === adminPassword) {
     return res.status(200).json({ success: true });

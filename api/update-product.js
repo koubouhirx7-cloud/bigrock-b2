@@ -1,6 +1,14 @@
+import { verifyToken } from './utils/verify-token.js';
+
 export default async function handler(req, res) {
   if (req.method !== 'PATCH') {
     return res.status(405).json({ message: 'Method Not Allowed' });
+  }
+
+  try {
+    await verifyToken(req);
+  } catch (error) {
+    return res.status(401).json({ message: error.message });
   }
 
   const { id, updates } = req.body;
