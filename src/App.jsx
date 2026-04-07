@@ -352,13 +352,13 @@ function App() {
         memo: draftMemo || "メモなし",
         shippingOption: [shippingOption]
       });
-      alert("次回注文時まで保留として、下書きに保存しました。");
+      alert("注文保留データとして保存しました。");
       setCart([]);
       setIsConfirmingOrder(false);
       setDraftMemo('');
       setActiveTab('drafts');
     } catch (e) {
-      alert("下書きの保存に失敗しました。");
+      alert("保留データの保存に失敗しました。");
       console.error(e);
     } finally {
       setIsSavingDraft(false);
@@ -1052,11 +1052,15 @@ function App() {
             {/* --- DRAFTS VIEW --- */}
             {activeTab === 'drafts' && (
               <div className="flex flex-col gap-6">
-                <div className="flex items-center justify-between border-b border-border-subtle pb-4">
-                  <h3 className="text-xl font-bold text-text-main uppercase tracking-wider flex items-center gap-2">
-                    <span className="material-symbols-outlined text-primary text-2xl">edit_document</span>
-                    下書き一覧
+                <div className="flex flex-col border-b border-border-subtle pb-4">
+                  <h3 className="text-xl font-bold text-text-main uppercase tracking-wider flex items-center gap-2 mb-2">
+                    <span className="material-symbols-outlined text-primary text-2xl">receipt_long</span>
+                    注文保留一覧
                   </h3>
+                  <p className="text-sm text-text-muted flex items-center gap-1">
+                    <span className="material-symbols-outlined text-[16px] text-accent-red">info</span>
+                    <span className="font-bold text-accent-red">ご注意：</span> 在庫の取り置き期間は、保留日より<span className="font-bold underline">1週間以内</span>となります。
+                  </p>
                 </div>
 
                 <div className="bg-surface border border-border-subtle rounded-sm overflow-hidden">
@@ -1067,8 +1071,8 @@ function App() {
                     </div>
                   ) : drafts.length === 0 ? (
                     <div className="p-12 pl-6 pr-6 text-center">
-                      <span className="material-symbols-outlined text-4xl text-text-muted mb-4 opacity-50">drafts</span>
-                      <p className="text-text-muted">保存された下書きはありません。</p>
+                      <span className="material-symbols-outlined text-4xl text-text-muted mb-4 opacity-50">inbox</span>
+                      <p className="text-text-muted">保留中の注文はありません。</p>
                     </div>
                   ) : (
                     <div className="divide-y divide-border-subtle">
@@ -1096,9 +1100,25 @@ function App() {
                                     <span className="text-text-muted italic">メモなし</span>
                                 )}
                             </p>
-                            <div className="flex items-center gap-4 text-sm text-text-muted">
+                            <div className="flex items-center gap-4 text-sm text-text-muted border-t border-border-subtle pt-3 mt-3">
                               <span className="flex items-center gap-1"><span className="material-symbols-outlined text-[16px]">inventory_2</span> {JSON.parse(draft.items || '[]').reduce((a,b)=>a+b.quantity,0)}点</span>
                               <span className="flex items-center gap-1"><span className="material-symbols-outlined text-[16px]">payments</span> ¥{draft.totalAmount.toLocaleString()}</span>
+                            </div>
+
+                            {/* Item details breakdown */}
+                            <div className="mt-3 bg-black/5 p-3 rounded-sm">
+                              <p className="text-xs font-bold text-text-muted mb-2 border-b border-border-subtle pb-1">注文明細</p>
+                              <ul className="text-sm space-y-1">
+                                {JSON.parse(draft.items || '[]').map((item, idx) => (
+                                  <li key={idx} className="flex justify-between items-start text-text-main">
+                                    <span>
+                                      <span className="font-bold">{item.productName || item.name}</span>
+                                      {item.variant && <span className="text-text-muted text-xs ml-1">({item.variant})</span>}
+                                    </span>
+                                    <span className="font-mono ml-4 text-primary whitespace-nowrap">x {item.quantity}</span>
+                                  </li>
+                                ))}
+                              </ul>
                             </div>
                           </div>
                           <div className="flex items-center gap-2 w-full md:w-auto">
@@ -1106,7 +1126,7 @@ function App() {
                               onClick={() => {
                                 setCart(JSON.parse(draft.items || '[]'));
                                 setActiveTab('cart');
-                                showToast('下書きをカートに復元しました');
+                                showToast('保留した注文をカートに復元しました');
                               }}
                               className="flex-1 md:flex-none border border-primary text-primary px-4 py-2 text-sm font-bold rounded-sm hover:bg-primary/5 transition-colors text-center"
                             >
@@ -1114,8 +1134,8 @@ function App() {
                             </button>
                             <button 
                               onClick={async () => {
-                                if (window.confirm("この下書きを削除しますか？")) {
-                                  try { await deleteOrder(draft.id); setDrafts(drafts.filter(d => d.id !== draft.id)); showToast('下書きを削除しました'); } catch (e) { alert("削除に失敗しました"); }
+                                if (window.confirm("この保留データを削除しますか？")) {
+                                  try { await deleteOrder(draft.id); setDrafts(drafts.filter(d => d.id !== draft.id)); showToast('保留データを削除しました'); } catch (e) { alert("削除に失敗しました"); }
                                 }
                               }}
                               className="flex-none text-text-muted hover:text-accent-red px-3 py-2 rounded-sm hover:bg-accent-red/10 transition-colors"
@@ -1287,7 +1307,7 @@ function App() {
                             {shippingOption === '次回注文時まで保留' ? 'save' : 'send'}
                         </span>
                     )}
-                    {shippingOption === '次回注文時まで保留' ? '下書きに保存する' : '確定する'}
+                    {shippingOption === '次回注文時まで保留' ? '注文保留データとして保存' : '確定する'}
                   </button>
                 </div>
               </div>
