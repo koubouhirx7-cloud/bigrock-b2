@@ -821,21 +821,9 @@ function App() {
                           </div>
                         </div>
 
-                        <div className="mb-6">
-                            <label className="block text-xs font-bold text-text-muted uppercase tracking-wider mb-2">発送オプション</label>
-                            <select 
-                                value={shippingOption}
-                                onChange={(e) => setShippingOption(e.target.value)}
-                                className="w-full bg-background-main border border-border-subtle px-3 py-2 rounded-sm text-sm"
-                            >
-                                <option value="このまま発送">このまま発送</option>
-                                <option value="次回注文時まで保留">次回注文時まで保留</option>
-                            </select>
-                        </div>
-
                         <button onClick={() => setIsConfirmingOrder(true)} className="w-full bg-primary text-background-main font-bold py-3 rounded-sm hover:bg-primary-dim transition-colors flex items-center justify-center gap-2 shadow-lg shadow-primary/20">
                           <span className="material-symbols-outlined">send</span>
-                          発注を実行する
+                          発注手続きへ進む
                         </button>
                         
                         <div className="mt-4 pt-4 border-t border-dashed border-border-subtle">
@@ -1237,17 +1225,24 @@ function App() {
                   以下の内容で発注を確定します。<br/>よろしいでしょうか？
                 </p>
                 <div className="bg-black/5 p-4 rounded-sm mb-6 border border-border-subtle">
-                  <div className="flex justify-between text-sm mb-2">
+                  <div className="flex justify-between text-sm mb-4">
                     <span className="text-text-muted">合計点数:</span>
                     <span className="font-bold text-text-main">{getCartTotalQuantity()} 点</span>
                   </div>
-                  <div className="flex justify-between text-sm mb-2">
-                    <span className="text-text-muted">発送オプション:</span>
-                    <span className="font-bold text-primary">{shippingOption}</span>
+                  <div className="mb-4">
+                      <label className="block text-xs font-bold text-text-muted uppercase tracking-wider mb-2">発送オプションを選択してください</label>
+                      <select 
+                          value={shippingOption}
+                          onChange={(e) => setShippingOption(e.target.value)}
+                          className="w-full bg-background-main border border-border-subtle px-3 py-2.5 rounded-sm text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all font-bold text-primary"
+                      >
+                          <option value="このまま発送">このまま発送</option>
+                          <option value="次回注文時まで保留">次回注文時まで保留</option>
+                      </select>
                   </div>
-                  <div className="flex justify-between text-sm pt-2 border-t border-border-subtle">
-                    <span className="text-text-muted">合計金額 (税込):</span>
-                    <span className="font-bold text-text-main">¥{Math.floor(getCartTotalPrice() * 1.1).toLocaleString()}</span>
+                  <div className="flex justify-between text-sm pt-4 border-t border-border-subtle">
+                    <span className="text-text-muted mt-1">合計金額 (税込):</span>
+                    <span className="font-bold text-text-main font-mono text-lg text-primary">¥{Math.floor(getCartTotalPrice() * 1.1).toLocaleString()}</span>
                   </div>
                 </div>
                 <div className="flex gap-3">
