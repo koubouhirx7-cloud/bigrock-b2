@@ -252,9 +252,9 @@ export default function Register({ setParentTab }) {
                     </div>
                 </div>
 
-                {/* 連絡先・所在地 */}
+                {/* 連絡先・所在地(商品配送先) */}
                 <div className="space-y-4">
-                    <h3 className="text-sm font-bold border-b border-border-dark pb-2 mt-8 text-primary">連絡先・所在地</h3>
+                    <h3 className="text-sm font-bold border-b border-border-dark pb-2 mt-8 text-primary">連絡先・所在地(商品配送先)</h3>
 
                     <div className="space-y-1.5">
                         <label className="block text-xs font-bold text-text-main">郵便番号 <span className="text-accent-red">*</span></label>
