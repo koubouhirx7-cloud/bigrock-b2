@@ -39,35 +39,34 @@ export default async function handler(req, res) {
                     parsedItems = JSON.parse(items || '[]');
                 } catch(e) { }
 
-                let itemsText = parsedItems.map(item => `・${item.productName || item.name} (${item.variant || '-'}) x **${item.quantity}**`).join('\n');
+                let itemsText = parsedItems.map(item => `・**${item.productName || item.name}**\n　└ 仕様: ${item.variant || '-'} / 数量: **${item.quantity}**`).join('\n\n');
                 if (!itemsText) itemsText = "アイテム詳細なし";
                 // Discordの制約(フィールド長1024文字)への対策
                 if (itemsText.length > 1000) itemsText = itemsText.substring(0, 950) + '\n... (他多数)';
 
                 const discordPayload = {
-                    content: "🔔 **新規のB2B発注が入りました！**",
                     embeds: [
                         {
-                            title: `注文ID: ${orderId || '不明'}`,
+                            title: "🛎️ 新規の発注を受け付けました！",
                             color: 5814783, // blurple色
                             fields: [
                                 {
-                                    name: "🏢 会社名 (担当者)",
-                                    value: `${companyName || 'ゲスト'}`,
-                                    inline: true
-                                },
-                                {
-                                    name: "✉️ メールアドレス",
-                                    value: `${customerEmail || '未登録'}`,
+                                    name: "🏷️ 注文ID",
+                                    value: `\`${orderId || '不明'}\``,
                                     inline: true
                                 },
                                 {
                                     name: "💰 合計金額 (税込)",
-                                    value: `¥${Number(totalAmount || 0).toLocaleString()}`,
+                                    value: `**¥${Number(totalAmount || 0).toLocaleString()}**`,
+                                    inline: true
+                                },
+                                {
+                                    name: "🏢 顧客情報",
+                                    value: `**会社名:** ${companyName || 'ゲスト'}\n**メール:** ${customerEmail || '未登録'}`,
                                     inline: false
                                 },
                                 {
-                                    name: "📦 発注内容",
+                                    name: "📦 発注アイテム",
                                     value: itemsText,
                                     inline: false
                                 }
