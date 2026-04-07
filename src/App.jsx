@@ -42,46 +42,53 @@ const ProductGallery = ({ product }) => {
       </div>
       
       {isFullscreen && (
-        <div className="fixed inset-0 z-[100] bg-black/95 backdrop-blur-xl flex flex-col items-center justify-center p-4">
-            <div className="absolute top-6 right-6 flex gap-4 z-10">
-                <button onClick={() => setIsFullscreen(false)} className="text-white hover:text-primary transition-colors flex items-center justify-center size-14 bg-white/10 hover:bg-white/20 rounded-full backdrop-blur-md">
+        <div className="fixed inset-0 z-[100] bg-black/95 backdrop-blur-xl flex flex-col" onClick={() => setIsFullscreen(false)}>
+            {/* Top bar: close button */}
+            <div className="flex-shrink-0 flex justify-end p-4">
+                <button onClick={() => setIsFullscreen(false)} className="text-white hover:text-primary transition-colors flex items-center justify-center size-12 bg-white/10 hover:bg-white/20 rounded-full backdrop-blur-md">
                     <span className="material-symbols-outlined text-2xl">close</span>
                 </button>
             </div>
-            
-            {allImages.length > 1 && (
-                <>
-                    <button 
-                        onClick={(e) => { e.stopPropagation(); setCurrentIndex(prev => prev > 0 ? prev - 1 : allImages.length - 1); }} 
-                        className="absolute left-4 lg:left-12 top-1/2 -translate-y-1/2 text-white hover:text-primary transition-colors flex items-center justify-center size-14 lg:size-16 bg-white/10 hover:bg-white/20 rounded-full backdrop-blur-md z-10"
-                    >
-                        <span className="material-symbols-outlined text-3xl">chevron_left</span>
-                    </button>
-                    <button 
-                        onClick={(e) => { e.stopPropagation(); setCurrentIndex(prev => prev < allImages.length - 1 ? prev + 1 : 0); }} 
-                        className="absolute right-4 lg:right-12 top-1/2 -translate-y-1/2 text-white hover:text-primary transition-colors flex items-center justify-center size-14 lg:size-16 bg-white/10 hover:bg-white/20 rounded-full backdrop-blur-md z-10"
-                    >
-                        <span className="material-symbols-outlined text-3xl">chevron_right</span>
-                    </button>
-                </>
-            )}
 
-            <div className="relative w-full h-full flex items-center justify-center" onClick={() => setIsFullscreen(false)}>
-              <img src={allImages[currentIndex]} alt={product.name} className="w-auto h-auto max-w-[95vw] max-h-[85vh] object-contain drop-shadow-2xl" onClick={(e) => e.stopPropagation()} />
+            {/* Center: main image with prev/next arrows */}
+            <div className="relative flex-1 flex items-center justify-center min-h-0 px-16 lg:px-24">
+              {allImages.length > 1 && (
+                <>
+                  <button 
+                    onClick={(e) => { e.stopPropagation(); setCurrentIndex(prev => prev > 0 ? prev - 1 : allImages.length - 1); }} 
+                    className="absolute left-3 lg:left-6 text-white hover:text-primary transition-colors flex items-center justify-center size-12 lg:size-14 bg-white/10 hover:bg-white/20 rounded-full backdrop-blur-md z-10"
+                  >
+                    <span className="material-symbols-outlined text-3xl">chevron_left</span>
+                  </button>
+                  <button 
+                    onClick={(e) => { e.stopPropagation(); setCurrentIndex(prev => prev < allImages.length - 1 ? prev + 1 : 0); }} 
+                    className="absolute right-3 lg:right-6 text-white hover:text-primary transition-colors flex items-center justify-center size-12 lg:size-14 bg-white/10 hover:bg-white/20 rounded-full backdrop-blur-md z-10"
+                  >
+                    <span className="material-symbols-outlined text-3xl">chevron_right</span>
+                  </button>
+                </>
+              )}
+              <img 
+                src={allImages[currentIndex]} 
+                alt={product.name} 
+                className="w-auto h-auto max-w-full max-h-full object-contain drop-shadow-2xl" 
+                onClick={(e) => e.stopPropagation()} 
+              />
             </div>
-            
+
+            {/* Bottom: thumbnail strip */}
             {allImages.length > 1 && (
-                <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex gap-3 overflow-x-auto max-w-[90vw] pb-2 hide-scrollbar z-10">
+              <div className="flex-shrink-0 flex justify-center gap-3 overflow-x-auto py-4 px-4 hide-scrollbar" onClick={(e) => e.stopPropagation()}>
                 {allImages.map((img, idx) => (
-                    <button
+                  <button
                     key={idx}
-                    onClick={(e) => { e.stopPropagation(); setCurrentIndex(idx); }}
-                    className={`flex-shrink-0 w-24 h-16 rounded-md border-2 overflow-hidden transition-all ${currentIndex === idx ? 'border-primary ring-2 ring-primary opacity-100 scale-110 shadow-lg' : 'border-white/20 opacity-40 hover:opacity-100 scale-100 hover:scale-105'}`}
-                    >
+                    onClick={() => setCurrentIndex(idx)}
+                    className={`flex-shrink-0 w-20 h-14 rounded-md border-2 overflow-hidden transition-all ${currentIndex === idx ? 'border-primary ring-2 ring-primary opacity-100 scale-110 shadow-lg' : 'border-white/20 opacity-40 hover:opacity-100 scale-100 hover:scale-105'}`}
+                  >
                     <img src={img} alt={`Gallery ${idx + 1}`} className="w-full h-full object-cover" />
-                    </button>
+                  </button>
                 ))}
-                </div>
+              </div>
             )}
         </div>
       )}
