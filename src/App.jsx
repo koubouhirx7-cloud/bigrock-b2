@@ -127,10 +127,11 @@ function App() {
   const variantGroups = useMemo(() => {
     if (!selectedProduct || !selectedProduct.variants) return {};
     return selectedProduct.variants.reduce((acc, v) => {
-      const parts = v.name.split('/');
+      const variantName = v.name || v.id || 'バリエーション名未設定';
+      const parts = variantName.split('/');
       const groupName = parts.length > 1 ? parts[parts.length - 1].trim() : '全バリエーション';
       if (!acc[groupName]) acc[groupName] = [];
-      acc[groupName].push(v);
+      acc[groupName].push({ ...v, name: variantName });
       return acc;
     }, {});
   }, [selectedProduct]);
