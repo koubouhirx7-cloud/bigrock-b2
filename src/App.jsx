@@ -352,9 +352,9 @@ function App() {
         memo: draftMemo || "メモなし",
         shippingOption: [shippingOption]
       });
-      alert("下書きとして保存しました。");
+      alert("次回注文時まで保留として、下書きに保存しました。");
       setCart([]);
-      setShowDraftModal(false);
+      setIsConfirmingOrder(false);
       setDraftMemo('');
       setActiveTab('drafts');
     } catch (e) {
@@ -827,13 +827,6 @@ function App() {
                           発注手続きへ進む
                         </button>
                         
-                        <div className="mt-4 pt-4 border-t border-dashed border-border-subtle">
-                            <button onClick={() => setShowDraftModal(true)} className="w-full bg-surface text-text-main border border-border-subtle font-bold py-2.5 rounded-sm hover:bg-black/5 transition-colors flex items-center justify-center gap-2">
-                                <span className="material-symbols-outlined text-[18px]">save</span>
-                                下書きとして一時保存
-                            </button>
-                        </div>
-
                         <p className="text-[10px] text-text-muted text-center mt-4">
                           発注を実行する前に確認画面が表示されます。
                         </p>
@@ -1241,6 +1234,20 @@ function App() {
                           <option value="次回注文時まで保留">次回注文時まで保留</option>
                       </select>
                   </div>
+                  
+                  {shippingOption === '次回注文時まで保留' && (
+                      <div className="mb-4">
+                          <label className="block text-xs font-bold text-text-muted uppercase tracking-wider mb-2">後で識別しやすいようにメモを残せます（任意）</label>
+                          <input
+                              type="text"
+                              value={draftMemo}
+                              onChange={(e) => setDraftMemo(e.target.value)}
+                              placeholder="例: A社 展示会用 / 〇〇様 発注分"
+                              className="w-full bg-surface border border-border-subtle px-3 py-2 rounded-sm text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all font-mono"
+                          />
+                      </div>
+                  )}
+
                   <div className="flex justify-between text-sm pt-4 border-t border-border-subtle">
                     <span className="text-text-muted mt-1">合計金額 (税込):</span>
                     <span className="font-bold text-text-main font-mono text-lg text-primary">¥{Math.floor(getCartTotalPrice() * 1.1).toLocaleString()}</span>
@@ -1249,16 +1256,24 @@ function App() {
                 <div className="flex gap-3">
                   <button 
                     onClick={() => setIsConfirmingOrder(false)}
-                    className="flex-1 py-3 text-sm font-bold text-text-main bg-surface-highlight border border-border-subtle rounded-sm hover:bg-black/5 transition-colors"
+                    disabled={isSavingDraft}
+                    className="flex-1 py-3 text-sm font-bold text-text-main bg-surface-highlight border border-border-subtle rounded-sm hover:bg-black/5 transition-colors disabled:opacity-50"
                   >
                     キャンセル
                   </button>
                   <button 
-                    onClick={placeOrder}
-                    className="flex-1 py-3 text-sm font-bold text-background-main bg-primary rounded-sm hover:bg-primary-dim transition-colors flex items-center justify-center gap-2"
+                    onClick={shippingOption === '次回注文時まで保留' ? saveDraft : placeOrder}
+                    disabled={isSavingDraft}
+                    className="flex-1 py-3 text-sm font-bold text-background-main bg-primary rounded-sm hover:bg-primary-dim transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
                   >
-                    <span className="material-symbols-outlined text-[18px]">send</span>
-                    確定する
+                    {isSavingDraft ? (
+                        <span className="material-symbols-outlined animate-spin text-[18px]">sync</span>
+                    ) : (
+                        <span className="material-symbols-outlined text-[18px]">
+                            {shippingOption === '次回注文時まで保留' ? 'save' : 'send'}
+                        </span>
+                    )}
+                    {shippingOption === '次回注文時まで保留' ? '下書きに保存する' : '確定する'}
                   </button>
                 </div>
               </div>
@@ -1266,49 +1281,7 @@ function App() {
           </div>
         )}
 
-        {/* Draft Saving Modal */}
-        {showDraftModal && (
-          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-text-main/20 backdrop-blur-sm animate-fade-in">
-            <div className="bg-surface border border-border-subtle w-full max-w-md rounded-sm shadow-2xl overflow-hidden">
-              <div className="p-6 border-b border-border-subtle bg-background-main">
-                <h3 className="text-lg font-bold text-text-main flex items-center gap-2">
-                  <span className="material-symbols-outlined text-primary">save</span>
-                  下書きとして保存
-                </h3>
-              </div>
-              <div className="p-6">
-                <p className="text-text-main text-sm mb-4">
-                  現在のカートを下書きとして保存します。<br/>後で識別しやすいようにメモ（お客様名など）を入力してください。
-                </p>
-                <input
-                    type="text"
-                    value={draftMemo}
-                    onChange={(e) => setDraftMemo(e.target.value)}
-                    placeholder="例: A社 展示会用 / 〇〇様 発注分"
-                    className="w-full bg-background-main border border-border-subtle px-4 py-2.5 rounded-sm text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all font-mono mb-6"
-                />
-                
-                <div className="flex gap-3">
-                  <button 
-                    onClick={() => setShowDraftModal(false)}
-                    disabled={isSavingDraft}
-                    className="flex-1 py-3 text-sm font-bold text-text-main bg-surface-highlight border border-border-subtle rounded-sm hover:bg-black/5 transition-colors disabled:opacity-50"
-                  >
-                    キャンセル
-                  </button>
-                  <button 
-                    onClick={saveDraft}
-                    disabled={isSavingDraft}
-                    className="flex-1 py-3 text-sm font-bold text-background-main bg-primary rounded-sm hover:bg-primary-dim transition-colors flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer"
-                  >
-                    {isSavingDraft ? <span className="material-symbols-outlined animate-spin text-[18px]">sync</span> : <span className="material-symbols-outlined text-[18px]">save</span>}
-                    保存する
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
+
 
         {/* Toast Notification */}
         {toastMessage && (
