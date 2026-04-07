@@ -492,14 +492,26 @@ export default function Admin({ products, onExitAdmin, refreshProducts }) {
                                             const items = JSON.parse(order.items || "[]");
                                             const totalItems = items.reduce((sum, item) => sum + (item.quantity || 1), 0);
                                             return (
-                                                <tr key={order.id} className="border-b border-border-dark/50 hover:bg-black/5 transition-colors">
+                                                <tr key={order.id} className="border-b border-border-dark/50 hover:bg-black/5 transition-colors cursor-pointer" onClick={(e) => { if (!e.target.closest('button')) openEditModal(order); }}>
                                                     <td className="p-4 font-mono font-bold text-text-main">{order.orderId}</td>
                                                     <td className="p-4">
                                                         <div className="text-xs text-text-muted">{new Date(order.createdAt).toLocaleString('ja-JP')}</div>
                                                         <div className="text-sm font-bold text-text-main">{order.companyName || order.customerEmail || 'ゲスト'}</div>
                                                         {order.companyName && order.customerEmail && <div className="text-[10px] text-text-muted/70">{order.customerEmail}</div>}
                                                     </td>
-                                                    <td className="p-4 text-text-muted">{totalItems}点</td>
+                                                    <td className="p-4">
+                                                        <div className="flex -space-x-2 overflow-hidden mb-1">
+                                                            {items.slice(0, 5).map((item, idx) => (
+                                                                item.imageUrl ? (
+                                                                    <img key={idx} src={item.imageUrl} alt={item.productName || item.name} className="inline-block h-6 w-6 rounded-full border border-border-dark object-cover bg-white" title={`${item.productName || item.name} x${item.quantity}`} />
+                                                                ) : (
+                                                                    <div key={idx} className="inline-flex items-center justify-center h-6 w-6 rounded-full border border-border-dark bg-surface-highlight text-[8px] text-text-muted" title={`${item.productName || item.name} x${item.quantity}`}>画像なし</div>
+                                                                )
+                                                            ))}
+                                                            {items.length > 5 && <div className="inline-flex items-center justify-center h-6 w-6 rounded-full border border-border-dark bg-black/10 text-[9px] font-bold text-text-main z-10">+{items.length - 5}</div>}
+                                                        </div>
+                                                        <div className="text-xs text-text-muted">{totalItems}点</div>
+                                                    </td>
                                                     <td className="p-4 text-right font-mono font-bold text-primary">¥{(order.totalAmount || 0).toLocaleString()}</td>
                                                     <td className="p-4 text-center">
                                                         <div className="flex items-center justify-center gap-2">
@@ -590,52 +602,100 @@ export default function Admin({ products, onExitAdmin, refreshProducts }) {
             {/* Order Edit Modal */}
             {editingOrder && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-in fade-in duration-200">
-                    <div className="bg-surface w-full max-w-md rounded-xl shadow-2xl flex flex-col overflow-hidden border border-border-dark animate-in zoom-in-95 duration-200">
+                    <div className="bg-surface w-full max-w-4xl rounded-xl shadow-2xl flex flex-col overflow-hidden border border-border-dark animate-in zoom-in-95 duration-200">
                         <div className="p-6 border-b border-border-dark flex justify-between items-center bg-surface-highlight">
                             <h2 className="text-xl font-bold font-display text-text-main flex items-center gap-2">
-                                <span className="material-symbols-outlined text-primary">local_shipping</span>
-                                ステータスの変更
+                                <span className="material-symbols-outlined text-primary">receipt_long</span>
+                                注文詳細・ステータス変更
                             </h2>
                             <button onClick={() => setEditingOrder(null)} className="text-text-muted hover:text-text-main transition-colors">
                                 <span className="material-symbols-outlined">close</span>
                             </button>
                         </div>
-                        <div className="p-6 flex flex-col gap-6">
-                            <div className="bg-background-main p-4 rounded-lg border border-border-dark font-mono text-sm shadow-inner flex justify-between items-center">
-                                <span className="text-text-muted text-xs">注文ID</span>
-                                <span className="font-bold text-text-main">{editingOrder.orderId}</span>
-                            </div>
-                            
-                            <div className="flex flex-col gap-2">
-                                <label className="text-sm font-bold text-text-main">ステータス <span className="text-red-500">*</span></label>
-                                <div className="relative">
-                                    <select 
-                                        value={editStatus}
-                                        onChange={(e) => setEditStatus(e.target.value)}
-                                        className="w-full bg-background-main border border-border-dark px-4 py-3 rounded text-text-main focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all appearance-none cursor-pointer font-bold"
-                                    >
-                                        <option value="処理中">処理中 (Processing)</option>
-                                        <option value="発送準備中">発送準備中 (Preparing to Ship)</option>
-                                        <option value="発送済">発送済 (Shipped)</option>
-                                    </select>
-                                    <span className="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-text-muted pointer-events-none">expand_more</span>
+                        <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-8 max-h-[80vh] overflow-y-auto custom-scrollbar">
+                            {/* Left Column: Order Details */}
+                            <div className="flex flex-col gap-6">
+                                <div>
+                                    <h3 className="text-sm font-bold text-text-muted border-b border-border-dark pb-2 mb-3">注文情報</h3>
+                                    <div className="text-sm space-y-2">
+                                        <div className="flex justify-between"><span className="text-text-muted">注文ID:</span><span className="font-mono font-bold">{editingOrder.orderId}</span></div>
+                                        <div className="flex justify-between"><span className="text-text-muted">日時:</span><span>{new Date(editingOrder.createdAt).toLocaleString('ja-JP')}</span></div>
+                                        <div className="flex justify-between"><span className="text-text-muted">顧客:</span><span className="font-bold">{editingOrder.companyName || 'ゲスト'}</span></div>
+                                        <div className="flex justify-between"><span className="text-text-muted">Email:</span><span>{editingOrder.customerEmail}</span></div>
+                                        {editingOrder.shippingOption && <div className="flex justify-between"><span className="text-text-muted">配送指定:</span><span className="text-primary font-bold">{Array.isArray(editingOrder.shippingOption) ? editingOrder.shippingOption[0] : editingOrder.shippingOption}</span></div>}
+                                        {editingOrder.memo && editingOrder.memo !== "メモなし" && (
+                                            <div className="mt-2 bg-accent-red/5 p-3 rounded border border-accent-red/20">
+                                                <span className="block text-xs font-bold text-accent-red mb-1">備考 / メモ</span>
+                                                <span className="text-text-main">{editingOrder.memo}</span>
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                                
+                                <div>
+                                    <h3 className="text-sm font-bold text-text-muted border-b border-border-dark pb-2 mb-3">注文内容</h3>
+                                    <div className="bg-background-main border border-border-dark rounded-lg overflow-hidden divide-y divide-border-dark">
+                                        {JSON.parse(editingOrder.items || "[]").map((item, idx) => (
+                                            <div key={idx} className="p-3 flex items-center gap-3">
+                                                {item.imageUrl ? (
+                                                    <img src={item.imageUrl} alt={item.productName || item.name} className="w-12 h-12 object-cover rounded bg-white border border-border-dark" />
+                                                ) : (
+                                                    <div className="w-12 h-12 rounded bg-surface-highlight border border-border-dark flex items-center justify-center text-[10px] text-text-muted">画像なし</div>
+                                                )}
+                                                <div className="flex-1 min-w-0">
+                                                    <div className="text-sm font-bold text-text-main truncate">{item.productName || item.name}</div>
+                                                    {item.variant && <div className="text-xs text-text-muted mt-0.5">{item.variant}</div>}
+                                                    <div className="flex items-center justify-between mt-1">
+                                                        <div className="text-xs font-mono">¥{item.price.toLocaleString()} x {item.quantity}</div>
+                                                        <div className="text-sm font-bold font-mono">¥{(item.price * item.quantity).toLocaleString()}</div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                    <div className="text-right mt-3">
+                                        <div className="text-xs text-text-muted">合計金額</div>
+                                        <div className="text-xl font-bold text-primary font-mono">¥{(editingOrder.totalAmount || 0).toLocaleString()}</div>
+                                    </div>
                                 </div>
                             </div>
+                            
+                            {/* Right Column: Status Edit */}
+                            <div className="flex flex-col gap-6">
+                                <h3 className="text-sm font-bold text-text-muted border-b border-border-dark pb-2">対応状況</h3>
+                                
+                                <div className="flex flex-col gap-2">
+                                    <label className="text-sm font-bold text-text-main">ステータス <span className="text-red-500">*</span></label>
+                                    <div className="relative">
+                                        <select 
+                                            value={editStatus}
+                                            onChange={(e) => setEditStatus(e.target.value)}
+                                            className="w-full bg-background-main border border-border-dark px-4 py-3 rounded text-text-main focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all appearance-none cursor-pointer font-bold"
+                                        >
+                                            <option value="処理中">処理中 (Processing)</option>
+                                            <option value="発送準備中">発送準備中 (Preparing to Ship)</option>
+                                            <option value="発送済">発送済 (Shipped)</option>
+                                            <option value="下書き">注文保留 (Hold)</option>
+                                        </select>
+                                        <span className="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-text-muted pointer-events-none">expand_more</span>
+                                    </div>
+                                </div>
 
-                            <div className="flex flex-col gap-2">
-                                <label className="text-sm font-bold text-text-main flex items-center gap-2">
-                                    配送情報 (追跡番号など)
-                                </label>
-                                <input 
-                                    type="text"
-                                    value={editShippingInfo}
-                                    onChange={(e) => setEditShippingInfo(e.target.value)}
-                                    placeholder="例: ヤマト運輸 1234-5678-9012"
-                                    className="w-full bg-background-main border border-border-dark px-4 py-3 rounded text-text-main focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all placeholder:text-text-muted/50"
-                                />
-                                <p className="text-xs text-text-muted mt-1 leading-relaxed">
-                                    入力された情報は購入者の注文履歴画面に表示されます。配送後の追跡に利用されます。
-                                </p>
+                                <div className="flex flex-col gap-2">
+                                    <label className="text-sm font-bold text-text-main flex items-center gap-2">
+                                        配送情報 (追跡番号など)
+                                    </label>
+                                    <textarea 
+                                        value={editShippingInfo}
+                                        onChange={(e) => setEditShippingInfo(e.target.value)}
+                                        placeholder="例: ヤマト運輸 1234-5678-9012"
+                                        rows={4}
+                                        className="w-full bg-background-main border border-border-dark px-4 py-3 rounded text-text-main focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all placeholder:text-text-muted/50"
+                                    />
+                                    <p className="text-xs text-text-muted mt-1 leading-relaxed">
+                                        入力された情報は購入者の注文履歴画面に表示されます。配送後の追跡に利用されます。
+                                    </p>
+                                </div>
                             </div>
                         </div>
                         
