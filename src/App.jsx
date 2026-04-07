@@ -8,6 +8,7 @@ import { useAuth } from './context/AuthContext'
 const ProductGallery = ({ product }) => {
   const allImages = [product.imageUrl, ...(product.galleryImages || [])].filter(Boolean);
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [isFullscreen, setIsFullscreen] = useState(false);
 
   useEffect(() => {
     setCurrentIndex(0);
@@ -23,17 +24,68 @@ const ProductGallery = ({ product }) => {
 
   return (
     <div className="flex flex-col gap-3">
-      <div className="bg-background-main border border-border-subtle rounded-sm aspect-video overflow-hidden relative group">
-        <img src={allImages[currentIndex]} alt={product.name} className="w-full h-full object-cover opacity-90 group-hover:opacity-100 transition-opacity duration-500" />
+      <div 
+        className="bg-background-main border border-border-subtle rounded-sm aspect-video overflow-hidden relative group cursor-pointer"
+        onClick={() => setIsFullscreen(true)}
+      >
+        <img src={allImages[currentIndex]} alt={product.name} className="w-full h-full object-cover opacity-90 group-hover:opacity-100 group-hover:scale-105 transition-all duration-700" />
+        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors flex items-center justify-center">
+            <span className="material-symbols-outlined text-white opacity-0 group-hover:opacity-100 scale-50 group-hover:scale-100 transition-all duration-300 text-5xl drop-shadow-lg">open_in_full</span>
+        </div>
         <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-background-main to-transparent h-1/2 opacity-60 pointer-events-none"></div>
-        <div className="absolute inset-4 top-auto flex justify-between items-end">
+        <div className="absolute inset-4 top-auto flex justify-between items-end pointer-events-none">
           <h2 className="text-2xl font-bold text-white drop-shadow-md">{product.name}</h2>
-          <a href={product.originalUrl} target="_blank" rel="noreferrer" className="flex items-center gap-1 text-xs font-medium text-white bg-black/30 backdrop-blur-md px-3 py-1.5 rounded-full hover:bg-primary hover:text-background-main transition-colors border border-white/20">
+          <a onClick={(e) => e.stopPropagation()} href={product.originalUrl} target="_blank" rel="noreferrer" className="pointer-events-auto flex items-center gap-1 text-xs font-medium text-white bg-black/30 backdrop-blur-md px-3 py-1.5 rounded-full hover:bg-primary hover:text-background-main transition-colors border border-white/20">
             公式サイト <span className="material-symbols-outlined text-[14px]">open_in_new</span>
           </a>
         </div>
       </div>
       
+      {isFullscreen && (
+        <div className="fixed inset-0 z-[100] bg-black/95 backdrop-blur-xl flex flex-col items-center justify-center p-4">
+            <div className="absolute top-6 right-6 flex gap-4 z-10">
+                <button onClick={() => setIsFullscreen(false)} className="text-white hover:text-primary transition-colors flex items-center justify-center size-14 bg-white/10 hover:bg-white/20 rounded-full backdrop-blur-md">
+                    <span className="material-symbols-outlined text-2xl">close</span>
+                </button>
+            </div>
+            
+            {allImages.length > 1 && (
+                <>
+                    <button 
+                        onClick={(e) => { e.stopPropagation(); setCurrentIndex(prev => prev > 0 ? prev - 1 : allImages.length - 1); }} 
+                        className="absolute left-4 lg:left-12 top-1/2 -translate-y-1/2 text-white hover:text-primary transition-colors flex items-center justify-center size-14 lg:size-16 bg-white/10 hover:bg-white/20 rounded-full backdrop-blur-md z-10"
+                    >
+                        <span className="material-symbols-outlined text-3xl">chevron_left</span>
+                    </button>
+                    <button 
+                        onClick={(e) => { e.stopPropagation(); setCurrentIndex(prev => prev < allImages.length - 1 ? prev + 1 : 0); }} 
+                        className="absolute right-4 lg:right-12 top-1/2 -translate-y-1/2 text-white hover:text-primary transition-colors flex items-center justify-center size-14 lg:size-16 bg-white/10 hover:bg-white/20 rounded-full backdrop-blur-md z-10"
+                    >
+                        <span className="material-symbols-outlined text-3xl">chevron_right</span>
+                    </button>
+                </>
+            )}
+
+            <div className="relative w-full h-full flex items-center justify-center" onClick={() => setIsFullscreen(false)}>
+              <img src={allImages[currentIndex]} alt={product.name} className="w-auto h-auto max-w-[95vw] max-h-[85vh] object-contain drop-shadow-2xl" onClick={(e) => e.stopPropagation()} />
+            </div>
+            
+            {allImages.length > 1 && (
+                <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex gap-3 overflow-x-auto max-w-[90vw] pb-2 hide-scrollbar z-10">
+                {allImages.map((img, idx) => (
+                    <button
+                    key={idx}
+                    onClick={(e) => { e.stopPropagation(); setCurrentIndex(idx); }}
+                    className={`flex-shrink-0 w-24 h-16 rounded-md border-2 overflow-hidden transition-all ${currentIndex === idx ? 'border-primary ring-2 ring-primary opacity-100 scale-110 shadow-lg' : 'border-white/20 opacity-40 hover:opacity-100 scale-100 hover:scale-105'}`}
+                    >
+                    <img src={img} alt={`Gallery ${idx + 1}`} className="w-full h-full object-cover" />
+                    </button>
+                ))}
+                </div>
+            )}
+        </div>
+      )}
+
       {allImages.length > 1 && (
         <div className="flex gap-2 overflow-x-auto pb-1 mt-1 hide-scrollbar">
           {allImages.map((img, idx) => (
