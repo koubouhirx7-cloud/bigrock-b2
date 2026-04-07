@@ -126,6 +126,11 @@ export default function Admin({ products, onExitAdmin, refreshProducts }) {
     };
 
     useEffect(() => {
+        // Ensure customers are loaded to display full details in orders view
+        if (!isLoadingCustomers && customersList.length === 0) {
+            loadCustomers();
+        }
+        
         if (adminTab === 'orders') {
             const loadOrders = async () => {
                 setIsLoadingOrders(true);
@@ -618,17 +623,37 @@ export default function Admin({ products, onExitAdmin, refreshProducts }) {
                                 <div>
                                     <h3 className="text-sm font-bold text-text-muted border-b border-border-dark pb-2 mb-3">注文情報</h3>
                                     <div className="text-sm space-y-2">
-                                        <div className="flex justify-between"><span className="text-text-muted">注文ID:</span><span className="font-mono font-bold">{editingOrder.orderId}</span></div>
-                                        <div className="flex justify-between"><span className="text-text-muted">日時:</span><span>{new Date(editingOrder.createdAt).toLocaleString('ja-JP')}</span></div>
-                                        <div className="flex justify-between"><span className="text-text-muted">顧客:</span><span className="font-bold">{editingOrder.companyName || 'ゲスト'}</span></div>
-                                        <div className="flex justify-between"><span className="text-text-muted">Email:</span><span>{editingOrder.customerEmail}</span></div>
-                                        {editingOrder.shippingOption && <div className="flex justify-between"><span className="text-text-muted">配送指定:</span><span className="text-primary font-bold">{Array.isArray(editingOrder.shippingOption) ? editingOrder.shippingOption[0] : editingOrder.shippingOption}</span></div>}
-                                        {editingOrder.memo && editingOrder.memo !== "メモなし" && (
-                                            <div className="mt-2 bg-accent-red/5 p-3 rounded border border-accent-red/20">
-                                                <span className="block text-xs font-bold text-accent-red mb-1">備考 / メモ</span>
-                                                <span className="text-text-main">{editingOrder.memo}</span>
-                                            </div>
-                                        )}
+                                        {(() => {
+                                            const fullCustomer = customersList.find(c => c.email === editingOrder.customerEmail);
+                                            return (
+                                                <>
+                                                    <div className="flex justify-between"><span className="text-text-muted">注文ID:</span><span className="font-mono font-bold">{editingOrder.orderId}</span></div>
+                                                    <div className="flex justify-between"><span className="text-text-muted">日時:</span><span>{new Date(editingOrder.createdAt).toLocaleString('ja-JP')}</span></div>
+                                                    <div className="flex justify-between items-start gap-4">
+                                                        <span className="text-text-muted whitespace-nowrap">顧客:</span>
+                                                        <div className="text-right">
+                                                            <div className="font-bold">{fullCustomer?.companyName || editingOrder.companyName || 'ゲスト'}</div>
+                                                            {fullCustomer?.contactName && <div className="text-xs text-text-muted mt-0.5">{fullCustomer.department} {fullCustomer.contactName} 様</div>}
+                                                        </div>
+                                                    </div>
+                                                    <div className="flex justify-between"><span className="text-text-muted">Email:</span><span>{editingOrder.customerEmail}</span></div>
+                                                    {fullCustomer?.phone && <div className="flex justify-between"><span className="text-text-muted">電話番号:</span><span className="font-mono">{fullCustomer.phone}</span></div>}
+                                                    {fullCustomer?.shippingAddress && (
+                                                        <div className="flex flex-col gap-1 mt-2 pt-2 border-t border-border-dark/50">
+                                                            <span className="text-text-muted text-xs">配送先住所:</span>
+                                                            <span className="text-sm leading-relaxed whitespace-pre-wrap">{fullCustomer.shippingAddress}</span>
+                                                        </div>
+                                                    )}
+                                                    {editingOrder.shippingOption && <div className="flex justify-between mt-2 pt-2 border-t border-border-dark/50"><span className="text-text-muted">配送指定:</span><span className="text-primary font-bold">{Array.isArray(editingOrder.shippingOption) ? editingOrder.shippingOption[0] : editingOrder.shippingOption}</span></div>}
+                                                    {editingOrder.memo && editingOrder.memo !== "メモなし" && (
+                                                        <div className="mt-2 bg-accent-red/5 p-3 rounded border border-accent-red/20">
+                                                            <span className="block text-xs font-bold text-accent-red mb-1">備考 / メモ</span>
+                                                            <span className="text-text-main">{editingOrder.memo}</span>
+                                                        </div>
+                                                    )}
+                                                </>
+                                            );
+                                        })()}
                                     </div>
                                 </div>
                                 
