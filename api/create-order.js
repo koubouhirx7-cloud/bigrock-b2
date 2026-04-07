@@ -29,11 +29,16 @@ export default async function handler(req, res) {
         const data = await response.json();
         
         // --- 発注通知 (Discord Webhook) ---
+        // 下書きの場合は通知をスキップして終了
+        if (req.body.status === '下書き') {
+            return res.status(200).json(data);
+        }
+
         const discordWebhookUrl = process.env.DISCORD_WEBHOOK_URL;
         if (discordWebhookUrl) {
             try {
                 // req.body の情報を使ってDiscord用メッセージを組み立てる
-                const { orderId, companyName, customerEmail, totalAmount, items } = req.body;
+                const { orderId, companyName, customerEmail, totalAmount, items, shippingOption } = req.body;
                 let parsedItems = [];
                 try {
                     parsedItems = JSON.parse(items || '[]');
@@ -63,6 +68,11 @@ export default async function handler(req, res) {
                                 {
                                     name: "🏢 顧客情報",
                                     value: `**会社名:** ${companyName || 'ゲスト'}\n**メール:** ${customerEmail || '未登録'}`,
+                                    inline: false
+                                },
+                                {
+                                    name: "🚚 発送オプション",
+                                    value: `**${shippingOption || '指定なし'}**`,
                                     inline: false
                                 },
                                 {

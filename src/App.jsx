@@ -219,6 +219,11 @@ function App() {
     return savedCart ? JSON.parse(savedCart) : [];
   });
   const [orderHistory, setOrderHistory] = useState([])
+  const [drafts, setDrafts] = useState([])
+  const [shippingOption, setShippingOption] = useState('このまま発送')
+  const [showDraftModal, setShowDraftModal] = useState(false)
+  const [draftMemo, setDraftMemo] = useState('')
+  const [isSavingDraft, setIsSavingDraft] = useState(false)
   const [isLoadingHistory, setIsLoadingHistory] = useState(false)
   const [historyFilter, setHistoryFilter] = useState('all')
 
@@ -304,7 +309,8 @@ function App() {
         companyName: customerProfile?.companyName || "ゲスト",
         items: JSON.stringify(cart),
         totalAmount: finalTotal,
-        status: "処理中"
+        status: "処理中",
+        shippingOption
       });
       console.log("Order successfully created in MicroCMS");
     } catch (error) {
@@ -328,20 +334,57 @@ function App() {
     setOrderCompleteData(newOrder)
   }
 
+  const saveDraft = async () => {
+    if (cart.length === 0) return;
+    setIsSavingDraft(true);
+    const orderIdValue = `DRF-${Math.floor(Math.random() * 10000) + 4000}`;
+    const totalQty = getCartTotalQuantity();
+    const finalTotal = Math.floor(getCartTotalPrice() * 1.1);
+
+    try {
+      await createOrder({
+        orderId: orderIdValue,
+        customerEmail: customerProfile?.email || currentUser?.email || "b2b-client@example.com",
+        companyName: customerProfile?.companyName || "ゲスト",
+        items: JSON.stringify(cart),
+        totalAmount: finalTotal,
+        status: "下書き",
+        memo: draftMemo || "メモなし",
+      });
+      alert("下書きとして保存しました。");
+      setCart([]);
+      setShowDraftModal(false);
+      setDraftMemo('');
+      setActiveTab('drafts');
+    } catch (e) {
+      alert("下書きの保存に失敗しました。");
+      console.error(e);
+    } finally {
+      setIsSavingDraft(false);
+    }
+  }
+
   // Fetch real order history
   useEffect(() => {
-    if (activeTab === 'history') {
+    if (activeTab === 'history' || activeTab === 'drafts') {
       const loadHistory = async () => {
         setIsLoadingHistory(true);
         try {
           const allOrders = await fetchOrders();
           const userEmail = customerProfile?.email || currentUser?.email || "b2b-client@example.com";
-          // Filter by current user and sort descending
-          const myOrders = allOrders
-            .filter(o => o.customerEmail === userEmail)
+          
+          const userOrders = allOrders.filter(o => o.customerEmail === userEmail);
+          
+          const myOrders = userOrders
+            .filter(o => o.status !== '下書き')
+            .sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt));
+            
+          const myDrafts = userOrders
+            .filter(o => o.status === '下書き')
             .sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt));
           
           setOrderHistory(myOrders);
+          setDrafts(myDrafts);
         } catch (error) {
           console.error("Failed to load history", error);
         } finally {
@@ -580,6 +623,15 @@ function App() {
             <span className="text-sm font-medium">注文履歴</span>
           </button>
 
+          <button
+            className={`group flex items-center w-full gap-3 px-6 py-3 transition-colors ${activeTab === 'drafts' ? 'bg-black/5 border-l-2 border-primary text-primary' : 'border-l-2 border-transparent text-text-muted hover:text-text-main hover:bg-black/5'}`}
+            onClick={() => setActiveTab('drafts')}
+          >
+            <span className="material-symbols-outlined">edit_document</span>
+            <span className="text-sm font-medium">下書き一覧</span>
+            {drafts.length > 0 && <span className="ml-auto bg-primary text-white text-[10px] font-bold px-2 py-0.5 rounded-full">{drafts.length}</span>}
+          </button>
+
           {/* Cart Item */}
           <button
             className={`group flex items-center w-full gap-3 px-6 py-3 transition-colors ${activeTab === 'cart' ? 'bg-black/5 border-l-2 border-primary text-primary' : 'border-l-2 border-transparent text-text-muted hover:text-text-main hover:bg-black/5'}`}
@@ -754,7 +806,7 @@ function App() {
                       <div className="bg-surface border border-border-subtle rounded-sm p-6 sticky top-0">
                         <h4 className="text-sm font-bold text-text-main uppercase tracking-wider mb-4 border-b border-border-subtle pb-2">注文サマリー</h4>
 
-                        <div className="flex flex-col gap-3 text-sm mb-6">
+                        <div className="flex flex-col gap-3 text-sm mb-6 pb-6 border-b border-border-subtle">
                           <div className="flex justify-between text-text-muted">
                             <span>商品小計 ({getCartTotalQuantity()}点)</span>
                             <span className="font-mono text-text-main">¥{getCartTotalPrice().toLocaleString()}</span>
@@ -769,10 +821,29 @@ function App() {
                           </div>
                         </div>
 
+                        <div className="mb-6">
+                            <label className="block text-xs font-bold text-text-muted uppercase tracking-wider mb-2">発送オプション</label>
+                            <select 
+                                value={shippingOption}
+                                onChange={(e) => setShippingOption(e.target.value)}
+                                className="w-full bg-background-main border border-border-subtle px-3 py-2 rounded-sm text-sm"
+                            >
+                                <option value="このまま発送">このまま発送</option>
+                                <option value="次回注文時まで保留">次回注文時まで保留</option>
+                            </select>
+                        </div>
+
                         <button onClick={() => setIsConfirmingOrder(true)} className="w-full bg-primary text-background-main font-bold py-3 rounded-sm hover:bg-primary-dim transition-colors flex items-center justify-center gap-2 shadow-lg shadow-primary/20">
                           <span className="material-symbols-outlined">send</span>
                           発注を実行する
                         </button>
+                        
+                        <div className="mt-4 pt-4 border-t border-dashed border-border-subtle">
+                            <button onClick={() => setShowDraftModal(true)} className="w-full bg-surface text-text-main border border-border-subtle font-bold py-2.5 rounded-sm hover:bg-black/5 transition-colors flex items-center justify-center gap-2">
+                                <span className="material-symbols-outlined text-[18px]">save</span>
+                                下書きとして一時保存
+                            </button>
+                        </div>
 
                         <p className="text-[10px] text-text-muted text-center mt-4">
                           発注を実行する前に確認画面が表示されます。
@@ -996,6 +1067,79 @@ function App() {
             )}
 
             {/* --- HISTORY VIEW --- */}
+            {/* --- DRAFTS VIEW --- */}
+            {activeTab === 'drafts' && (
+              <div className="flex flex-col gap-6">
+                <div className="flex items-center justify-between border-b border-border-subtle pb-4">
+                  <h3 className="text-xl font-bold text-text-main uppercase tracking-wider flex items-center gap-2">
+                    <span className="material-symbols-outlined text-primary text-2xl">edit_document</span>
+                    下書き一覧
+                  </h3>
+                </div>
+
+                <div className="bg-surface border border-border-subtle rounded-sm overflow-hidden">
+                  {isLoadingHistory ? (
+                    <div className="p-12 pl-6 pr-6 text-center text-text-muted">
+                      <span className="material-symbols-outlined animate-spin text-2xl mb-2 text-primary">sync</span>
+                      <p>読み込み中...</p>
+                    </div>
+                  ) : drafts.length === 0 ? (
+                    <div className="p-12 pl-6 pr-6 text-center">
+                      <span className="material-symbols-outlined text-4xl text-text-muted mb-4 opacity-50">drafts</span>
+                      <p className="text-text-muted">保存された下書きはありません。</p>
+                    </div>
+                  ) : (
+                    <div className="divide-y divide-border-subtle">
+                      {drafts.map(draft => (
+                        <div key={draft.id} className="p-6 hover:bg-black/5 transition-colors flex flex-col md:flex-row gap-4 items-start md:items-center justify-between">
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-3 mb-2">
+                              <span className="text-sm font-bold text-text-main font-mono bg-black/5 px-2 py-0.5 rounded">{draft.id}</span>
+                              <span className="text-xs text-text-muted py-0.5">{new Date(draft.createdAt).toLocaleString('ja-JP')}</span>
+                            </div>
+                            <p className="text-sm text-text-main mb-1">
+                                {draft.memo && draft.memo !== 'メモなし' ? (
+                                    <span className="font-bold">メモ: {draft.memo}</span>
+                                ) : (
+                                    <span className="text-text-muted italic">メモなし</span>
+                                )}
+                            </p>
+                            <div className="flex items-center gap-4 text-sm text-text-muted">
+                              <span className="flex items-center gap-1"><span className="material-symbols-outlined text-[16px]">inventory_2</span> {JSON.parse(draft.items || '[]').reduce((a,b)=>a+b.quantity,0)}点</span>
+                              <span className="flex items-center gap-1"><span className="material-symbols-outlined text-[16px]">payments</span> ¥{draft.totalAmount.toLocaleString()}</span>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-2 w-full md:w-auto">
+                            <button 
+                              onClick={() => {
+                                setCart(JSON.parse(draft.items || '[]'));
+                                setActiveTab('cart');
+                                showToast('下書きをカートに復元しました');
+                              }}
+                              className="flex-1 md:flex-none border border-primary text-primary px-4 py-2 text-sm font-bold rounded-sm hover:bg-primary/5 transition-colors text-center"
+                            >
+                              カートに復元
+                            </button>
+                            <button 
+                              onClick={async () => {
+                                if (window.confirm("この下書きを削除しますか？")) {
+                                  try { await deleteOrder(draft.id); setDrafts(drafts.filter(d => d.id !== draft.id)); showToast('下書きを削除しました'); } catch (e) { alert("削除に失敗しました"); }
+                                }
+                              }}
+                              className="flex-none text-text-muted hover:text-accent-red px-3 py-2 rounded-sm hover:bg-accent-red/10 transition-colors"
+                            >
+                              <span className="material-symbols-outlined text-[18px]">delete</span>
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* --- HISTORY VIEW --- */}
             {activeTab === 'history' && (
               <div className="flex flex-col gap-6">
                 <div className="flex items-center justify-between border-b border-border-subtle pb-4">
@@ -1097,7 +1241,11 @@ function App() {
                     <span className="text-text-muted">合計点数:</span>
                     <span className="font-bold text-text-main">{getCartTotalQuantity()} 点</span>
                   </div>
-                  <div className="flex justify-between text-sm">
+                  <div className="flex justify-between text-sm mb-2">
+                    <span className="text-text-muted">発送オプション:</span>
+                    <span className="font-bold text-primary">{shippingOption}</span>
+                  </div>
+                  <div className="flex justify-between text-sm pt-2 border-t border-border-subtle">
                     <span className="text-text-muted">合計金額 (税込):</span>
                     <span className="font-bold text-text-main">¥{Math.floor(getCartTotalPrice() * 1.1).toLocaleString()}</span>
                   </div>
@@ -1115,6 +1263,50 @@ function App() {
                   >
                     <span className="material-symbols-outlined text-[18px]">send</span>
                     確定する
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Draft Saving Modal */}
+        {showDraftModal && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-text-main/20 backdrop-blur-sm animate-fade-in">
+            <div className="bg-surface border border-border-subtle w-full max-w-md rounded-sm shadow-2xl overflow-hidden">
+              <div className="p-6 border-b border-border-subtle bg-background-main">
+                <h3 className="text-lg font-bold text-text-main flex items-center gap-2">
+                  <span className="material-symbols-outlined text-primary">save</span>
+                  下書きとして保存
+                </h3>
+              </div>
+              <div className="p-6">
+                <p className="text-text-main text-sm mb-4">
+                  現在のカートを下書きとして保存します。<br/>後で識別しやすいようにメモ（お客様名など）を入力してください。
+                </p>
+                <input
+                    type="text"
+                    value={draftMemo}
+                    onChange={(e) => setDraftMemo(e.target.value)}
+                    placeholder="例: A社 展示会用 / 〇〇様 発注分"
+                    className="w-full bg-background-main border border-border-subtle px-4 py-2.5 rounded-sm text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all font-mono mb-6"
+                />
+                
+                <div className="flex gap-3">
+                  <button 
+                    onClick={() => setShowDraftModal(false)}
+                    disabled={isSavingDraft}
+                    className="flex-1 py-3 text-sm font-bold text-text-main bg-surface-highlight border border-border-subtle rounded-sm hover:bg-black/5 transition-colors disabled:opacity-50"
+                  >
+                    キャンセル
+                  </button>
+                  <button 
+                    onClick={saveDraft}
+                    disabled={isSavingDraft}
+                    className="flex-1 py-3 text-sm font-bold text-background-main bg-primary rounded-sm hover:bg-primary-dim transition-colors flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer"
+                  >
+                    {isSavingDraft ? <span className="material-symbols-outlined animate-spin text-[18px]">sync</span> : <span className="material-symbols-outlined text-[18px]">save</span>}
+                    保存する
                   </button>
                 </div>
               </div>
