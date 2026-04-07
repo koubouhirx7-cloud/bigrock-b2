@@ -32,6 +32,15 @@ export default function Register({ setParentTab }) {
         annualSales: '',
         industry: '',
         websiteUrl: '',
+        hasSeparateBilling: false,
+        billingCompanyName: '',
+        billingDepartment: '',
+        billingContactLastName: '',
+        billingContactFirstName: '',
+        billingPostalCode: '',
+        billingAddressLine1: '',
+        billingAddressLine2: '',
+        billingPhone: '',
         newsletter: true,
         termsAgreed: false,
     });
@@ -67,6 +76,29 @@ export default function Register({ setParentTab }) {
         }
     };
 
+    const handleBillingPostalCodeChange = async (e) => {
+        const val = e.target.value;
+        setRegForm(prev => ({ ...prev, billingPostalCode: val }));
+        
+        const cleanCode = val.replace(/-/g, '');
+        if (cleanCode.length === 7) {
+            try {
+                const response = await fetch(`https://zipcloud.ibsnet.co.jp/api/search?zipcode=${cleanCode}`);
+                const data = await response.json();
+                if (data.status === 200 && data.results) {
+                    const result = data.results[0];
+                    const address = `${result.address1}${result.address2}${result.address3}`;
+                    setRegForm(prev => ({
+                        ...prev,
+                        billingAddressLine1: address
+                    }));
+                }
+            } catch (error) {
+                console.error("Billing postal code search failed:", error);
+            }
+        }
+    };
+
     const handleSubmit = async () => {
         if (!regForm.termsAgreed) {
             alert("利用規約への同意が必要です。");
@@ -89,11 +121,21 @@ export default function Register({ setParentTab }) {
             const existing = customers.find(c => c.email === userEmail);
             
             if (!existing) {
-                const fullAddress = `〒${regForm.postalCode} ${regForm.addressLine1} ${regForm.addressLine2}`.trim();
+                let fullAddress = `〒${regForm.postalCode} ${regForm.addressLine1} ${regForm.addressLine2}`.trim();
                 const representativeName = `${regForm.representativeLastName} ${regForm.representativeFirstName}`.trim();
                 const representativeNameKana = `${regForm.representativeLastNameKana} ${regForm.representativeFirstNameKana}`.trim();
                 const contactName = `${regForm.contactLastName} ${regForm.contactFirstName}`.trim();
                 const contactNameKana = `${regForm.contactLastNameKana} ${regForm.contactFirstNameKana}`.trim();
+
+                if (regForm.hasSeparateBilling) {
+                    if (!regForm.billingCompanyName || !regForm.billingContactLastName || !regForm.billingContactFirstName || !regForm.billingPostalCode || !regForm.billingAddressLine1 || !regForm.billingPhone) {
+                        alert("請求先情報の必須項目(*)をすべて入力してください。");
+                        setIsProcessing(false);
+                        return;
+                    }
+                    const billingStr = `\n\n【請求先情報】\n会社名: ${regForm.billingCompanyName}\n担当: ${regForm.billingDepartment ? regForm.billingDepartment + ' ' : ''}${regForm.billingContactLastName} ${regForm.billingContactFirstName}\n住所: 〒${regForm.billingPostalCode} ${regForm.billingAddressLine1} ${regForm.billingAddressLine2}\n電話: ${regForm.billingPhone}`.trim();
+                    fullAddress += billingStr;
+                }
 
                 await createCustomer({
                     companyName: regForm.companyName,
@@ -241,6 +283,61 @@ export default function Register({ setParentTab }) {
                     <div className="space-y-1.5 pt-2">
                         <label className="block text-xs font-bold text-text-main">FAX番号</label>
                         <input type="tel" name="fax" value={regForm.fax} onChange={handleChange} className="w-full p-2.5 text-sm bg-surface border border-border-dark text-text-main focus:border-primary focus:ring-1 focus:ring-primary transition-all" placeholder="03-1234-5679" />
+                    </div>
+
+                    {/* 請求書送付先チェックボックス */}
+                    <div className="pt-4 border-t border-border-dark mt-6">
+                        <label className="flex items-center gap-3 cursor-pointer p-3 bg-surface-highlight border border-border-dark rounded hover:bg-black/5 transition-colors mb-4">
+                            <input type="checkbox" name="hasSeparateBilling" checked={regForm.hasSeparateBilling} onChange={handleChange} className="w-4 h-4 text-primary bg-background-main border-border-dark rounded focus:ring-primary" />
+                            <span className="text-sm font-bold text-text-main">請求書送付先が上記と異なる場合はチェック</span>
+                        </label>
+
+                        {/* 請求書送付先フィールド */}
+                        {regForm.hasSeparateBilling && (
+                            <div className="space-y-4 animate-in slide-in-from-top-4 fade-in duration-300 p-5 bg-background-main border border-border-dark rounded mt-2">
+                                <h4 className="text-xs tracking-wider font-bold text-primary mb-2">請求先情報</h4>
+                                
+                                <div className="space-y-1.5">
+                                    <label className="block text-xs font-bold text-text-main">請求先会社名 <span className="text-accent-red">*</span></label>
+                                    <input type="text" name="billingCompanyName" value={regForm.billingCompanyName} onChange={handleChange} className="w-full p-2.5 text-sm bg-surface border border-border-dark text-text-main focus:border-primary focus:ring-1 focus:ring-primary transition-all" placeholder="例: 株式会社ビッグロック 経理代行" />
+                                </div>
+
+                                <div className="grid grid-cols-[1fr_2fr] gap-4">
+                                    <div className="space-y-1.5">
+                                        <label className="block text-xs font-bold text-text-main">部署名</label>
+                                        <input type="text" name="billingDepartment" value={regForm.billingDepartment} onChange={handleChange} className="w-full p-2.5 text-sm bg-surface border border-border-dark text-text-main focus:border-primary focus:ring-1 focus:ring-primary transition-all" placeholder="例: 経理部" />
+                                    </div>
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <div className="space-y-1.5">
+                                            <label className="block text-xs font-bold text-text-main">担当者姓 <span className="text-accent-red">*</span></label>
+                                            <input type="text" name="billingContactLastName" value={regForm.billingContactLastName} onChange={handleChange} className="w-full p-2.5 text-sm bg-surface border border-border-dark text-text-main focus:border-primary focus:ring-1 focus:ring-primary transition-all" placeholder="例: 鈴木" />
+                                        </div>
+                                        <div className="space-y-1.5">
+                                            <label className="block text-xs font-bold text-text-main">担当者名 <span className="text-accent-red">*</span></label>
+                                            <input type="text" name="billingContactFirstName" value={regForm.billingContactFirstName} onChange={handleChange} className="w-full p-2.5 text-sm bg-surface border border-border-dark text-text-main focus:border-primary focus:ring-1 focus:ring-primary transition-all" placeholder="例: 三郎" />
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="space-y-1.5 pt-2">
+                                    <label className="block text-xs font-bold text-text-main">郵便番号 <span className="text-accent-red">*</span></label>
+                                    <input type="text" name="billingPostalCode" value={regForm.billingPostalCode} onChange={handleBillingPostalCodeChange} className="w-full p-2.5 text-sm bg-surface border border-border-dark text-text-main focus:border-primary focus:ring-1 focus:ring-primary transition-all" placeholder="例: 1500001" maxLength={8} />
+                                </div>
+                                <div className="space-y-1.5">
+                                    <label className="block text-xs font-bold text-text-main">都道府県・市区町村・番地 <span className="text-accent-red">*</span></label>
+                                    <input type="text" name="billingAddressLine1" value={regForm.billingAddressLine1} onChange={handleChange} className="w-full p-2.5 text-sm bg-surface border border-border-dark text-text-main focus:border-primary focus:ring-1 focus:ring-primary transition-all" placeholder="例: 東京都渋谷区神宮前1-2-3" />
+                                </div>
+                                <div className="space-y-1.5">
+                                    <label className="block text-xs font-bold text-text-main">建物名・部屋番号など</label>
+                                    <input type="text" name="billingAddressLine2" value={regForm.billingAddressLine2} onChange={handleChange} className="w-full p-2.5 text-sm bg-surface border border-border-dark text-text-main focus:border-primary focus:ring-1 focus:ring-primary transition-all" placeholder="例: ベンチャービル 2F" />
+                                </div>
+
+                                <div className="space-y-1.5 pt-2">
+                                    <label className="block text-xs font-bold text-text-main">電話番号 <span className="text-accent-red">*</span></label>
+                                    <input type="tel" name="billingPhone" value={regForm.billingPhone} onChange={handleChange} className="w-full p-2.5 text-sm bg-surface border border-border-dark text-text-main focus:border-primary focus:ring-1 focus:ring-primary transition-all" placeholder="03-9876-5432" />
+                                </div>
+                            </div>
+                        )}
                     </div>
                 </div>
 
