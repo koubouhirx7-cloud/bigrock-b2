@@ -277,6 +277,12 @@ function App() {
             imageUrl: item.externalImageUrl || item.image?.url || '',
             originalUrl: item.originalUrl || '',
             collapseByDefault: typeof item.collapseByDefault === 'boolean' ? item.collapseByDefault : true,
+            relatedProducts: item.relatedProducts?.map(rp => ({
+              id: rp.skuproducts || rp.sku || rp.id,
+              name: rp.title,
+              imageUrl: rp.externalImageUrl || rp.image?.url || '',
+              price: rp.basePrice || rp.price || 0
+            })) || [],
             variants: parsedVariants
           };
         })
@@ -770,6 +776,39 @@ function App() {
                         <p className="text-2xl font-mono font-bold text-text-main">¥{selectedProduct.price.toLocaleString()}</p>
                       </div>
                     </div>
+
+                    {/* Related Products Section */}
+                    {selectedProduct.relatedProducts && selectedProduct.relatedProducts.length > 0 && (
+                      <div className="bg-surface border border-border-subtle p-6 rounded-sm">
+                        <h4 className="text-sm font-bold text-text-main uppercase tracking-wider mb-4 border-b border-border-subtle pb-2">関連する製品</h4>
+                        <div className="grid grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-4">
+                          {selectedProduct.relatedProducts.map(rp => (
+                            <div 
+                              key={rp.id}
+                              onClick={() => {
+                                const fullProduct = products.find(p => p.id === rp.id) || rp;
+                                setSelectedProduct(fullProduct);
+                                window.scrollTo({ top: 0, behavior: 'smooth' });
+                              }}
+                              className="group cursor-pointer border border-border-subtle rounded-sm overflow-hidden flex flex-col hover:border-primary transition-colors bg-background-main shadow-sm"
+                            >
+                              <div className="aspect-square bg-background-main overflow-hidden border-b border-border-subtle">
+                                {rp.imageUrl ? (
+                                  <img src={rp.imageUrl} alt={rp.name} className="w-full h-full object-cover opacity-90 group-hover:opacity-100 group-hover:scale-105 transition-all duration-500" />
+                                ) : (
+                                  <div className="w-full h-full flex items-center justify-center text-text-muted text-xs">No Image</div>
+                                )}
+                              </div>
+                              <div className="p-3 flex flex-col gap-1 flex-1">
+                                <p className="text-xs font-bold text-text-main line-clamp-2 leading-snug">{rp.name}</p>
+                                <p className="text-[10px] font-mono font-bold text-text-main mt-auto pt-1">¥{rp.price.toLocaleString()}</p>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
                   </div>
 
                   {/* Right: Variants List */}
