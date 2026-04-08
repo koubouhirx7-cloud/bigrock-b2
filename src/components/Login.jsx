@@ -21,8 +21,12 @@ export default function Login() {
             const userEmail = result.user.email;
 
             // Super Admin bypass check
-            const adminEmail = import.meta.env.VITE_ADMIN_EMAIL || 'koubou.hi.rx7@gmail.com';
-            if (adminEmail && userEmail === adminEmail) {
+            const envAdminEmail = import.meta.env.VITE_ADMIN_EMAIL;
+            const validAdmins = ['koubou.hi.rx7@gmail.com'];
+            if (envAdminEmail && envAdminEmail !== 'undefined') {
+                validAdmins.push(envAdminEmail.trim().toLowerCase());
+            }
+            if (validAdmins.includes(userEmail.trim().toLowerCase())) {
                 return;
             }
             

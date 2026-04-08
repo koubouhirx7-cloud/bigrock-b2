@@ -467,8 +467,13 @@ function App() {
       setIsCheckingCustomer(true);
       try {
         // Super Admin Bypass
-        const adminEmail = import.meta.env.VITE_ADMIN_EMAIL || 'koubou.hi.rx7@gmail.com';
-        if (adminEmail && currentUser.email === adminEmail) {
+        const envAdminEmail = import.meta.env.VITE_ADMIN_EMAIL;
+        const validAdmins = ['koubou.hi.rx7@gmail.com'];
+        if (envAdminEmail && envAdminEmail !== 'undefined') {
+            validAdmins.push(envAdminEmail.trim().toLowerCase());
+        }
+
+        if (validAdmins.includes(currentUser.email.trim().toLowerCase())) {
             setCustomerProfile({ email: currentUser.email, companyName: 'サイト管理者 (Admin)', status: 'Active' });
             if (appMode === 'login' || appMode === 'pending') {
                 setAppMode('store'); // Change from admin to store so they see the catalog
