@@ -6,6 +6,10 @@ export default function Admin({ products, onExitAdmin, refreshProducts }) {
     const [ordersList, setOrdersList] = useState([]);
     const [isLoadingOrders, setIsLoadingOrders] = useState(false);
     
+    // Freee Invoices State
+    const [isGeneratingInvoices, setIsGeneratingInvoices] = useState(false);
+    const [invoiceResults, setInvoiceResults] = useState(null);
+
     // Admin Orders Filtering State
     const [ordersFilterTime, setOrdersFilterTime] = useState('all');
     const [ordersFilterCustomer, setOrdersFilterCustomer] = useState('all');
@@ -294,6 +298,14 @@ export default function Admin({ products, onExitAdmin, refreshProducts }) {
                         <span className="material-symbols-outlined text-[20px]">group</span>
                         <span className="text-sm font-bold">顧客管理</span>
                     </button>
+
+                    <button
+                        onClick={() => setAdminTab('invoices')}
+                        className={`w-full text-left p-3 flex items-center gap-3 transition-colors ${adminTab === 'invoices' ? 'bg-primary/10 text-primary border-r-2 border-primary' : 'text-text-muted hover:text-text-main hover:bg-surface-highlight'}`}
+                    >
+                        <span className="material-symbols-outlined text-[20px]">request_quote</span>
+                        <span className="text-sm font-bold">月次請求発行</span>
+                    </button>
                 </div>
 
                 <div className="p-4 border-t border-border-dark text-xs text-text-muted text-center font-mono">
@@ -313,6 +325,7 @@ export default function Admin({ products, onExitAdmin, refreshProducts }) {
                             <h1 className="text-2xl font-bold text-text-main tracking-tight">
                                 {adminTab === 'products' && '製品在庫一覧 (Inventory)'}
                                 {adminTab === 'users' && '登録顧客 (Users)'}
+                                {adminTab === 'invoices' && '月次請求発行 (Freee Integration)'}
                             </h1>
                         )}
                         
@@ -599,6 +612,88 @@ export default function Admin({ products, onExitAdmin, refreshProducts }) {
                                     </tbody>
                                 </table>
                             )}
+                        </div>
+                    )}
+
+                    {adminTab === 'invoices' && (
+                        <div className="bg-surface border border-border-dark overflow-hidden flex flex-col min-h-[400px] p-8">
+                            <div className="max-w-2xl mx-auto w-full">
+                                <div className="text-center mb-8">
+                                    <span className="material-symbols-outlined text-[48px] text-primary mb-4">request_quote</span>
+                                    <h2 className="text-xl font-bold mb-2">会計freee連携・月次請求書の一括発行</h2>
+                                    <p className="text-sm text-text-muted">
+                                        毎月20日締めで、当月（前月21日〜当月20日）の受注データを集計し、
+                                        翌月10日払い（土日祝の場合は翌営業日）の請求書をfreee上に作成します。
+                                    </p>
+                                </div>
+                                
+                                {invoiceResults ? (
+                                    <div className="bg-surface-highlight border border-border-dark p-6 rounded mb-8">
+                                        <h3 className="font-bold text-emerald-500 mb-4 flex items-center gap-2">
+                                            <span className="material-symbols-outlined">check_circle</span>
+                                            処理が完了しました
+                                        </h3>
+                                        <p className="text-sm mb-4 text-text-muted">
+                                            対象期間: {new Date(invoiceResults.billingPeriod?.start).toLocaleDateString('ja-JP')} 〜 {new Date(invoiceResults.billingPeriod?.end).toLocaleDateString('ja-JP')}
+                                        </p>
+                                        <div className="max-h-64 overflow-y-auto mt-4 space-y-2">
+                                            {invoiceResults.results?.map((res, i) => (
+                                                <div key={i} className="flex justify-between text-sm p-3 bg-background-main border border-border-dark rounded">
+                                                    <span className="font-bold text-text-main">{res.company || res.email}</span>
+                                                    {res.status === 'Success' ? (
+                                                        <span className="text-emerald-500 font-bold flex items-center gap-1"><span className="material-symbols-outlined text-[14px]">done</span> 発行済</span>
+                                                    ) : (
+                                                        <span className="text-accent-red font-bold flex items-center gap-1" title={res.error}><span className="material-symbols-outlined text-[14px]">error</span> エラー</span>
+                                                    )}
+                                                </div>
+                                            ))}
+                                            {(!invoiceResults.results || invoiceResults.results.length === 0) && (
+                                                <div className="text-text-muted text-sm text-center py-4">今月の請求対象となる受注データはありませんでした。</div>
+                                            )}
+                                        </div>
+                                        <div className="mt-6 flex justify-center">
+                                            <button onClick={() => setInvoiceResults(null)} className="text-sm text-text-muted hover:text-text-main underline">
+                                                戻る
+                                            </button>
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <div className="flex gap-4 justify-center mt-8 pt-6 border-t border-border-dark/50">
+                                        <button 
+                                            onClick={() => { window.location.href = '/api/freee-auth'; }}
+                                            className="px-6 py-3 bg-surface-highlight border border-border-dark hover:bg-black/5 flex items-center gap-2 rounded transition-colors text-sm font-bold text-text-main shadow-sm"
+                                        >
+                                            <span className="material-symbols-outlined text-[18px]">sync_saved_locally</span>
+                                            Freeeと連携する
+                                        </button>
+                                        <button 
+                                            onClick={async () => {
+                                                if(!window.confirm('今月の月次請求書をfreee上に発行します。実行してよろしいですか？')) return;
+                                                setIsGeneratingInvoices(true);
+                                                try {
+                                                    const res = await fetch('/api/create-invoices', { method: 'POST' });
+                                                    const data = await res.json();
+                                                    if(res.ok) setInvoiceResults(data);
+                                                    else alert("エラー: " + data.message);
+                                                } catch(err) {
+                                                    alert("通信エラー: " + err.message);
+                                                } finally {
+                                                    setIsGeneratingInvoices(false);
+                                                }
+                                            }}
+                                            disabled={isGeneratingInvoices}
+                                            className="px-6 py-3 bg-primary text-white hover:bg-primary-hover flex items-center gap-2 rounded transition-colors text-sm font-bold shadow-md disabled:opacity-50"
+                                        >
+                                            {isGeneratingInvoices ? (
+                                                <span className="material-symbols-outlined animate-spin text-[18px]">sync</span>
+                                            ) : (
+                                                <span className="material-symbols-outlined text-[18px]">send</span>
+                                            )}
+                                            {isGeneratingInvoices ? '処理中...' : '今月の請求書を発行'}
+                                        </button>
+                                    </div>
+                                )}
+                            </div>
                         </div>
                     )}
                 </div>

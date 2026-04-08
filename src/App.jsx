@@ -467,7 +467,7 @@ function App() {
       setIsCheckingCustomer(true);
       try {
         // Super Admin Bypass
-        const adminEmail = import.meta.env.VITE_ADMIN_EMAIL;
+        const adminEmail = import.meta.env.VITE_ADMIN_EMAIL || 'koubou.hi.rx7@gmail.com';
         if (adminEmail && currentUser.email === adminEmail) {
             setCustomerProfile({ email: currentUser.email, companyName: 'サイト管理者 (Admin)', status: 'Active' });
             if (appMode === 'login' || appMode === 'pending') {

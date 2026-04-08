@@ -8,6 +8,7 @@ export default function Register({ setParentTab }) {
     const [isProcessing, setIsProcessing] = useState(false);
     const [isTermsModalOpen, setIsTermsModalOpen] = useState(false);
     const [termsModalView, setTermsModalView] = useState('terms');
+    const [showConfirm, setShowConfirm] = useState(false);
 
     // Initial State for Comprehensive Registration Form
     const [regForm, setRegForm] = useState({
@@ -99,7 +100,7 @@ export default function Register({ setParentTab }) {
         }
     };
 
-    const handleSubmit = async () => {
+    const handleProceed = () => {
         if (!regForm.termsAgreed) {
             alert("利用規約への同意が必要です。");
             return;
@@ -111,6 +112,17 @@ export default function Register({ setParentTab }) {
             return;
         }
 
+        if (regForm.hasSeparateBilling) {
+            if (!regForm.billingCompanyName || !regForm.billingContactLastName || !regForm.billingContactFirstName || !regForm.billingPostalCode || !regForm.billingAddressLine1 || !regForm.billingPhone) {
+                alert("請求先情報の必須項目(*)をすべて入力してください。");
+                return;
+            }
+        }
+
+        setShowConfirm(true);
+    };
+
+    const handleFinalSubmit = async () => {
         setIsProcessing(true);
         try {
             const result = await loginWithGoogle();
@@ -128,11 +140,6 @@ export default function Register({ setParentTab }) {
                 const contactNameKana = `${regForm.contactLastNameKana} ${regForm.contactFirstNameKana}`.trim();
 
                 if (regForm.hasSeparateBilling) {
-                    if (!regForm.billingCompanyName || !regForm.billingContactLastName || !regForm.billingContactFirstName || !regForm.billingPostalCode || !regForm.billingAddressLine1 || !regForm.billingPhone) {
-                        alert("請求先情報の必須項目(*)をすべて入力してください。");
-                        setIsProcessing(false);
-                        return;
-                    }
                     const billingStr = `\n\n【請求先情報】\n会社名: ${regForm.billingCompanyName}\n担当: ${regForm.billingDepartment ? regForm.billingDepartment + ' ' : ''}${regForm.billingContactLastName} ${regForm.billingContactFirstName}\n住所: 〒${regForm.billingPostalCode} ${regForm.billingAddressLine1} ${regForm.billingAddressLine2}\n電話: ${regForm.billingPhone}`.trim();
                     fullAddress += billingStr;
                 }
@@ -177,11 +184,97 @@ export default function Register({ setParentTab }) {
         <div className="animate-in fade-in duration-300 w-full">
             <h2 className="text-xl font-bold mb-6 text-center tracking-tight text-text-main">新規販売店アカウントの発行</h2>
             
-            <p className="text-xs text-text-muted mb-6 bg-surface-highlight p-3 rounded border border-border-dark leading-relaxed">
-                以下のフォームに必要事項をご入力の上、Googleアカウントで申請手続きを完了してください。<br/>
-                申請後、弊社にて取引審査を行い、結果をご連絡いたします。
+            <p className="text-xs text-text-muted mb-6 bg-surface-highlight p-3 rounded border border-border-dark leading-relaxed whitespace-pre-line">
+                {showConfirm ? 
+                    "入力内容をご確認ください。\n間違いがなければ「Googleアカウントで申請手続きを完了する」ボタンを押してください。" 
+                    : 
+                    "以下のフォームに必要事項をご入力の上、確認画面へ進んでください。後ほどGoogleアカウントで申請手続きを完了します。\n申請後、弊社にて取引審査を行い、結果をご連絡いたします。"}
             </p>
 
+            {showConfirm ? (
+                <div className="space-y-6 bg-surface p-6 rounded-lg border border-border-dark text-sm text-text-main shadow-sm">
+                    <h3 className="font-bold border-b border-border-dark pb-2 text-primary">会社情報</h3>
+                    <div className="grid grid-cols-[130px_1fr] gap-y-3 gap-x-2">
+                        <div className="font-bold text-text-muted">会社名:</div><div>{regForm.companyName}</div>
+                        <div className="font-bold text-text-muted">会社名カナ:</div><div>{regForm.companyNameKana}</div>
+                        <div className="font-bold text-text-muted">代表者名:</div><div>{regForm.representativeLastName} {regForm.representativeFirstName}</div>
+                        <div className="font-bold text-text-muted">代表者名カナ:</div><div>{regForm.representativeLastNameKana} {regForm.representativeFirstNameKana}</div>
+                    </div>
+
+                    <h3 className="font-bold border-b border-border-dark pb-2 text-primary mt-8">担当者情報</h3>
+                    <div className="grid grid-cols-[130px_1fr] gap-y-3 gap-x-2">
+                        <div className="font-bold text-text-muted">部署名:</div><div>{regForm.department || '-'}</div>
+                        <div className="font-bold text-text-muted">担当者名:</div><div>{regForm.contactLastName} {regForm.contactFirstName}</div>
+                        <div className="font-bold text-text-muted">担当者名カナ:</div><div>{regForm.contactLastNameKana} {regForm.contactFirstNameKana}</div>
+                    </div>
+
+                    <h3 className="font-bold border-b border-border-dark pb-2 text-primary mt-8">連絡先・所在地</h3>
+                    <div className="grid grid-cols-[130px_1fr] gap-y-3 gap-x-2">
+                        <div className="font-bold text-text-muted">郵便番号:</div><div>〒{regForm.postalCode}</div>
+                        <div className="font-bold text-text-muted">住所:</div><div>{regForm.addressLine1} {regForm.addressLine2}</div>
+                        <div className="font-bold text-text-muted">電話番号:</div><div>{regForm.phone}</div>
+                        <div className="font-bold text-text-muted">携帯番号:</div><div>{regForm.mobilePhone || '-'}</div>
+                        <div className="font-bold text-text-muted">FAX番号:</div><div>{regForm.fax || '-'}</div>
+                    </div>
+
+                    {regForm.hasSeparateBilling && (
+                        <>
+                            <h3 className="font-bold border-b border-border-dark pb-2 text-primary mt-8">請求書送付先</h3>
+                            <div className="grid grid-cols-[130px_1fr] gap-y-3 gap-x-2">
+                                <div className="font-bold text-text-muted">会社名:</div><div>{regForm.billingCompanyName}</div>
+                                <div className="font-bold text-text-muted">部署名:</div><div>{regForm.billingDepartment || '-'}</div>
+                                <div className="font-bold text-text-muted">担当者名:</div><div>{regForm.billingContactLastName} {regForm.billingContactFirstName}</div>
+                                <div className="font-bold text-text-muted">郵便番号:</div><div>〒{regForm.billingPostalCode}</div>
+                                <div className="font-bold text-text-muted">住所:</div><div>{regForm.billingAddressLine1} {regForm.billingAddressLine2}</div>
+                                <div className="font-bold text-text-muted">電話番号:</div><div>{regForm.billingPhone}</div>
+                            </div>
+                        </>
+                    )}
+
+                    <h3 className="font-bold border-b border-border-dark pb-2 text-primary mt-8">企業付加情報</h3>
+                    <div className="grid grid-cols-[130px_1fr] gap-y-3 gap-x-2">
+                        <div className="font-bold text-text-muted">設立年月:</div><div>{regForm.establishedYearMonth || '-'}</div>
+                        <div className="font-bold text-text-muted">業態/業種:</div><div>{regForm.industry || '-'}</div>
+                        <div className="font-bold text-text-muted">年商(千円):</div><div>{regForm.annualSales ? `${regForm.annualSales} 千円` : '-'}</div>
+                        <div className="font-bold text-text-muted">HP URL:</div><div>{regForm.websiteUrl || '-'}</div>
+                    </div>
+                    
+                    <div className="grid grid-cols-[130px_1fr] gap-y-3 gap-x-2 mt-4 pt-4 border-t border-border-dark">
+                        <div className="font-bold text-text-muted">お知らせメール:</div><div>{regForm.newsletter ? '受け取る' : '受け取らない'}</div>
+                    </div>
+
+                    <div className="pt-8 pb-4 flex flex-col gap-4">
+                        <button
+                            type="button"
+                            onClick={handleFinalSubmit}
+                            disabled={isProcessing}
+                            className="w-full flex items-center justify-center gap-3 bg-white hover:bg-slate-100 text-slate-900 font-bold py-4 px-4 transition-colors duration-200 shadow-md disabled:opacity-50 text-base"
+                        >
+                            {isProcessing ? (
+                                <span className="material-symbols-outlined animate-spin text-slate-500">sync</span>
+                            ) : (
+                                <>
+                                    <svg height="22" viewBox="0 0 24 24" width="22" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"></path>
+                                        <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"></path>
+                                        <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"></path>
+                                        <path d="M12 5.38c1.62 0 3.06.56 4.21 1.66l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"></path>
+                                    </svg>
+                                    <span className="font-bold tracking-tight">Googleアカウントで申請手続きを完了する</span>
+                                </>
+                            )}
+                        </button>
+                        <button
+                            type="button"
+                            onClick={() => setShowConfirm(false)}
+                            disabled={isProcessing}
+                            className="w-full flex items-center justify-center gap-2 bg-transparent hover:bg-black/5 text-text-main font-bold py-3 px-4 transition-colors duration-200 border border-border-dark rounded disabled:opacity-50 text-sm"
+                        >
+                            戻って修正する
+                        </button>
+                    </div>
+                </div>
+            ) : (
             <form className="space-y-6" onSubmit={(e) => e.preventDefault()}>
                 {/* 会社情報 */}
                 <div className="space-y-4">
@@ -383,26 +476,15 @@ export default function Register({ setParentTab }) {
                 <div className="pt-4">
                     <button
                         type="button"
-                        onClick={handleSubmit}
-                        disabled={isProcessing}
-                        className="w-full flex items-center justify-center gap-3 bg-white hover:bg-slate-100 text-slate-900 font-bold py-4 px-4 transition-colors duration-200 shadow-md disabled:opacity-50 text-base"
+                        onClick={handleProceed}
+                        className="w-full flex items-center justify-center gap-2 bg-primary hover:bg-primary-hover text-white font-bold py-4 px-4 transition-colors duration-200 shadow-md text-base rounded"
                     >
-                        {isProcessing ? (
-                            <span className="material-symbols-outlined animate-spin text-slate-500">sync</span>
-                        ) : (
-                            <>
-                                <svg height="22" viewBox="0 0 24 24" width="22" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"></path>
-                                    <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"></path>
-                                    <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"></path>
-                                    <path d="M12 5.38c1.62 0 3.06.56 4.21 1.66l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"></path>
-                                </svg>
-                                <span className="font-bold tracking-tight">Googleアカウントで申請手続きを完了する</span>
-                            </>
-                        )}
+                        <span>入力内容の確認へ進む</span>
+                        <span className="material-symbols-outlined text-sm">arrow_forward</span>
                     </button>
                 </div>
             </form>
+            )}
             
             <TermsModal 
                 isOpen={isTermsModalOpen} 
