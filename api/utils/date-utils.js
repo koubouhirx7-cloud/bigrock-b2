@@ -1,5 +1,5 @@
 import { addDays, isWeekend } from 'date-fns';
-import * as JapaneseHolidays from 'japanese-holidays';
+import JapaneseHolidays from 'japanese-holidays';
 
 /**
  * Ensures the given date is a business day (weekday and non-holiday in Japan).
@@ -19,7 +19,9 @@ export function getNextBusinessDay(date) {
         }
 
         // Is it a public holiday?
-        const holiday = JapaneseHolidays.isHoliday(current);
+        // Handle possible ESM/CJS import discrepancies
+        const jh = JapaneseHolidays.default || JapaneseHolidays;
+        const holiday = jh.isHoliday(current);
         if (holiday) {
             current = addDays(current, 1);
             continue;
