@@ -158,11 +158,7 @@ export const fetchCustomers = async () => {
  */
 export const createCustomer = async (customerData) => {
     try {
-        const token = await getAuthToken();
-        const headers = {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
-        };
+        const headers = await getAuthHeaders();
         const response = await fetch('/api/create-customer', {
             method: 'POST',
             headers,
@@ -184,8 +180,7 @@ export const createCustomer = async (customerData) => {
  */
 export const deleteCustomer = async (id) => {
     try {
-        const token = await getAuthToken();
-        const headers = getHeaders(token);
+        const headers = await getAuthHeaders();
         const response = await fetch(`/api/delete-customer?id=${id}`, {
             method: 'DELETE',
             headers
