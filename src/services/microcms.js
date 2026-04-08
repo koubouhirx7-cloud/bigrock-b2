@@ -164,7 +164,14 @@ export const createCustomer = async (customerData) => {
             headers,
             body: JSON.stringify(customerData)
         });
-        if (!response.ok) throw new Error(`Failed to create customer: ${response.statusText}`);
+        if (!response.ok) {
+            let errorText = response.statusText;
+            try {
+                const errBody = await response.json();
+                errorText = JSON.stringify(errBody);
+            } catch (e) {}
+            throw new Error(`\n\n${errorText}`);
+        }
         return await response.json();
     } catch (err) {
         console.error("Error creating customer:", err);
