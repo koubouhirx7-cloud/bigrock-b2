@@ -158,7 +158,11 @@ export const fetchCustomers = async () => {
  */
 export const createCustomer = async (customerData) => {
     try {
-        const headers = await getAuthHeaders();
+        const token = await getAuthToken();
+        const headers = {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+        };
         const response = await fetch('/api/create-customer', {
             method: 'POST',
             headers,
@@ -171,6 +175,28 @@ export const createCustomer = async (customerData) => {
         return await response.json();
     } catch (err) {
         console.error("Error creating customer:", err);
+        throw err;
+    }
+};
+
+/**
+ * Delete a customer
+ */
+export const deleteCustomer = async (id) => {
+    try {
+        const token = await getAuthToken();
+        const headers = getHeaders(token);
+        const response = await fetch(`/api/delete-customer?id=${id}`, {
+            method: 'DELETE',
+            headers
+        });
+        if (!response.ok) {
+            const errBody = await response.json().catch(()=>null);
+            throw new Error(`Failed to delete customer: ${errBody ? JSON.stringify(errBody) : response.statusText}`);
+        }
+        return await response.json();
+    } catch (err) {
+        console.error("Error deleting customer:", err);
         throw err;
     }
 };

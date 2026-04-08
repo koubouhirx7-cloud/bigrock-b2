@@ -125,6 +125,7 @@ export default function Register({ setParentTab }) {
     const handleFinalSubmit = async () => {
         setIsProcessing(true);
         try {
+            // Register flow
             const result = await loginWithGoogle();
             const userEmail = result.user.email;
 

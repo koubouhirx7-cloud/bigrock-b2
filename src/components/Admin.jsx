@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { fetchOrders, updateOrder, deleteOrder, fetchCustomers, createCustomer, updateCustomer, updateProduct } from '../services/microcms';
+import { fetchOrders, updateOrder, deleteOrder, fetchCustomers, createCustomer, updateCustomer, deleteCustomer, updateProduct } from '../services/microcms';
 import { auth } from '../services/firebase';
 
 export default function Admin({ products, onExitAdmin, refreshProducts }) {
@@ -168,6 +168,23 @@ export default function Admin({ products, onExitAdmin, refreshProducts }) {
         
         // Use mailto link
         window.location.href = `mailto:?bcc=${bccString}&subject=${subject}&body=${body}`;
+    };
+
+    const handleDeleteCustomer = async (id, companyName) => {
+        if (!window.confirm(`顧客「${companyName}」を削除してもよろしいですか？\nこの操作は取り消せません。`)) {
+            return;
+        }
+        setIsLoading(true);
+        try {
+            await deleteCustomer(id);
+            setCustomersList(customersList.filter(c => c.id !== id));
+            alert('顧客を削除しました。');
+        } catch (error) {
+            console.error('Error deleting customer:', error);
+            alert('顧客の削除に失敗しました。');
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     const openCustomerModal = (customer = null) => {
@@ -604,8 +621,11 @@ export default function Admin({ products, onExitAdmin, refreshProducts }) {
                                                     </span>
                                                 </td>
                                                 <td className="p-4 text-center">
-                                                    <button onClick={() => openCustomerModal(customer)} className="text-text-muted hover:text-text-main transition-colors p-1">
+                                                    <button onClick={() => openCustomerModal(customer)} className="text-text-muted hover:text-text-main transition-colors p-1" title="編集">
                                                         <span className="material-symbols-outlined text-[18px]">edit</span>
+                                                    </button>
+                                                    <button onClick={() => handleDeleteCustomer(customer.id, customer.companyName)} className="text-text-muted hover:text-red-500 transition-colors p-1 ml-2" title="削除">
+                                                        <span className="material-symbols-outlined text-[18px]">delete</span>
                                                     </button>
                                                 </td>
                                             </tr>
