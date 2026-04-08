@@ -29,7 +29,7 @@ export default function handler(req, res) {
 
   const { password } = req.body;
 
-  const adminPassword = process.env.ADMIN_PASSWORD;
+  const adminPassword = process.env.VITE_ADMIN_PASSWORD || process.env.ADMIN_PASSWORD;
 
   if (!adminPassword) {
     console.error("ADMIN_PASSWORD environment variable is not configured.");
