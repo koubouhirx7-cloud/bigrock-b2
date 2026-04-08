@@ -160,7 +160,7 @@ export default function Register({ setParentTab }) {
                     industry: regForm.industry,
                     websiteUrl: regForm.websiteUrl,
                     email: userEmail,
-                    status: 'Inactive',
+                    status: ['Inactive'],
                     shippingAddress: fullAddress,
                     newsletter: regForm.newsletter
                 });

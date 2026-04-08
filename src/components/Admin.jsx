@@ -153,7 +153,7 @@ export default function Admin({ products, onExitAdmin, refreshProducts }) {
 
     const handleSendNewsletter = () => {
         const recipients = customersList
-            .filter(c => c.status === 'Active' && c.newsletter === true)
+            .filter(c => (Array.isArray(c.status) ? c.status.includes('Active') : c.status === 'Active') && c.newsletter === true)
             .map(c => c.email)
             .filter(email => !!email);
 
@@ -190,7 +190,7 @@ export default function Admin({ products, onExitAdmin, refreshProducts }) {
                 industry: customer.industry || '',
                 websiteUrl: customer.websiteUrl || '',
                 shippingAddress: customer.shippingAddress || '',
-                status: customer.status || 'Active',
+                status: Array.isArray(customer.status) ? customer.status : [customer.status || 'Active'],
                 newsletter: customer.newsletter || false
             });
         } else {
@@ -199,7 +199,7 @@ export default function Admin({ products, onExitAdmin, refreshProducts }) {
                 companyName: '', companyNameKana: '', repName: '', repNameKana: '', 
                 department: '', contactName: '', contactNameKana: '', email: '', 
                 phone: '', mobilePhone: '', fax: '', established: '', annualSales: '', 
-                industry: '', websiteUrl: '', shippingAddress: '', status: 'Active', newsletter: false 
+                industry: '', websiteUrl: '', shippingAddress: '', status: ['Active'], newsletter: false 
             });
         }
         setIsCustomerModalOpen(true);
@@ -599,8 +599,8 @@ export default function Admin({ products, onExitAdmin, refreshProducts }) {
                                                     {customer.phone && <div className="text-xs text-text-muted font-mono mt-0.5">{customer.phone}</div>}
                                                 </td>
                                                 <td className="p-4">
-                                                    <span className={`inline-flex items-center px-2 py-1 rounded text-[11px] font-bold tracking-wider uppercase font-mono border ${customer.status === 'Active' ? 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20' : 'bg-text-muted/10 text-text-muted border-border-dark'}`}>
-                                                        {customer.status || 'Active'}
+                                                    <span className={`inline-flex items-center px-2 py-1 rounded text-[11px] font-bold tracking-wider uppercase font-mono border ${(Array.isArray(customer.status) ? customer.status.includes('Active') : customer.status === 'Active') ? 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20' : 'bg-text-muted/10 text-text-muted border-border-dark'}`}>
+                                                        {(Array.isArray(customer.status) ? customer.status[0] : customer.status) || 'Active'}
                                                     </span>
                                                 </td>
                                                 <td className="p-4 text-center">
@@ -887,8 +887,8 @@ export default function Admin({ products, onExitAdmin, refreshProducts }) {
                                     <label className="text-xs font-bold text-text-main">アカウント状態 <span className="text-red-500">*</span></label>
                                     <div className="relative">
                                         <select 
-                                            value={customerForm.status}
-                                            onChange={(e) => setCustomerForm({...customerForm, status: e.target.value})}
+                                            value={Array.isArray(customerForm.status) ? customerForm.status[0] : customerForm.status}
+                                            onChange={(e) => setCustomerForm({...customerForm, status: [e.target.value]})}
                                             className="w-full bg-surface border border-border-dark px-3 py-2.5 rounded text-text-main focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all appearance-none cursor-pointer font-bold text-sm"
                                         >
                                             <option value="Active">有効 (Active)</option>

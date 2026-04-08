@@ -165,12 +165,8 @@ export const createCustomer = async (customerData) => {
             body: JSON.stringify(customerData)
         });
         if (!response.ok) {
-            let errorText = response.statusText;
-            try {
-                const errBody = await response.json();
-                errorText = JSON.stringify(errBody);
-            } catch (e) {}
-            throw new Error(`\n\n${errorText}`);
+            const rawText = await response.text();
+            throw new Error(`\n\nHTTP ${response.status} ${response.statusText}\nBody: ${rawText.substring(0, 500)}`);
         }
         return await response.json();
     } catch (err) {
