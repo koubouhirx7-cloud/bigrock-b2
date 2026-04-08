@@ -14,6 +14,10 @@ export default function Admin({ products, onExitAdmin, refreshProducts }) {
     // Admin Orders Filtering State
     const [ordersFilterTime, setOrdersFilterTime] = useState('all');
     const [ordersFilterCustomer, setOrdersFilterCustomer] = useState('all');
+    
+    // Newsletter Modal state
+    const [isNewsletterModalOpen, setIsNewsletterModalOpen] = useState(false);
+    const [newsletterRecipients, setNewsletterRecipients] = useState([]);
 
     const uniqueCustomers = useMemo(() => {
         const names = ordersList.map(o => o.companyName || o.customerEmail || 'ゲスト');
@@ -162,19 +166,15 @@ export default function Admin({ products, onExitAdmin, refreshProducts }) {
             return;
         }
 
-        const bccString = recipients.join(',');
-        const subject = encodeURIComponent('【お知らせ】BIGROCKより');
-        const body = encodeURIComponent('各位\n\n平素は格別のお引き立てを賜り厚く御礼申し上げます。\n\n----\n株式会社ビッグロック');
-        
-        // Use mailto link
-        window.location.href = `mailto:?bcc=${bccString}&subject=${subject}&body=${body}`;
+        setNewsletterRecipients(recipients);
+        setIsNewsletterModalOpen(true);
     };
 
     const handleDeleteCustomer = async (id, companyName) => {
         if (!window.confirm(`顧客「${companyName}」を削除してもよろしいですか？\nこの操作は取り消せません。`)) {
             return;
         }
-        setIsLoading(true);
+        setIsLoadingCustomers(true);
         try {
             await deleteCustomer(id);
             setCustomersList(customersList.filter(c => c.id !== id));
@@ -183,7 +183,7 @@ export default function Admin({ products, onExitAdmin, refreshProducts }) {
             console.error('Error deleting customer:', error);
             alert(`顧客の削除に失敗しました。\n詳細: ${error.message}`);
         } finally {
-            setIsLoading(false);
+            setIsLoadingCustomers(false);
         }
     };
 
@@ -728,6 +728,69 @@ export default function Admin({ products, onExitAdmin, refreshProducts }) {
                     )}
                 </div>
             </main>
+
+            {/* Newsletter Modal */}
+            {isNewsletterModalOpen && (
+                <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
+                    <div className="bg-background-main w-full max-w-lg rounded shadow-2xl flex flex-col max-h-[90vh]">
+                        <div className="flex justify-between items-center p-4 border-b border-border-dark bg-surface">
+                            <h2 className="text-xl font-bold text-text-main flex items-center gap-2">
+                                <span className="material-symbols-outlined text-primary text-[24px]">mail</span>
+                                メルマガ宛先 (BCC)
+                            </h2>
+                            <button onClick={() => setIsNewsletterModalOpen(false)} className="text-text-muted hover:text-text-main p-1 rounded transition-colors cursor-pointer">
+                                <span className="material-symbols-outlined">close</span>
+                            </button>
+                        </div>
+                        <div className="p-6 overflow-y-auto flex-1">
+                            <div className="mb-4">
+                                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary/10 text-primary font-bold text-sm">
+                                    <span className="material-symbols-outlined text-[16px]">group</span>
+                                    対象顧客: {newsletterRecipients.length}件
+                                </span>
+                                <p className="text-xs text-text-muted mt-2">
+                                    メルマガ配信希望であり、ステータスがActiveの顧客のみ抽出されています。
+                                </p>
+                            </div>
+                            
+                            <div className="space-y-2 mb-6">
+                                <label className="block text-sm font-bold text-text-main">抽出リスト (カンマ区切り)</label>
+                                <textarea
+                                    readOnly
+                                    value={newsletterRecipients.join(', ')}
+                                    className="w-full h-32 p-3 bg-surface border border-border-dark text-xs text-text-main focus:outline-none focus:border-primary font-mono tracking-tight leading-relaxed resize-none rounded"
+                                />
+                            </div>
+
+                            <div className="flex flex-col gap-3">
+                                <button 
+                                    onClick={() => {
+                                        navigator.clipboard.writeText(newsletterRecipients.join(','));
+                                        alert('BCC用メールアドレスをクリップボードにコピーしました。\nmassエディタやメールソフトのBCC欄に貼り付けてご使用ください。');
+                                    }}
+                                    className="flex items-center justify-center gap-2 w-full py-3 bg-surface border border-border-dark hover:bg-surface-highlight hover:border-primary text-text-main font-bold transition-all shadow-sm rounded"
+                                >
+                                    <span className="material-symbols-outlined text-[20px]">content_copy</span>
+                                    <span>BCCアドレスをコピーする</span>
+                                </button>
+                                
+                                <button 
+                                    onClick={() => {
+                                        const bccString = newsletterRecipients.join(',');
+                                        const subject = encodeURIComponent('【お知らせ】BIGROCKより');
+                                        const body = encodeURIComponent('各位\n\n平素は格別のお引き立てを賜り厚く御礼申し上げます。\n\n----\n株式会社ビッグロック');
+                                        window.location.href = `mailto:?bcc=${bccString}&subject=${subject}&body=${body}`;
+                                    }}
+                                    className="flex items-center justify-center gap-2 w-full py-3 bg-primary text-background-main hover:bg-white font-bold transition-all shadow-md rounded"
+                                >
+                                    <span className="material-symbols-outlined text-[20px]">open_in_new</span>
+                                    <span>メールソフトを起動する</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
 
             {/* Order Edit Modal */}
             {editingOrder && (
