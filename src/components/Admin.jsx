@@ -181,7 +181,7 @@ export default function Admin({ products, onExitAdmin, refreshProducts }) {
             alert('顧客を削除しました。');
         } catch (error) {
             console.error('Error deleting customer:', error);
-            alert('顧客の削除に失敗しました。');
+            alert(`顧客の削除に失敗しました。\n詳細: ${error.message}`);
         } finally {
             setIsLoading(false);
         }
