@@ -11,7 +11,7 @@ export default async function handler(req, res) {
         return res.status(401).json({ message: error.message });
     }
 
-    const API_KEY = process.env.MICROCMS_API_KEY;
+    const API_KEY = process.env.VITE_MICROCMS_API_KEY || process.env.MICROCMS_API_KEY;
     const DOMAIN = process.env.VITE_MICROCMS_SERVICE_DOMAIN || process.env.MICROCMS_SERVICE_DOMAIN;
 
     if (!API_KEY || !DOMAIN) {
