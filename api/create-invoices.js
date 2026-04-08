@@ -62,10 +62,11 @@ export default async function handler(req, res) {
         // 5. Group by customer email
         const customerGroups = {};
         validOrders.forEach(order => {
-            const email = order.customerEmail;
+            const email = order.customerEmail || order.email || 'unknown';
             if (!customerGroups[email]) {
+                const cName = order.companyName || order.customerCompanyName; // support both just in case
                 customerGroups[email] = {
-                    companyName: order.customerCompanyName,
+                    companyName: cName ? cName : `お客様 (${email})`,
                     orders: []
                 };
             }
