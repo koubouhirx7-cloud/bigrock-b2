@@ -31,14 +31,18 @@ export default async function handler(req, res) {
         const API_KEY = process.env.VITE_MICROCMS_API_KEY || process.env.MICROCMS_API_KEY;
         const DOMAIN = process.env.VITE_MICROCMS_SERVICE_DOMAIN || process.env.MICROCMS_SERVICE_DOMAIN;
 
-        // Fetch up to maybe 500 recent orders. A real prod system needs pagination, 
-        // using limit=100 as a simple fallback, but let's grab up to 300
-        const ordersRes = await fetch(`https://${DOMAIN}.microcms.io/api/v1/orders?limit=300`, {
+        if (!API_KEY || !DOMAIN) {
+            throw new Error('Server configuration error: Missing MicroCMS Credentials');
+        }
+
+        // Fetch up to 100 recent orders. MicroCMS max limit is 100, using 300 causes a 400 error.
+        const ordersRes = await fetch(`https://${DOMAIN}.microcms.io/api/v1/orders?limit=100`, {
             headers: { 'X-MICROCMS-API-KEY': API_KEY }
         });
 
         if (!ordersRes.ok) {
-            throw new Error("Failed to fetch orders from MicroCMS");
+            const errText = await ordersRes.text();
+            throw new Error(`Failed to fetch orders from MicroCMS. Status: ${ordersRes.status}, Error: ${errText}`);
         }
         
         const ordersData = await ordersRes.json();
