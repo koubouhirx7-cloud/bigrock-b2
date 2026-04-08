@@ -644,7 +644,10 @@ export default function Admin({ products, onExitAdmin, refreshProducts }) {
                                                     {res.status === 'Success' ? (
                                                         <span className="text-emerald-500 font-bold flex items-center gap-1"><span className="material-symbols-outlined text-[14px]">done</span> 発行済</span>
                                                     ) : (
-                                                        <span className="text-accent-red font-bold flex items-center gap-1" title={res.error}><span className="material-symbols-outlined text-[14px]">error</span> エラー</span>
+                                                        <div className="flex flex-col items-end">
+                                                            <span className="text-accent-red font-bold flex items-center gap-1"><span className="material-symbols-outlined text-[14px]">error</span> エラー</span>
+                                                            <span className="text-[10px] text-text-muted mt-1 max-w-[200px] truncate" title={res.error}>{res.error}</span>
+                                                        </div>
                                                     )}
                                                 </div>
                                             ))}
