@@ -119,6 +119,8 @@ export default function Register({ setParentTab }) {
             }
         }
 
+        // UX: Scroll to top when changing views so the user doesn't get lost
+        window.scrollTo({ top: 0, behavior: 'smooth' });
         setShowConfirm(true);
     };
 
