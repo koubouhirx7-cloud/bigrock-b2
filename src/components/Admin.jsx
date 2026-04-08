@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { fetchOrders, updateOrder, deleteOrder, fetchCustomers, createCustomer, updateCustomer, updateProduct } from '../services/microcms';
+import { auth } from '../services/firebase';
 
 export default function Admin({ products, onExitAdmin, refreshProducts }) {
     const [adminTab, setAdminTab] = useState('products');
@@ -671,7 +672,13 @@ export default function Admin({ products, onExitAdmin, refreshProducts }) {
                                                 if(!window.confirm('今月の月次請求書をfreee上に発行します。実行してよろしいですか？')) return;
                                                 setIsGeneratingInvoices(true);
                                                 try {
-                                                    const res = await fetch('/api/create-invoices', { method: 'POST' });
+                                                    const token = auth.currentUser ? await auth.currentUser.getIdToken() : '';
+                                                    const res = await fetch('/api/create-invoices', { 
+                                                        method: 'POST',
+                                                        headers: {
+                                                            'Authorization': `Bearer ${token}`
+                                                        }
+                                                    });
                                                     const data = await res.json();
                                                     if(res.ok) setInvoiceResults(data);
                                                     else alert("エラー: " + data.message);
