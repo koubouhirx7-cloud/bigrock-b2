@@ -1161,17 +1161,29 @@ function App() {
                             {/* Item details breakdown */}
                             <div className="mt-3 bg-black/5 p-3 rounded-sm">
                               <p className="text-xs font-bold text-text-muted mb-2 border-b border-border-subtle pb-1">注文明細</p>
-                              <ul className="text-sm space-y-1">
+                              <div className="space-y-0 divide-y divide-border-subtle border-t border-border-subtle/50 mt-2">
                                 {JSON.parse(draft.items || '[]').map((item, idx) => (
-                                  <li key={idx} className="flex justify-between items-start text-text-main">
-                                    <span>
-                                      <span className="font-bold">{item.productName || item.name}</span>
-                                      {item.variant && <span className="text-text-muted text-xs ml-1">({item.variant})</span>}
-                                    </span>
-                                    <span className="font-mono ml-4 text-primary whitespace-nowrap">x {item.quantity}</span>
-                                  </li>
+                                  <div key={idx} className="flex items-center py-2">
+                                    {item.imageUrl ? (
+                                      <img src={item.imageUrl} alt={item.productName || item.name} className="w-10 h-10 rounded object-cover border border-border-subtle bg-white mr-3 shrink-0" />
+                                    ) : (
+                                      <div className="w-10 h-10 rounded border border-border-subtle bg-surface-highlight flex items-center justify-center text-[10px] text-text-muted mr-3 shrink-0">画像なし</div>
+                                    )}
+                                    <div className="flex-1 min-w-0 pr-3">
+                                      <p className="text-[11px] font-medium text-text-muted leading-tight truncate">{item.productName || item.name}</p>
+                                      {item.variantName && (
+                                        <p className="text-sm font-bold text-text-main mt-0.5 leading-tight">{item.variantName}</p>
+                                      )}
+                                      <p className="text-xs font-mono text-text-muted mt-1">¥{(item.price || 0).toLocaleString()}</p>
+                                    </div>
+                                    <div className="text-right whitespace-nowrap shrink-0">
+                                      <div className="text-sm font-bold bg-primary/10 text-primary border border-primary/20 px-2.5 py-0.5 rounded shadow-sm inline-block">
+                                        {item.quantity}点
+                                      </div>
+                                    </div>
+                                  </div>
                                 ))}
-                              </ul>
+                              </div>
                             </div>
                           </div>
                           <div className="flex items-center gap-2 w-full md:w-auto">
