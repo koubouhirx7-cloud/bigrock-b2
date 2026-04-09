@@ -858,7 +858,7 @@ export default function Admin({ products, onExitAdmin, refreshProducts }) {
                                                 )}
                                                 <div className="flex-1 min-w-0">
                                                     <div className="text-sm font-bold text-text-main truncate">{item.productName || item.name}</div>
-                                                    {item.variant && <div className="text-xs text-text-muted mt-0.5">{item.variant}</div>}
+                                                    {item.variantName && <div className="text-xs text-text-muted mt-0.5">{item.variantName}</div>}
                                                     <div className="flex items-center justify-between mt-1">
                                                         <div className="text-xs font-mono">¥{item.price.toLocaleString()} x {item.quantity}</div>
                                                         <div className="text-sm font-bold font-mono">¥{(item.price * item.quantity).toLocaleString()}</div>
