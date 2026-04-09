@@ -243,6 +243,14 @@ function App() {
   const [isLoadingHistory, setIsLoadingHistory] = useState(false)
   const [historyFilter, setHistoryFilter] = useState('all')
 
+  const showToast = (msg) => {
+    if (toastTimer.current) {
+      clearTimeout(toastTimer.current);
+    }
+    setToastMessage(msg);
+    toastTimer.current = setTimeout(() => setToastMessage(null), 3000);
+  };
+
   const filteredOrderHistory = useMemo(() => {
     if (historyFilter === 'all') return orderHistory;
     
@@ -297,12 +305,8 @@ function App() {
       return [...prevCart, { ...product, cartItemId, variantId: variant?.id, variantName: variant?.name, quantity: addedQuantity, isBO }]
     })
 
-    if (toastTimer.current) {
-      clearTimeout(toastTimer.current)
-    }
     const variantStr = variant ? ` (${variant.name})` : ''
-    setToastMessage(`カートに追加しました：${product.name}${variantStr}`)
-    toastTimer.current = setTimeout(() => setToastMessage(null), 3000)
+    showToast(`カートに追加しました：${product.name}${variantStr}`)
   }
 
   const updateCartItemQuantity = (cartItemId, delta) => {
