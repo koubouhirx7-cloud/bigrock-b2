@@ -1370,6 +1370,90 @@ function App() {
 
 
 
+        {/* Order History Details Modal */}
+        {selectedHistoryOrder && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-text-main/50 backdrop-blur-sm shadow-2xl animate-fade-in" onClick={() => setSelectedHistoryOrder(null)}>
+            <div className="bg-surface w-full max-w-2xl max-h-[90vh] rounded-sm shadow-2xl overflow-hidden flex flex-col" onClick={e => e.stopPropagation()}>
+              <div className="p-6 border-b border-border-subtle bg-background-main flex justify-between items-center z-10 shrink-0">
+                <h2 className="text-xl font-bold flex items-center gap-2">
+                  <span className="material-symbols-outlined text-primary">receipt_long</span>
+                  注文詳細
+                </h2>
+                <button onClick={() => setSelectedHistoryOrder(null)} className="text-text-muted hover:text-text-main transition-colors p-1 rounded-full hover:bg-black/5">
+                  <span className="material-symbols-outlined">close</span>
+                </button>
+              </div>
+              
+              <div className="p-6 overflow-y-auto bg-background-main/50 space-y-6 flex-1">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="bg-surface p-5 rounded-sm border border-border-subtle shadow-sm">
+                    <h3 className="text-xs font-bold text-primary uppercase tracking-wider mb-4 border-b border-border-subtle pb-2">注文情報</h3>
+                    <div className="space-y-3">
+                      <div>
+                        <p className="text-[10px] text-text-muted uppercase tracking-wider">注文ID</p>
+                        <p className="text-sm font-mono font-bold text-text-main mt-0.5">{selectedHistoryOrder.orderId}</p>
+                      </div>
+                      <div>
+                        <p className="text-[10px] text-text-muted uppercase tracking-wider">日時</p>
+                        <p className="text-sm font-mono text-text-main mt-0.5">{new Date(selectedHistoryOrder.createdAt).toLocaleString('ja-JP')}</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="bg-surface p-5 rounded-sm border border-border-subtle shadow-sm">
+                    <h3 className="text-xs font-bold text-primary uppercase tracking-wider mb-4 border-b border-border-subtle pb-2">対応状況</h3>
+                    <div className="space-y-4">
+                      <div>
+                        <p className="text-[10px] text-text-muted uppercase tracking-wider mb-1">ステータス</p>
+                        <span className={`inline-flex items-center px-2.5 py-1 rounded text-xs font-bold border ${selectedHistoryOrder.status === '処理中' ? 'bg-primary/10 text-primary border-primary/20' : selectedHistoryOrder.status === '発送済' ? 'bg-blue-500/10 text-blue-500 border-blue-500/20' : 'bg-accent-green/10 text-accent-green border-accent-green/20'}`}>
+                          {selectedHistoryOrder.status || '処理中'}
+                        </span>
+                      </div>
+                      {selectedHistoryOrder.shippingInfo && (
+                        <div>
+                          <p className="text-[10px] text-text-muted uppercase tracking-wider">配送情報・追跡番号</p>
+                          <p className="text-sm text-text-main mt-0.5 bg-black/5 p-2 rounded-sm font-mono whitespace-pre-wrap">{selectedHistoryOrder.shippingInfo}</p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="bg-surface p-5 rounded-sm border border-border-subtle shadow-sm">
+                  <h3 className="text-xs font-bold text-primary uppercase tracking-wider mb-4 border-b border-border-subtle pb-2">注文内容</h3>
+                  <div className="space-y-0 divide-y divide-border-subtle border border-border-subtle rounded-sm">
+                    {JSON.parse(selectedHistoryOrder.items || "[]").map((item, idx) => (
+                      <div key={idx} className="flex items-center p-3">
+                        {item.imageUrl ? (
+                          <img src={item.imageUrl} alt={item.productName || item.name} className="w-12 h-12 rounded object-cover border border-border-subtle bg-white mr-4" />
+                        ) : (
+                          <div className="w-12 h-12 rounded border border-border-subtle bg-surface-highlight flex items-center justify-center text-[10px] text-text-muted mr-4">画像なし</div>
+                        )}
+                        <div className="flex-1 min-w-0 pr-4">
+                          <p className="text-xs font-medium text-text-muted leading-tight">{item.productName || item.name}</p>
+                          {item.variantName && (
+                            <p className="text-base font-bold text-text-main mt-0.5 leading-tight truncate">{item.variantName}</p>
+                          )}
+                        </div>
+                        <div className="text-right whitespace-nowrap">
+                          <div className="text-base font-bold bg-primary/10 text-primary border border-primary/20 px-3 py-0.5 rounded shadow-sm inline-block">
+                            {item.quantity}点
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="text-right mt-4 pt-4 border-t border-border-subtle">
+                    <p className="text-xs text-text-muted">合計金額</p>
+                    <p className="text-xl font-bold font-mono text-primary mt-1">¥{(selectedHistoryOrder.totalAmount || 0).toLocaleString()}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+
         {/* Toast Notification */}
         {toastMessage && (
           <div className="fixed bottom-8 right-8 bg-background-main/95 border border-border-subtle border-l-4 border-l-accent-green text-text-main px-6 py-4 rounded-sm shadow-2xl z-50 flex items-center gap-3 animate-fade-in">

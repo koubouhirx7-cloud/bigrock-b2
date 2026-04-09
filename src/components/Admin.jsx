@@ -858,11 +858,20 @@ export default function Admin({ products, onExitAdmin, refreshProducts }) {
                                                     <div className="w-12 h-12 rounded bg-surface-highlight border border-border-dark flex items-center justify-center text-[10px] text-text-muted">画像なし</div>
                                                 )}
                                                 <div className="flex-1 min-w-0">
-                                                    <div className="text-sm font-bold text-text-main truncate">{item.productName || item.name}</div>
-                                                    {item.variantName && <div className="text-xs text-text-muted mt-0.5">{item.variantName}</div>}
-                                                    <div className="flex items-center justify-between mt-1">
-                                                        <div className="text-xs font-mono">¥{item.price.toLocaleString()} x {item.quantity}</div>
-                                                        <div className="text-sm font-bold font-mono">¥{(item.price * item.quantity).toLocaleString()}</div>
+                                                    <div className="text-xs font-medium text-text-muted truncate">{item.productName || item.name}</div>
+                                                    {item.variantName && (
+                                                        <div className="text-base font-bold text-text-main mt-0.5 leading-tight">
+                                                            {item.variantName}
+                                                        </div>
+                                                    )}
+                                                    <div className="flex flex-wrap items-center justify-between mt-2 gap-2">
+                                                        <div className="text-xs font-mono text-text-muted">¥{item.price.toLocaleString()}</div>
+                                                        <div className="flex items-center gap-3">
+                                                            <div className="text-base font-bold bg-primary/10 text-primary border border-primary/20 px-3 py-0.5 rounded shadow-sm">
+                                                                {item.quantity}点
+                                                            </div>
+                                                            <div className="text-sm font-bold font-mono">¥{(item.price * item.quantity).toLocaleString()}</div>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
