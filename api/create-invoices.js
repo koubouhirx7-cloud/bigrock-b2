@@ -120,26 +120,30 @@ export default async function handler(req, res) {
                     const items = typeof order.items === 'string' ? JSON.parse(order.items) : order.items;
                     items.forEach(item => {
                         invoiceContents.push({
-                            type: 'normal',
-                            qty: parseInt(item.quantity) || 1,
+                            type: 'item',
+                            quantity: (parseInt(item.quantity) || 1).toString(),
                             unit: '個',
-                            unit_price: parseInt(item.price) || 0,
+                            unit_price: (parseInt(item.price) || 0).toString(),
                             description: `${item.name} (注文番号: ${order.id})`,
-                            tax_entry_method: 'inclusive'
+                            tax_rate: 10
                         });
                     });
                 });
 
-                // Step C: POST Invoice
+                // Step C: POST Invoice (Using new Freee iv/invoices endpoint)
                 const invoicePayload = {
                     company_id: parseInt(companyId),
-                    issue_date: issueDate,
-                    due_date: dueDate,
                     partner_id: partnerId,
-                    invoice_contents: invoiceContents
+                    partner_title: '御中',
+                    billing_date: issueDate,
+                    due_date: dueDate,
+                    tax_entry_method: 'in',
+                    tax_fraction: 'omit',
+                    withholding_tax_entry_method: 'in',
+                    lines: invoiceContents
                 };
 
-                const invRes = await fetch(`https://api.freee.co.jp/api/1/invoices`, {
+                const invRes = await fetch(`https://api.freee.co.jp/iv/invoices`, {
                     method: 'POST',
                     headers: { 
                         'Authorization': `Bearer ${accessToken}`,
