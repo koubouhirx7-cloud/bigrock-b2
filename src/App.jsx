@@ -117,6 +117,7 @@ function App() {
   const [isCheckingCustomer, setIsCheckingCustomer] = useState(false)
   const [activeTab, setActiveTab] = useState('catalog')
   const [products, setProducts] = useState(productsDataFromJson)
+  const [isProductsLoading, setIsProductsLoading] = useState(false)
 
   const productMap = useMemo(() => {
     return new Map(products.map(p => [p.id, p]));
@@ -238,6 +239,7 @@ function App() {
   const [showDraftModal, setShowDraftModal] = useState(false)
   const [draftMemo, setDraftMemo] = useState('')
   const [isSavingDraft, setIsSavingDraft] = useState(false)
+  const [isPlacingOrder, setIsPlacingOrder] = useState(false)
   const [isLoadingHistory, setIsLoadingHistory] = useState(false)
   const [historyFilter, setHistoryFilter] = useState('all')
 
@@ -324,8 +326,9 @@ function App() {
   const getCartTotalPrice = () => cart.reduce((total, item) => total + (item.price * item.quantity), 0)
 
   const placeOrder = async () => {
-    if (cart.length === 0) return;
+    if (cart.length === 0 || isPlacingOrder) return;
 
+    setIsPlacingOrder(true);
     const orderIdValue = `ORD-${Math.floor(Math.random() * 10000) + 4000}`;
     const totalQty = getCartTotalQuantity();
     const finalTotal = Math.floor(getCartTotalPrice() * 1.1);
@@ -344,6 +347,7 @@ function App() {
     } catch (error) {
       console.error("Failed to push order to MicroCMS", error);
       alert("発注の送信に失敗しました。時間をおいてもう一度お試しください。");
+      setIsPlacingOrder(false);
       return; // Stop if it fails
     }
 
@@ -358,8 +362,9 @@ function App() {
     // 注文後はそのまま再フェッチするか、単純にローカルに追加して待つ
     // MicroCMSから再取得するため historyを開いた時に最新化される
     setCart([])
-    setIsConfirmingOrder(false)
     setOrderCompleteData(newOrder)
+    setIsConfirmingOrder(false)
+    setIsPlacingOrder(false)
   }
 
   const saveDraft = async () => {
@@ -445,7 +450,7 @@ function App() {
               id: v.id || v.name,
               name: v.name,
               manufacturer: v.manufacturer || '',
-              stock: v.stock
+              stock: Number(v.stock) || 0
             }));
           }
         } catch (e) {
@@ -478,6 +483,7 @@ function App() {
   // 1. Instantly show cached data from the previous session if valid.
   // 2. Silently fetch fresh data from the API in the background.
   const loadProducts = async () => {
+    setIsProductsLoading(true);
     // Step 1: Show cached data immediately if available and fresh
     try {
       const cached = sessionStorage.getItem(PRODUCT_CACHE_KEY);
@@ -485,6 +491,7 @@ function App() {
         const { timestamp, data } = JSON.parse(cached);
         if (Date.now() - timestamp < PRODUCT_CACHE_TTL && data.length > 0) {
           setProducts(data);
+          setIsProductsLoading(false);
           console.log('[Products] Loaded from cache instantly.');
           // Still fetch in background to get the freshest data
           fetchProducts().then(freshData => {
@@ -512,6 +519,8 @@ function App() {
       }
     } catch (err) {
       console.warn('[Products] API fetch failed, keeping local data:', err);
+    } finally {
+      setIsProductsLoading(false);
     }
   };
 
@@ -1134,10 +1143,12 @@ function App() {
                     <span className="material-symbols-outlined text-primary text-2xl">receipt_long</span>
                     注文保留一覧
                   </h3>
-                  <p className="text-sm text-text-muted mt-2 flex items-center gap-1">
-                    <span className="material-symbols-outlined text-[16px] text-accent-red">info</span>
-                    <span className="font-bold text-accent-red">ご注意：</span> システムの都合上、注文の保留はカート内容のメモ保存機能であり、<span className="font-bold underline">実際の在庫を確保するものではありません</span>。保留中に在庫切れとなる場合がございますので決済はお早めに。（※保留データは1週間後に自動削除されます）
-                  </p>
+                  <div className="text-sm text-text-muted mt-2 flex items-start gap-1.5">
+                    <span className="material-symbols-outlined text-[16px] text-accent-red mt-0.5">info</span>
+                    <p className="flex-1 leading-relaxed">
+                      <span className="font-bold text-accent-red">ご注意：</span> システムの都合上、注文の保留はカート内容のメモ保存機能であり、<span className="font-bold underline">実際の在庫を確保するものではありません</span>。保留中に在庫切れとなる場合がございますので決済はお早めに。（※保留データは1週間後に自動削除されます）
+                    </p>
+                  </div>
                 </div>
 
                 <div className="bg-surface border border-border-subtle rounded-sm overflow-hidden">
@@ -1194,6 +1205,8 @@ function App() {
                                   const isActuallyBO = liveVariant
                                     ? liveVariant.stock < item.quantity
                                     : item.isBO;
+                                  // ライブデータ未取得かつisBoがfalseの場合、まだ読込中として扱う
+                                  const badgeUncertain = !liveVariant && !item.isBO;
 
                                   return (
                                     <div key={idx} className="flex items-center py-2">
@@ -1208,7 +1221,9 @@ function App() {
                                           {item.variantName && (
                                             <p className="text-sm font-bold text-text-main leading-none truncate pt-0.5">{item.variantName}</p>
                                           )}
-                                          {isActuallyBO ? (
+                                          {(isProductsLoading && badgeUncertain) ? (
+                                            <span className="inline-flex shrink-0 items-center justify-center rounded bg-gray-500/10 px-1.5 py-[3px] text-[9px] font-bold text-gray-500 border border-gray-500/20 tracking-wider leading-none animate-pulse">確認中</span>
+                                          ) : isActuallyBO ? (
                                             <span className="inline-flex shrink-0 items-center justify-center rounded bg-accent-red/10 px-1.5 py-[3px] text-[9px] font-bold text-accent-red border border-accent-red/20 tracking-wider leading-none">BO品</span>
                                           ) : (
                                             <span className="inline-flex shrink-0 items-center justify-center rounded bg-emerald-500/10 px-1.5 py-[3px] text-[9px] font-bold text-emerald-600 border border-emerald-500/20 tracking-wider leading-none">在庫品</span>
@@ -1396,17 +1411,17 @@ function App() {
                 <div className="flex gap-3">
                   <button 
                     onClick={() => setIsConfirmingOrder(false)}
-                    disabled={isSavingDraft}
+                    disabled={isSavingDraft || isPlacingOrder}
                     className="flex-1 py-3 text-sm font-bold text-text-main bg-surface-highlight border border-border-subtle rounded-sm hover:bg-black/5 transition-colors disabled:opacity-50"
                   >
                     キャンセル
                   </button>
                   <button 
                     onClick={shippingOption === '次回注文時まで保留' ? saveDraft : placeOrder}
-                    disabled={isSavingDraft}
+                    disabled={isSavingDraft || isPlacingOrder}
                     className="flex-1 py-3 text-sm font-bold text-background-main bg-primary rounded-sm hover:bg-primary-dim transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
                   >
-                    {isSavingDraft ? (
+                    {(isSavingDraft || isPlacingOrder) ? (
                         <span className="material-symbols-outlined animate-spin text-[18px]">sync</span>
                     ) : (
                         <span className="material-symbols-outlined text-[18px]">

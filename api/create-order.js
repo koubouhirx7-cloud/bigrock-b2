@@ -50,19 +50,23 @@ export default async function handler(req, res) {
                 parsedItems = JSON.parse(req.body.items || '[]');
             } catch(e) {}
 
-            // productId単位でバリアントごとに引き算する数量をまとめる
             const updatesByProduct = {};
             parsedItems.forEach(item => {
                 const pid = item.microcmsId || item.id || item.productId;
                 const vid = item.variantId;
                 const qty = parseInt(item.quantity || 1, 10);
-                if (pid && vid && qty > 0) {
-                    if (!updatesByProduct[pid]) updatesByProduct[pid] = [];
-                    updatesByProduct[pid].push({ variantId: vid, qty });
+                if (pid && qty > 0) {
+                    if (!updatesByProduct[pid]) updatesByProduct[pid] = { variants: [], baseQty: 0 };
+                    
+                    if (vid) {
+                        updatesByProduct[pid].variants.push({ variantId: vid, qty });
+                    } else {
+                        updatesByProduct[pid].baseQty += qty;
+                    }
                 }
             });
 
-            // 全商品のGET+PATCHを並列実行（直列ループをやめる）
+            // 全商品のGET+PATCHを並列実行
             const stockUpdatePromises = Object.keys(updatesByProduct).map(async (pid) => {
                 try {
                     const prodRes = await fetch(`https://${serviceDomain}.microcms.io/api/v1/products/${pid}`, {
@@ -71,27 +75,41 @@ export default async function handler(req, res) {
                     
                     if (prodRes.ok) {
                         const product = await prodRes.json();
-                        if (product && product.variants) {
-                            let hasChanges = false;
+                        let hasChanges = false;
+                        let patchData = {};
+
+                        // バリアントの在庫減少処理
+                        if (product.variants && updatesByProduct[pid].variants.length > 0) {
                             const newVariants = product.variants.map(v => {
-                                const matchedTarget = updatesByProduct[pid].find(u => u.variantId === v.id);
+                                const variantIdToMatch = v.id || v.name;
+                                const matchedTarget = updatesByProduct[pid].variants.find(u => u.variantId === variantIdToMatch);
                                 if (matchedTarget) {
                                     hasChanges = true;
-                                    return { ...v, stock: (v.stock || 0) - matchedTarget.qty };
+                                    return { ...v, stock: Math.max(0, (v.stock || 0) - matchedTarget.qty) };
                                 }
                                 return v;
                             });
-
+                            
                             if (hasChanges) {
-                                await fetch(`https://${serviceDomain}.microcms.io/api/v1/products/${pid}`, {
-                                    method: 'PATCH',
-                                    headers: {
-                                        'Content-Type': 'application/json',
-                                        'X-MICROCMS-API-KEY': apiKey
-                                    },
-                                    body: JSON.stringify({ variants: newVariants })
-                                });
+                                patchData.variants = newVariants;
                             }
+                        }
+
+                        // 基本在庫（バリアントなし商品）の減少処理
+                        if (updatesByProduct[pid].baseQty > 0) {
+                            hasChanges = true;
+                            patchData.stock = Math.max(0, (product.stock || 0) - updatesByProduct[pid].baseQty);
+                        }
+
+                        if (hasChanges) {
+                            await fetch(`https://${serviceDomain}.microcms.io/api/v1/products/${pid}`, {
+                                method: 'PATCH',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'X-MICROCMS-API-KEY': apiKey
+                                },
+                                body: JSON.stringify(patchData)
+                            });
                         }
                     }
                 } catch (e) {

@@ -413,89 +413,69 @@ export default function Admin({ products, onExitAdmin, refreshProducts }) {
                 {/* Dynamic Area */}
                 <div className="flex-1 overflow-auto p-6 relative z-10">
                     {adminTab === 'products' && (
-                        <div className="bg-surface border border-border-dark overflow-hidden">
-                            <table className="w-full text-left border-collapse">
-                                <thead>
-                                    <tr className="border-b border-border-dark bg-surface-highlight text-xs uppercase tracking-wider text-text-muted font-mono">
-                                        <th className="p-4 font-normal w-12"></th>
-                                        <th className="p-4 font-normal">製品名</th>
-                                        <th className="p-4 font-normal">SKU/ID</th>
-                                        <th className="p-4 font-normal">カテゴリー</th>
-                                        <th className="p-4 font-normal text-right">単価 (卸)</th>
-                                        <th className="p-4 font-normal text-right">在庫数</th>
-                                        <th className="p-4 font-normal text-center">操作</th>
-                                    </tr>
-                                </thead>
-                                <tbody className="text-sm">
-                                    {products.map(p => (
-                                        <React.Fragment key={p.id}>
+                        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-6 pb-20">
+                            {products.map(p => (
+                                <div key={p.id} className="bg-surface flex flex-col hover:border-primary border border-border-dark transition-all group cursor-pointer shadow-sm hover:shadow-md" onClick={() => openProductModal(p)}>
+                                    <div className="aspect-square w-full bg-surface-highlight border-b border-border-dark relative overflow-hidden flex items-center justify-center p-4">
+                                        {p.imageUrl ? (
+                                            <img src={p.imageUrl} alt={p.name} className="w-full h-full object-contain mix-blend-multiply transition-transform duration-500 group-hover:scale-105" loading="lazy" />
+                                        ) : (
+                                            <span className="material-symbols-outlined text-border-dark text-[80px]">image</span>
+                                        )}
+                                    </div>
+                                    <div className="p-4 flex flex-col flex-1">
+                                        <div className="flex justify-between items-start gap-2 mb-1">
+                                            <h3 className="font-bold text-text-main text-sm leading-tight group-hover:text-primary transition-colors line-clamp-2">
+                                                {p.name}
+                                            </h3>
+                                            <span className="text-[10px] text-text-muted mt-0.5 shrink-0 px-1.5 py-0.5 bg-black/5 rounded-sm">{p.category}</span>
+                                        </div>
+                                        <div className="text-[11px] font-mono text-text-muted mb-3 flex items-center gap-1">
+                                            <span className="material-symbols-outlined text-[12px]">tag</span>
+                                            {p.id}
+                                        </div>
+                                        
+                                        <div className="mt-auto pt-3 border-t border-border-dark flex flex-col gap-2">
                                             {p.variants ? (
-                                                p.variants.map((v, i) => (
-                                                    <tr key={`${p.id}-${v.id || i}`} className="border-b border-border-dark/50 hover:bg-black/5 transition-colors">
-                                                        <td className="p-4">
-                                                            {i === 0 && (
-                                                                p.imageUrl ? (
-                                                                    <img src={p.imageUrl} alt={p.name} className="w-10 h-10 object-contain bg-white rounded border border-border-dark shrink-0" />
-                                                                ) : (
-                                                                    <div className="w-10 h-10 bg-black/5 rounded border border-border-dark flex items-center justify-center shrink-0">
-                                                                        <span className="material-symbols-outlined text-text-muted text-[20px]">image</span>
-                                                                    </div>
-                                                                )
-                                                            )}
-                                                        </td>
-                                                        <td className="p-4 font-bold text-text-main max-w-[200px]">
-                                                            {i === 0 ? <span className="truncate block" title={p.name}>{p.name}</span> : (
-                                                                <span className="text-text-muted ml-4">
-                                                                    ↳ {v.type === 'color' ? 'Color' : 'Size'}: {v.name}
+                                                <div className="flex flex-col gap-1.5">
+                                                    {p.variants.slice(0, 3).map((v, i) => (
+                                                        <div key={v.id || i} className="flex justify-between items-center text-xs">
+                                                            <span className="text-text-muted truncate pr-2 flex-1">{v.name}</span>
+                                                            <div className="flex items-center gap-2 shrink-0">
+                                                                <span className="font-mono text-primary font-bold">¥{(v.price || p.price).toLocaleString()}</span>
+                                                                <span className={`inline-flex items-center justify-center min-w-[2.5rem] px-1 py-0.5 text-[10px] font-bold font-mono border ${v.stock > 0 ? 'text-emerald-500 border-emerald-500/30 bg-emerald-500/10' : 'text-accent-red border-accent-red/30 bg-accent-red/10'}`}>
+                                                                    {v.stock}
                                                                 </span>
-                                                            )}
-                                                        </td>
-                                                        <td className="p-4 font-mono text-text-muted text-xs">{p.id}-{v.id || `V${i}`}</td>
-                                                        <td className="p-4 text-text-muted">{i === 0 ? p.category : ''}</td>
-                                                        <td className="p-4 text-right font-mono text-primary">¥{(v.price || p.price).toLocaleString()}</td>
-                                                        <td className="p-4 text-right">
-                                                            <span className={`inline-flex items-center justify-center min-w-[3rem] px-2 py-1 text-xs font-bold font-mono border ${v.stock > 0 ? 'text-emerald-500 border-emerald-500/30 bg-emerald-500/10' : 'text-accent-red border-accent-red/30 bg-accent-red/10'}`}>
-                                                                {v.stock}
-                                                            </span>
-                                                        </td>
-                                                        <td className="p-4 text-center">
-                                                            <button onClick={() => openProductModal(p)} className="text-text-muted hover:text-text-main transition-colors" title="製品を編集">
-                                                                <span className="material-symbols-outlined text-[18px]">edit</span>
-                                                            </button>
-                                                        </td>
-                                                    </tr>
-                                                ))
-                                            ) : (
-                                                <tr className="border-b border-border-dark hover:bg-black/5 transition-colors">
-                                                    <td className="p-4">
-                                                        {p.imageUrl ? (
-                                                            <img src={p.imageUrl} alt={p.name} className="w-10 h-10 object-contain bg-white rounded border border-border-dark shrink-0" />
-                                                        ) : (
-                                                            <div className="w-10 h-10 bg-black/5 rounded border border-border-dark flex items-center justify-center shrink-0">
-                                                                <span className="material-symbols-outlined text-text-muted text-[20px]">image</span>
                                                             </div>
-                                                        )}
-                                                    </td>
-                                                    <td className="p-4 font-bold text-text-main max-w-[200px] truncate" title={p.name}>{p.name}</td>
-                                                    <td className="p-4 font-mono text-text-muted text-xs">{p.id}</td>
-                                                    <td className="p-4 text-text-muted">{p.category}</td>
-                                                    <td className="p-4 text-right font-mono text-primary">¥{p.price.toLocaleString()}</td>
-                                                    <td className="p-4 text-right">
-                                                        <span className={`inline-flex items-center justify-center min-w-[3rem] px-2 py-1 text-xs font-bold font-mono border ${p.stock > 0 ? 'text-emerald-500 border-emerald-500/30 bg-emerald-500/10' : 'text-accent-red border-accent-red/30 bg-accent-red/10'}`}>
+                                                        </div>
+                                                    ))}
+                                                    {p.variants.length > 3 && (
+                                                        <div className="text-[10px] text-text-muted pt-1 text-right italic">
+                                                            ...他 {p.variants.length - 3} 件のバリエーション
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            ) : (
+                                                <div className="flex justify-between items-center text-xs">
+                                                    <span className="text-text-muted">基本在庫</span>
+                                                    <div className="flex items-center gap-2">
+                                                        <span className="font-mono text-primary font-bold">¥{p.price.toLocaleString()}</span>
+                                                        <span className={`inline-flex items-center justify-center min-w-[2.5rem] px-1 py-0.5 text-[10px] font-bold font-mono border ${p.stock > 0 ? 'text-emerald-500 border-emerald-500/30 bg-emerald-500/10' : 'text-accent-red border-accent-red/30 bg-accent-red/10'}`}>
                                                             {p.stock !== undefined ? p.stock : 100}
                                                         </span>
-                                                    </td>
-                                                    <td className="p-4 text-center">
-                                                        <button onClick={() => openProductModal(p)} className="text-text-muted hover:text-text-main transition-colors" title="製品を編集">
-                                                            <span className="material-symbols-outlined text-[18px]">edit</span>
-                                                        </button>
-                                                    </td>
-                                                </tr>
+                                                    </div>
+                                                </div>
                                             )}
-                                        </React.Fragment>
-                                    ))}
-                                </tbody>
-                            </table>
+                                        </div>
+                                    </div>
+                                    <div className="bg-surface-highlight border-t border-border-dark px-4 py-2.5 flex justify-between items-center group-hover:bg-primary transition-colors">
+                                        <span className="text-xs font-bold text-text-main group-hover:text-background-main transition-colors flex items-center gap-1">
+                                            編集する
+                                        </span>
+                                        <span className="material-symbols-outlined text-[16px] text-text-muted group-hover:text-background-main transition-colors">arrow_forward</span>
+                                    </div>
+                                </div>
+                            ))}
                         </div>
                     )}
 
