@@ -117,6 +117,10 @@ function App() {
   const [isCheckingCustomer, setIsCheckingCustomer] = useState(false)
   const [activeTab, setActiveTab] = useState('catalog')
   const [products, setProducts] = useState(productsDataFromJson)
+
+  const productMap = useMemo(() => {
+    return new Map(products.map(p => [p.id, p]));
+  }, [products]);
   const [selectedProduct, setSelectedProduct] = useState(null)
   const [selectedHistoryOrder, setSelectedHistoryOrder] = useState(null)
   const [expandedVariantGroups, setExpandedVariantGroups] = useState({})
@@ -1163,7 +1167,7 @@ function App() {
                               <p className="text-xs font-bold text-text-muted mb-2 border-b border-border-subtle pb-1">注文明細</p>
                               <div className="space-y-0 divide-y divide-border-subtle border-t border-border-subtle/50 mt-2">
                                 {JSON.parse(draft.items || '[]').map((item, idx) => {
-                                  const liveProduct = products.find(p => p.id === (item.productId || item.id));
+                                  const liveProduct = productMap.get(item.productId || item.id);
                                   const liveVariant = liveProduct?.variants?.find(v => v.id === item.variantId);
                                   const snapVariant = item.variants?.find(v => v.id === item.variantId);
                                   const relevantStock = liveVariant ? liveVariant.stock : (snapVariant ? snapVariant.stock : 0);
