@@ -175,12 +175,12 @@ export default async function handler(req, res) {
                     ]
                 };
 
-                // Discordへ非同期で送信 (レスポンス待ちはしない、エラーをキャッチして注文自体は失敗させない)
-                fetch(discordWebhookUrl, {
+                // Discordへ送信 (Vercel環境ではawaitしないと関数終了時に通信が切断されるためawaitする)
+                await fetch(discordWebhookUrl, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(discordPayload)
-                }).catch(err => console.error("Discord webhook failed", err));
+                });
 
             } catch (notifyError) {
                 console.error("Failed to process Discord notification", notifyError);
