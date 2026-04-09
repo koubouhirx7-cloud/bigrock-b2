@@ -861,14 +861,14 @@ export default function Admin({ products, onExitAdmin, refreshProducts }) {
                                                     <div className="text-xs font-medium text-text-muted truncate">{item.productName || item.name}</div>
                                                     <div className="flex items-center gap-2 mt-0.5 overflow-hidden">
                                                         {item.variantName && (
-                                                            <div className="text-base font-bold text-text-main leading-tight truncate">
+                                                            <div className="text-base font-bold text-text-main leading-none truncate pt-0.5">
                                                                 {item.variantName}
                                                             </div>
                                                         )}
                                                         {item.isBO ? (
-                                                            <span className="inline-flex shrink-0 items-center rounded bg-accent-red/10 px-1.5 py-0.5 text-[9px] font-bold text-accent-red border border-accent-red/20 tracking-wider">BO品</span>
+                                                            <span className="inline-flex shrink-0 items-center justify-center rounded bg-accent-red/10 px-1.5 py-[3px] text-[9px] font-bold text-accent-red border border-accent-red/20 tracking-wider leading-none">BO品</span>
                                                         ) : (
-                                                            <span className="inline-flex shrink-0 items-center rounded bg-emerald-500/10 px-1.5 py-0.5 text-[9px] font-bold text-emerald-600 border border-emerald-500/20 tracking-wider">在庫品</span>
+                                                            <span className="inline-flex shrink-0 items-center justify-center rounded bg-emerald-500/10 px-1.5 py-[3px] text-[9px] font-bold text-emerald-600 border border-emerald-500/20 tracking-wider leading-none">在庫品</span>
                                                         )}
                                                     </div>
                                                     <div className="flex flex-wrap items-center justify-between mt-2 gap-2">
