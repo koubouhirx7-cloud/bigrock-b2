@@ -43,6 +43,7 @@ export default async function handler(req, res) {
         }
 
         // --- 在庫自動引き落とし処理 (Stock auto-deduction) ---
+        // Run all stock updates in PARALLEL (not sequential) to avoid blocking the response
         try {
             let parsedItems = [];
             try {
@@ -52,7 +53,7 @@ export default async function handler(req, res) {
             // productId単位でバリアントごとに引き算する数量をまとめる
             const updatesByProduct = {};
             parsedItems.forEach(item => {
-                const pid = item.id || item.productId;
+                const pid = item.microcmsId || item.id || item.productId;
                 const vid = item.variantId;
                 const qty = parseInt(item.quantity || 1, 10);
                 if (pid && vid && qty > 0) {
@@ -61,8 +62,8 @@ export default async function handler(req, res) {
                 }
             });
 
-            // 各プロダクトを取得して在庫を引いて保存
-            for (const pid of Object.keys(updatesByProduct)) {
+            // 全商品のGET+PATCHを並列実行（直列ループをやめる）
+            const stockUpdatePromises = Object.keys(updatesByProduct).map(async (pid) => {
                 try {
                     const prodRes = await fetch(`https://${serviceDomain}.microcms.io/api/v1/products/${pid}`, {
                         headers: { 'X-MICROCMS-API-KEY': apiKey }
@@ -76,7 +77,6 @@ export default async function handler(req, res) {
                                 const matchedTarget = updatesByProduct[pid].find(u => u.variantId === v.id);
                                 if (matchedTarget) {
                                     hasChanges = true;
-                                    // 在庫数を減算 (必要に応じてマイナス数量でBO数を把握できるようにする)
                                     return { ...v, stock: (v.stock || 0) - matchedTarget.qty };
                                 }
                                 return v;
@@ -97,7 +97,10 @@ export default async function handler(req, res) {
                 } catch (e) {
                     console.error(`Failed to update stock for product ${pid}`, e);
                 }
-            }
+            });
+
+            // 全部まとめて並列実行
+            await Promise.all(stockUpdatePromises);
         } catch (stockErr) {
             console.error("Stock reduction process failed:", stockErr);
         }
