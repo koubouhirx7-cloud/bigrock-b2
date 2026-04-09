@@ -850,39 +850,44 @@ export default function Admin({ products, onExitAdmin, refreshProducts }) {
                                 <div>
                                     <h3 className="text-sm font-bold text-text-muted border-b border-border-dark pb-2 mb-3">注文内容</h3>
                                     <div className="bg-background-main border border-border-dark rounded-lg overflow-hidden divide-y divide-border-dark">
-                                        {JSON.parse(editingOrder.items || "[]").map((item, idx) => (
-                                            <div key={idx} className="p-3 flex items-center gap-3">
-                                                {item.imageUrl ? (
-                                                    <img src={item.imageUrl} alt={item.productName || item.name} className="w-12 h-12 object-cover rounded bg-white border border-border-dark" />
-                                                ) : (
-                                                    <div className="w-12 h-12 rounded bg-surface-highlight border border-border-dark flex items-center justify-center text-[10px] text-text-muted">画像なし</div>
-                                                )}
-                                                <div className="flex-1 min-w-0">
-                                                    <div className="text-xs font-medium text-text-muted truncate">{item.productName || item.name}</div>
-                                                    <div className="flex items-center gap-2 mt-0.5 overflow-hidden">
-                                                        {item.variantName && (
-                                                            <div className="text-base font-bold text-text-main leading-none truncate pt-0.5">
-                                                                {item.variantName}
-                                                            </div>
-                                                        )}
-                                                        {item.isBO ? (
-                                                            <span className="inline-flex shrink-0 items-center justify-center rounded bg-accent-red/10 px-1.5 py-[3px] text-[9px] font-bold text-accent-red border border-accent-red/20 tracking-wider leading-none">BO品</span>
-                                                        ) : (
-                                                            <span className="inline-flex shrink-0 items-center justify-center rounded bg-emerald-500/10 px-1.5 py-[3px] text-[9px] font-bold text-emerald-600 border border-emerald-500/20 tracking-wider leading-none">在庫品</span>
-                                                        )}
-                                                    </div>
-                                                    <div className="flex flex-wrap items-center justify-between mt-2 gap-2">
-                                                        <div className="text-xs font-mono text-text-muted">¥{item.price.toLocaleString()}</div>
-                                                        <div className="flex items-center gap-3">
-                                                            <div className="text-base font-bold bg-primary/10 text-primary border border-primary/20 px-3 py-0.5 rounded shadow-sm">
-                                                                {item.quantity}点
-                                                            </div>
-                                                            <div className="text-sm font-bold font-mono">¥{(item.price * item.quantity).toLocaleString()}</div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        ))}
+                                        {JSON.parse(editingOrder.items || "[]").map((item, idx) => {
+                                            const snapVariant = item.variants?.find(v => v.id === item.variantId);
+                                            const isActuallyBO = item.isBO || (snapVariant && snapVariant.stock < item.quantity);
+                                            
+                                            return (
+                                              <div key={idx} className="p-3 flex items-center gap-3">
+                                                  {item.imageUrl ? (
+                                                      <img src={item.imageUrl} alt={item.productName || item.name} className="w-12 h-12 object-cover rounded bg-white border border-border-dark" />
+                                                  ) : (
+                                                      <div className="w-12 h-12 rounded bg-surface-highlight border border-border-dark flex items-center justify-center text-[10px] text-text-muted">画像なし</div>
+                                                  )}
+                                                  <div className="flex-1 min-w-0">
+                                                      <div className="text-xs font-medium text-text-muted truncate">{item.productName || item.name}</div>
+                                                      <div className="flex items-center gap-2 mt-0.5 overflow-hidden">
+                                                          {item.variantName && (
+                                                              <div className="text-base font-bold text-text-main leading-none truncate pt-0.5">
+                                                                  {item.variantName}
+                                                              </div>
+                                                          )}
+                                                          {isActuallyBO ? (
+                                                              <span className="inline-flex shrink-0 items-center justify-center rounded bg-accent-red/10 px-1.5 py-[3px] text-[9px] font-bold text-accent-red border border-accent-red/20 tracking-wider leading-none">BO品</span>
+                                                          ) : (
+                                                              <span className="inline-flex shrink-0 items-center justify-center rounded bg-emerald-500/10 px-1.5 py-[3px] text-[9px] font-bold text-emerald-600 border border-emerald-500/20 tracking-wider leading-none">在庫品</span>
+                                                          )}
+                                                      </div>
+                                                      <div className="flex flex-wrap items-center justify-between mt-2 gap-2">
+                                                          <div className="text-xs font-mono text-text-muted">¥{(item.price || 0).toLocaleString()}</div>
+                                                          <div className="flex items-center gap-3">
+                                                              <div className="text-base font-bold bg-primary/10 text-primary border border-primary/20 px-3 py-0.5 rounded shadow-sm">
+                                                                  {item.quantity}点
+                                                              </div>
+                                                              <div className="text-sm font-bold font-mono">¥{((item.price || 0) * item.quantity).toLocaleString()}</div>
+                                                          </div>
+                                                      </div>
+                                                  </div>
+                                              </div>
+                                            );
+                                        })}
                                     </div>
                                     <div className="text-right mt-3">
                                         <div className="text-xs text-text-muted">合計金額</div>

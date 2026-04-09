@@ -1162,34 +1162,42 @@ function App() {
                             <div className="mt-3 bg-black/5 p-3 rounded-sm">
                               <p className="text-xs font-bold text-text-muted mb-2 border-b border-border-subtle pb-1">注文明細</p>
                               <div className="space-y-0 divide-y divide-border-subtle border-t border-border-subtle/50 mt-2">
-                                {JSON.parse(draft.items || '[]').map((item, idx) => (
-                                  <div key={idx} className="flex items-center py-2">
-                                    {item.imageUrl ? (
-                                      <img src={item.imageUrl} alt={item.productName || item.name} className="w-10 h-10 rounded object-cover border border-border-subtle bg-white mr-3 shrink-0" />
-                                    ) : (
-                                      <div className="w-10 h-10 rounded border border-border-subtle bg-surface-highlight flex items-center justify-center text-[10px] text-text-muted mr-3 shrink-0">画像なし</div>
-                                    )}
-                                    <div className="flex-1 min-w-0 pr-3">
-                                      <p className="text-[11px] font-medium text-text-muted leading-tight truncate">{item.productName || item.name}</p>
-                                      <div className="flex items-center gap-2 mt-0.5 overflow-hidden">
-                                        {item.variantName && (
-                                          <p className="text-sm font-bold text-text-main leading-none truncate pt-0.5">{item.variantName}</p>
-                                        )}
-                                        {item.isBO ? (
-                                          <span className="inline-flex shrink-0 items-center justify-center rounded bg-accent-red/10 px-1.5 py-[3px] text-[9px] font-bold text-accent-red border border-accent-red/20 tracking-wider leading-none">BO品</span>
-                                        ) : (
-                                          <span className="inline-flex shrink-0 items-center justify-center rounded bg-emerald-500/10 px-1.5 py-[3px] text-[9px] font-bold text-emerald-600 border border-emerald-500/20 tracking-wider leading-none">在庫品</span>
-                                        )}
+                                {JSON.parse(draft.items || '[]').map((item, idx) => {
+                                  const liveProduct = products.find(p => p.id === (item.productId || item.id));
+                                  const liveVariant = liveProduct?.variants?.find(v => v.id === item.variantId);
+                                  const snapVariant = item.variants?.find(v => v.id === item.variantId);
+                                  const relevantStock = liveVariant ? liveVariant.stock : (snapVariant ? snapVariant.stock : 0);
+                                  const isActuallyBO = item.isBO || (relevantStock < item.quantity);
+
+                                  return (
+                                    <div key={idx} className="flex items-center py-2">
+                                      {item.imageUrl ? (
+                                        <img src={item.imageUrl} alt={item.productName || item.name} className="w-10 h-10 rounded object-cover border border-border-subtle bg-white mr-3 shrink-0" />
+                                      ) : (
+                                        <div className="w-10 h-10 rounded border border-border-subtle bg-surface-highlight flex items-center justify-center text-[10px] text-text-muted mr-3 shrink-0">画像なし</div>
+                                      )}
+                                      <div className="flex-1 min-w-0 pr-3">
+                                        <p className="text-[11px] font-medium text-text-muted leading-tight truncate">{item.productName || item.name}</p>
+                                        <div className="flex items-center gap-2 mt-0.5 overflow-hidden">
+                                          {item.variantName && (
+                                            <p className="text-sm font-bold text-text-main leading-none truncate pt-0.5">{item.variantName}</p>
+                                          )}
+                                          {isActuallyBO ? (
+                                            <span className="inline-flex shrink-0 items-center justify-center rounded bg-accent-red/10 px-1.5 py-[3px] text-[9px] font-bold text-accent-red border border-accent-red/20 tracking-wider leading-none">BO品</span>
+                                          ) : (
+                                            <span className="inline-flex shrink-0 items-center justify-center rounded bg-emerald-500/10 px-1.5 py-[3px] text-[9px] font-bold text-emerald-600 border border-emerald-500/20 tracking-wider leading-none">在庫品</span>
+                                          )}
+                                        </div>
+                                        <p className="text-xs font-mono text-text-muted mt-1">¥{(item.price || 0).toLocaleString()}</p>
                                       </div>
-                                      <p className="text-xs font-mono text-text-muted mt-1">¥{(item.price || 0).toLocaleString()}</p>
-                                    </div>
-                                    <div className="text-right whitespace-nowrap shrink-0">
-                                      <div className="text-sm font-bold bg-primary/10 text-primary border border-primary/20 px-2.5 py-0.5 rounded shadow-sm inline-block">
-                                        {item.quantity}点
+                                      <div className="text-right whitespace-nowrap shrink-0">
+                                        <div className="text-sm font-bold bg-primary/10 text-primary border border-primary/20 px-2.5 py-0.5 rounded shadow-sm inline-block">
+                                          {item.quantity}点
+                                        </div>
                                       </div>
                                     </div>
-                                  </div>
-                                ))}
+                                  );
+                                })}
                               </div>
                             </div>
                           </div>
@@ -1441,33 +1449,38 @@ function App() {
                 <div className="bg-surface p-5 rounded-sm border border-border-subtle shadow-sm">
                   <h3 className="text-xs font-bold text-primary uppercase tracking-wider mb-4 border-b border-border-subtle pb-2">注文内容</h3>
                   <div className="space-y-0 divide-y divide-border-subtle border border-border-subtle rounded-sm">
-                    {JSON.parse(selectedHistoryOrder.items || "[]").map((item, idx) => (
-                      <div key={idx} className="flex items-center p-3">
-                        {item.imageUrl ? (
-                          <img src={item.imageUrl} alt={item.productName || item.name} className="w-12 h-12 rounded object-cover border border-border-subtle bg-white mr-4" />
-                        ) : (
-                          <div className="w-12 h-12 rounded border border-border-subtle bg-surface-highlight flex items-center justify-center text-[10px] text-text-muted mr-4">画像なし</div>
-                        )}
-                        <div className="flex-1 min-w-0 pr-4">
-                          <p className="text-xs font-medium text-text-muted leading-tight">{item.productName || item.name}</p>
-                          <div className="flex items-center gap-2 mt-0.5 overflow-hidden">
-                            {item.variantName && (
-                              <p className="text-base font-bold text-text-main leading-none truncate pt-0.5">{item.variantName}</p>
-                            )}
-                            {item.isBO ? (
-                              <span className="inline-flex shrink-0 items-center justify-center rounded bg-accent-red/10 px-1.5 py-[3px] text-[9px] font-bold text-accent-red border border-accent-red/20 tracking-wider leading-none">BO品</span>
-                            ) : (
-                              <span className="inline-flex shrink-0 items-center justify-center rounded bg-emerald-500/10 px-1.5 py-[3px] text-[9px] font-bold text-emerald-600 border border-emerald-500/20 tracking-wider leading-none">在庫品</span>
-                            )}
+                    {JSON.parse(selectedHistoryOrder.items || "[]").map((item, idx) => {
+                      const snapVariant = item.variants?.find(v => v.id === item.variantId);
+                      const isActuallyBO = item.isBO || (snapVariant && snapVariant.stock < item.quantity);
+                      
+                      return (
+                        <div key={idx} className="flex items-center p-3">
+                          {item.imageUrl ? (
+                            <img src={item.imageUrl} alt={item.productName || item.name} className="w-12 h-12 rounded object-cover border border-border-subtle bg-white mr-4" />
+                          ) : (
+                            <div className="w-12 h-12 rounded border border-border-subtle bg-surface-highlight flex items-center justify-center text-[10px] text-text-muted mr-4">画像なし</div>
+                          )}
+                          <div className="flex-1 min-w-0 pr-4">
+                            <p className="text-xs font-medium text-text-muted leading-tight">{item.productName || item.name}</p>
+                            <div className="flex items-center gap-2 mt-0.5 overflow-hidden">
+                              {item.variantName && (
+                                <p className="text-base font-bold text-text-main leading-none truncate pt-0.5">{item.variantName}</p>
+                              )}
+                              {isActuallyBO ? (
+                                <span className="inline-flex shrink-0 items-center justify-center rounded bg-accent-red/10 px-1.5 py-[3px] text-[9px] font-bold text-accent-red border border-accent-red/20 tracking-wider leading-none">BO品</span>
+                              ) : (
+                                <span className="inline-flex shrink-0 items-center justify-center rounded bg-emerald-500/10 px-1.5 py-[3px] text-[9px] font-bold text-emerald-600 border border-emerald-500/20 tracking-wider leading-none">在庫品</span>
+                              )}
+                            </div>
+                          </div>
+                          <div className="text-right whitespace-nowrap">
+                            <div className="text-base font-bold bg-primary/10 text-primary border border-primary/20 px-3 py-0.5 rounded shadow-sm inline-block">
+                              {item.quantity}点
+                            </div>
                           </div>
                         </div>
-                        <div className="text-right whitespace-nowrap">
-                          <div className="text-base font-bold bg-primary/10 text-primary border border-primary/20 px-3 py-0.5 rounded shadow-sm inline-block">
-                            {item.quantity}点
-                          </div>
-                        </div>
-                      </div>
-                    ))}
+                      );
+                    })}
                   </div>
                   <div className="text-right mt-4 pt-4 border-t border-border-subtle">
                     <p className="text-xs text-text-muted">合計金額</p>
