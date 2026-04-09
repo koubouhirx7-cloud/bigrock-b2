@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, useMemo } from 'react'
 import productsDataFromJson from './data/products.json'
 import Login from './components/Login'
 import Admin from './components/Admin'
-import { fetchProducts, createOrder, fetchOrders, fetchCustomers } from './services/microcms'
+import { fetchProducts, createOrder, fetchOrders, fetchCustomers, deleteOrder } from './services/microcms'
 import { useAuth } from './context/AuthContext'
 
 const ProductGallery = ({ product }) => {
@@ -1200,13 +1200,22 @@ function App() {
                                 {JSON.parse(draft.items || '[]').map((item, idx) => {
                                   // ライブデータのみを参照（スナップショット在庫は誤表示の原因になるため使用しない）
                                   const liveProduct = productMap.get(item.productId || item.id);
-                                  const liveVariant = liveProduct?.variants?.find(v => v.id === item.variantId);
-                                  // ライブデータが取得できた場合のみstock判定、取得できていない場合はisBO保存値を信頼
-                                  const isActuallyBO = liveVariant
-                                    ? liveVariant.stock < item.quantity
-                                    : item.isBO;
-                                  // ライブデータ未取得かつisBoがfalseの場合、まだ読込中として扱う
-                                  const badgeUncertain = !liveVariant && !item.isBO;
+                                  let isActuallyBO = false;
+                                  let badgeUncertain = false;
+                                  
+                                  if (liveProduct) {
+                                      if (item.variantId) {
+                                          const liveVariant = liveProduct.variants?.find(v => v.id === item.variantId);
+                                          isActuallyBO = liveVariant ? liveVariant.stock < item.quantity : item.isBO;
+                                      } else {
+                                          // 単体製品の場合（バリアントなし）は親のstockを見る
+                                          isActuallyBO = (liveProduct.stock !== undefined ? liveProduct.stock : 100) < item.quantity;
+                                      }
+                                  } else {
+                                      // ライブデータ未取得
+                                      isActuallyBO = item.isBO;
+                                      badgeUncertain = !item.isBO;
+                                  }
 
                                   return (
                                     <div key={idx} className="flex items-center py-2">
