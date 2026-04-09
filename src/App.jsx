@@ -1171,9 +1171,16 @@ function App() {
                                     )}
                                     <div className="flex-1 min-w-0 pr-3">
                                       <p className="text-[11px] font-medium text-text-muted leading-tight truncate">{item.productName || item.name}</p>
-                                      {item.variantName && (
-                                        <p className="text-sm font-bold text-text-main mt-0.5 leading-tight">{item.variantName}</p>
-                                      )}
+                                      <div className="flex items-center gap-2 mt-0.5 overflow-hidden">
+                                        {item.variantName && (
+                                          <p className="text-sm font-bold text-text-main leading-tight truncate">{item.variantName}</p>
+                                        )}
+                                        {item.isBO ? (
+                                          <span className="inline-flex shrink-0 items-center rounded bg-accent-red/10 px-1.5 py-0.5 text-[9px] font-bold text-accent-red border border-accent-red/20 tracking-wider">BO品</span>
+                                        ) : (
+                                          <span className="inline-flex shrink-0 items-center rounded bg-emerald-500/10 px-1.5 py-0.5 text-[9px] font-bold text-emerald-600 border border-emerald-500/20 tracking-wider">在庫品</span>
+                                        )}
+                                      </div>
                                       <p className="text-xs font-mono text-text-muted mt-1">¥{(item.price || 0).toLocaleString()}</p>
                                     </div>
                                     <div className="text-right whitespace-nowrap shrink-0">
@@ -1443,9 +1450,16 @@ function App() {
                         )}
                         <div className="flex-1 min-w-0 pr-4">
                           <p className="text-xs font-medium text-text-muted leading-tight">{item.productName || item.name}</p>
-                          {item.variantName && (
-                            <p className="text-base font-bold text-text-main mt-0.5 leading-tight truncate">{item.variantName}</p>
-                          )}
+                          <div className="flex items-center gap-2 mt-0.5 overflow-hidden">
+                            {item.variantName && (
+                              <p className="text-base font-bold text-text-main leading-tight truncate">{item.variantName}</p>
+                            )}
+                            {item.isBO ? (
+                              <span className="inline-flex shrink-0 items-center rounded bg-accent-red/10 px-1.5 py-0.5 text-[9px] font-bold text-accent-red border border-accent-red/20 tracking-wider">BO品</span>
+                            ) : (
+                              <span className="inline-flex shrink-0 items-center rounded bg-emerald-500/10 px-1.5 py-0.5 text-[9px] font-bold text-emerald-600 border border-emerald-500/20 tracking-wider">在庫品</span>
+                            )}
+                          </div>
                         </div>
                         <div className="text-right whitespace-nowrap">
                           <div className="text-base font-bold bg-primary/10 text-primary border border-primary/20 px-3 py-0.5 rounded shadow-sm inline-block">
