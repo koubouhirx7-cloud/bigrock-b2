@@ -87,6 +87,33 @@ export default function Admin({ products, onExitAdmin, refreshProducts }) {
     const [editStatus, setEditStatus] = useState('');
     const [editShippingInfo, setEditShippingInfo] = useState('');
     const [isUpdatingOrder, setIsUpdatingOrder] = useState(false);
+    const [sendNotificationEmail, setSendNotificationEmail] = useState(true);
+
+    const generatedNotificationText = useMemo(() => {
+        if (!editingOrder) return "";
+        let text = `${editingOrder.companyName || 'ゲスト'} 様\n\n`;
+        text += `以下の通り、注文状況が更新されましたのでお知らせいたします。\n\n`;
+        text += `【注文内容】\n`;
+        
+        try {
+            const items = JSON.parse(editingOrder.items || "[]");
+            items.forEach(item => {
+                const snapVariant = item.variants?.find(v => v.id === item.variantId);
+                const isActuallyBO = item.isBO || (snapVariant && snapVariant.stock < item.quantity);
+                const statusLabel = isActuallyBO ? "BO品" : "在庫品";
+                const variantStr = item.variantName ? ` ${item.variantName}` : "";
+                text += `・${item.productName || item.name}${variantStr} (${statusLabel}) - ${item.quantity}点\n`;
+            });
+        } catch(e) {}
+        
+        text += `\n【現在のステータス】\n${editStatus || '処理中'}\n`;
+        if (editShippingInfo) {
+            text += `\n【配送情報 / 追跡番号など】\n${editShippingInfo}\n`;
+        }
+        
+        text += `\nご注文履歴や詳細は、B2Bマイページよりご確認いただけます。\n引き続きよろしくお願いいたします。`;
+        return text;
+    }, [editingOrder, editStatus, editShippingInfo]);
 
     const openEditModal = (order) => {
         setEditingOrder(order);
@@ -102,6 +129,23 @@ export default function Admin({ products, onExitAdmin, refreshProducts }) {
                 status: editStatus,
                 shippingInfo: editShippingInfo
             });
+            
+            // Send automatic email notification if checked
+            if (sendNotificationEmail && editingOrder.customerEmail) {
+                // Ignore errors for email sending so it doesn't fail the whole update process
+                fetch('/api/send-email', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        to: editingOrder.customerEmail,
+                        subject: `【BIGROCK】注文状況の更新お知らせ (ID: ${editingOrder.orderId})`,
+                        text: generatedNotificationText
+                    })
+                }).catch(e => console.error("Email send trigger failed", e));
+            }
+
             // Re-fetch orders
             const data = await fetchOrders();
             const sortedOrders = data.sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt));
@@ -915,6 +959,45 @@ export default function Admin({ products, onExitAdmin, refreshProducts }) {
                             </div>
                         </div>
                         
+                        {/* Notification Settings Area */}
+                        <div className="p-6 border-t border-border-dark bg-surface-highlight flex flex-col gap-4">
+                            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                                <label className="flex items-center gap-2 cursor-pointer group">
+                                    <input 
+                                        type="checkbox" 
+                                        checked={sendNotificationEmail}
+                                        onChange={e => setSendNotificationEmail(e.target.checked)}
+                                        className="w-4 h-4 text-primary bg-background-main border-border-dark rounded focus:ring-primary"
+                                    />
+                                    <span className="text-sm font-bold text-text-main group-hover:text-primary transition-colors">
+                                        更新時にE-mailで自動通知する
+                                    </span>
+                                </label>
+                                
+                                <button 
+                                    onClick={() => {
+                                        navigator.clipboard.writeText(generatedNotificationText).then(() => {
+                                            alert('LINE用にクリップボードにコピーしました！\nLINE公式アカウント画面を開きますのでペーストして送信してください。');
+                                            window.open('https://manager.line.biz/', '_blank');
+                                        });
+                                    }}
+                                    className="text-xs font-bold bg-[#06C755] text-white py-2 px-4 rounded hover:bg-[#05b34c] transition-colors flex items-center justify-center gap-1 shadow-sm w-full md:w-auto"
+                                >
+                                    <span className="material-symbols-outlined text-[14px]">content_copy</span>
+                                    LINE用に本文をコピーして開く
+                                </button>
+                            </div>
+                            
+                            {/* Template Preview */}
+                            <div className="bg-background-main border border-border-dark rounded p-3 relative group">
+                                <p className="text-[10px] font-bold text-text-muted mb-2 uppercase tracking-wider flex items-center gap-1">
+                                    <span className="material-symbols-outlined text-[12px]">visibility</span>
+                                    自動生成メッセージプレビュー
+                                </p>
+                                <pre className="text-xs text-text-main font-mono whitespace-pre-wrap leading-relaxed max-h-32 overflow-y-auto custom-scrollbar">{generatedNotificationText}</pre>
+                            </div>
+                        </div>
+
                         <div className="p-6 border-t border-border-dark bg-background-main flex justify-end gap-3">
                             <button 
                                 onClick={() => setEditingOrder(null)} 
