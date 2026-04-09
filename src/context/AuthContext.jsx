@@ -35,6 +35,7 @@ export const AuthProvider = ({ children }) => {
         logout
     };
 
+    return (
         <AuthContext.Provider value={value}>
             {loading ? (
                 <div className="flex items-center justify-center h-screen bg-[#F6F7F2]">
@@ -42,4 +43,5 @@ export const AuthProvider = ({ children }) => {
                 </div>
             ) : children}
         </AuthContext.Provider>
+    );
 };
