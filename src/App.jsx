@@ -1269,7 +1269,7 @@ function App() {
                             <button 
                               onClick={async () => {
                                 if (window.confirm("この保留データを削除しますか？")) {
-                                  try { await deleteOrder(draft.id); setDrafts(drafts.filter(d => d.id !== draft.id)); showToast('保留データを削除しました'); } catch (e) { alert("削除に失敗しました"); }
+                                  try { await deleteOrder(draft.id); setDrafts(drafts.filter(d => d.id !== draft.id)); showToast('保留データを削除しました'); } catch (e) { alert("削除エラー: " + e.message); }
                                 }
                               }}
                               className="flex-none text-text-muted hover:text-accent-red px-3 py-2 rounded-sm hover:bg-accent-red/10 transition-colors"
