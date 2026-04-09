@@ -536,12 +536,9 @@ function App() {
               申請内容を確認後、担当者より承認完了のご連絡をいたしますので、今しばらくお待ちください。
             </p>
           </div>
-          <div className="flex w-full gap-3 mt-4">
-            <button onClick={logout} className="flex-1 py-3 border border-border-dark rounded font-bold hover:bg-surface-highlight transition-colors text-text-main">
-              ログアウト
-            </button>
-            <button onClick={() => window.location.reload()} className="flex-1 py-3 bg-primary text-background-main rounded font-bold hover:bg-white transition-colors">
-              再確認する
+          <div className="flex w-full mt-4">
+            <button onClick={logout} className="w-full py-3 bg-primary text-background-main hover:text-white rounded font-bold hover:bg-primary-dim transition-colors shadow-sm">
+              ログイン画面に戻る
             </button>
           </div>
         </div>
