@@ -300,6 +300,28 @@ export default function Register({ setParentTab }) {
                         <div className="font-bold text-text-muted">お知らせメール:</div><div>{regForm.newsletter ? '受け取る' : '受け取らない'}</div>
                     </div>
 
+                    <div className="mt-8 p-5 bg-[#06C755]/10 border border-[#06C755]/30 rounded-lg">
+                        <h4 className="text-sm font-bold text-[#06C755] flex items-center gap-2 mb-3">
+                            <span className="material-symbols-outlined text-[18px]">chat</span>
+                            【任意】LINEでの配送通知をご希望の方へ
+                        </h4>
+                        <p className="text-xs text-text-main leading-relaxed mb-4">
+                            発送完了通知等のスムーズな連携をご希望の方は、以下のボタンより公式LINEを友だち追加し、トーク画面でお客様の<strong>『会社名』</strong>を送信してください。
+                        </p>
+                        <a 
+                            href="https://lin.ee/ここにURLを入力" 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center justify-center gap-2 bg-[#06C755] text-white font-bold py-2.5 px-6 rounded-full text-xs hover:bg-[#05b34c] transition-colors shadow-sm w-full md:w-auto"
+                        >
+                            公式LINEを友だち追加する
+                        </a>
+                        <p className="text-[10px] text-text-muted mt-3">
+                            ※システム管理者が確認し、今後の通知を手配いたします。<br/>
+                            ※こちらのボタンのURL（リンク先）は、運営側の公式LINE URLに後ほど差し替えてください。
+                        </p>
+                    </div>
+
                     <div className="pt-8 pb-4 flex flex-col gap-4">
                         <button
                             type="button"
