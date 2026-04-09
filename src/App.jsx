@@ -908,7 +908,7 @@ function App() {
                           </div>
                         </div>
 
-                        <button onClick={() => setIsConfirmingOrder(true)} className="w-full bg-primary text-background-main font-bold py-3 rounded-sm hover:bg-primary-dim transition-colors flex items-center justify-center gap-2 shadow-lg shadow-primary/20">
+                        <button onClick={() => { setShippingOption('このまま発送'); setDraftMemo(''); setIsConfirmingOrder(true); }} className="w-full bg-primary text-background-main font-bold py-3 rounded-sm hover:bg-primary-dim transition-colors flex items-center justify-center gap-2 shadow-lg shadow-primary/20">
                           <span className="material-symbols-outlined">send</span>
                           発注手続きへ進む
                         </button>
