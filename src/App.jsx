@@ -396,54 +396,89 @@ function App() {
     }
   }, [activeTab]);
 
-  // Fetch products explicitly as a stable callback
-  const loadProducts = async () => {
-    const data = await fetchProducts()
-    if (data && data.length > 0) {
-        // MicroCMS response mapped to our standard expected format
-        const formattedData = data.map(item => {
-          let parsedVariants = null;
-          if (item.variants) {
-            try {
-              const rawVariants = typeof item.variants === 'string' ? JSON.parse(item.variants) : item.variants;
-              if (Array.isArray(rawVariants)) {
-                parsedVariants = rawVariants.map(v => ({
-                    id: v.id || v.name, // Fallback to name if id is missing in Custom Field
-                    name: v.name,
-                    stock: v.stock
-                }));
-              }
-            } catch (e) {
-              console.warn('Failed to parse variants for', item.title);
-            }
-          }
-          return {
-            id: item.skuproducts || item.sku || item.id,
-            microcmsId: item.id,
-            name: item.title,
-            category: Array.isArray(item.category) ? item.category[0] : (item.category || 'General'),
-            price: item.basePrice || item.price || 0,
-            stock: item.stock || 0,
-            imageUrl: item.externalImageUrl || item.image?.url || '',
-            originalUrl: item.originalUrl || '',
-            collapseByDefault: typeof item.collapseByDefault === 'boolean' ? item.collapseByDefault : true,
-            galleryImages: item.galleryImages?.map(img => img.url) || [],
-            relatedProducts: item.relatedProducts?.map(rp => ({
-              id: rp.skuproducts || rp.sku || rp.id,
-              name: rp.title,
-              imageUrl: rp.externalImageUrl || rp.image?.url || '',
-              price: rp.basePrice || rp.price || 0
-            })) || [],
-            variants: parsedVariants
-          };
-        })
-        setProducts(formattedData)
-      }
-  }
+  // Product data cache key and TTL (5 minutes)
+  const PRODUCT_CACHE_KEY = 'bigrock_products_cache';
+  const PRODUCT_CACHE_TTL = 5 * 60 * 1000;
 
-  useEffect(() => {
-    loadProducts()
-  }, [])
+  const parseProductData = (data) => {
+    return data.map(item => {
+      let parsedVariants = null;
+      if (item.variants) {
+        try {
+          const rawVariants = typeof item.variants === 'string' ? JSON.parse(item.variants) : item.variants;
+          if (Array.isArray(rawVariants)) {
+            parsedVariants = rawVariants.map(v => ({
+              id: v.id || v.name,
+              name: v.name,
+              stock: v.stock
+            }));
+          }
+        } catch (e) {
+          console.warn('Failed to parse variants for', item.title);
+        }
+      }
+      return {
+        id: item.skuproducts || item.sku || item.id,
+        microcmsId: item.id,
+        name: item.title,
+        category: Array.isArray(item.category) ? item.category[0] : (item.category || 'General'),
+        price: item.basePrice || item.price || 0,
+        stock: item.stock || 0,
+        imageUrl: item.externalImageUrl || item.image?.url || '',
+        originalUrl: item.originalUrl || '',
+        collapseByDefault: typeof item.collapseByDefault === 'boolean' ? item.collapseByDefault : true,
+        galleryImages: item.galleryImages?.map(img => img.url) || [],
+        relatedProducts: item.relatedProducts?.map(rp => ({
+          id: rp.skuproducts || rp.sku || rp.id,
+          name: rp.title,
+          imageUrl: rp.externalImageUrl || rp.image?.url || '',
+          price: rp.basePrice || rp.price || 0
+        })) || [],
+        variants: parsedVariants
+      };
+    });
+  };
+
+  // Fetch products with sessionStorage caching.
+  // 1. Instantly show cached data from the previous session if valid.
+  // 2. Silently fetch fresh data from the API in the background.
+  const loadProducts = async () => {
+    // Step 1: Show cached data immediately if available and fresh
+    try {
+      const cached = sessionStorage.getItem(PRODUCT_CACHE_KEY);
+      if (cached) {
+        const { timestamp, data } = JSON.parse(cached);
+        if (Date.now() - timestamp < PRODUCT_CACHE_TTL && data.length > 0) {
+          setProducts(data);
+          console.log('[Products] Loaded from cache instantly.');
+          // Still fetch in background to get the freshest data
+          fetchProducts().then(freshData => {
+            if (freshData && freshData.length > 0) {
+              const formatted = parseProductData(freshData);
+              setProducts(formatted);
+              sessionStorage.setItem(PRODUCT_CACHE_KEY, JSON.stringify({ timestamp: Date.now(), data: formatted }));
+            }
+          }).catch(err => console.warn('[Products] Background refresh failed:', err));
+          return;
+        }
+      }
+    } catch (e) {
+      console.warn('[Products] Cache read failed:', e);
+    }
+
+    // Step 2: No valid cache - fetch from API and cache the result
+    try {
+      const data = await fetchProducts();
+      if (data && data.length > 0) {
+        const formattedData = parseProductData(data);
+        setProducts(formattedData);
+        sessionStorage.setItem(PRODUCT_CACHE_KEY, JSON.stringify({ timestamp: Date.now(), data: formattedData }));
+        console.log('[Products] Fetched from API and cached.');
+      }
+    } catch (err) {
+      console.warn('[Products] API fetch failed, keeping local data:', err);
+    }
+  };
 
   // Sync cart to localStorage whenever it changes
   useEffect(() => {
@@ -476,9 +511,10 @@ function App() {
         if (validAdmins.includes(currentUser.email.trim().toLowerCase())) {
             setCustomerProfile({ email: currentUser.email, companyName: 'サイト管理者 (Admin)', status: 'Active' });
             if (appMode === 'login' || appMode === 'pending') {
-                setAppMode('store'); // Change from admin to store so they see the catalog
-                setActiveTab('catalog'); // explicitly lock to catalog tab
+                setAppMode('store');
+                setActiveTab('catalog');
             }
+            loadProducts();
             setIsCheckingCustomer(false);
             return;
         }
@@ -492,8 +528,9 @@ function App() {
           setCustomerProfile(profile);
           if (appMode === 'login' || appMode === 'pending') {
             setAppMode('store');
-            setActiveTab('catalog'); // explicitly lock to catalog tab
+            setActiveTab('catalog');
           }
+          loadProducts();
         } else {
           setCustomerProfile(null);
           setAppMode('pending');
