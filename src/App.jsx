@@ -486,7 +486,9 @@ function App() {
         const customers = await fetchCustomers();
         const profile = customers.find(c => c.email === currentUser.email);
         
-        if (profile && profile.status === 'Active') {
+        const isActive = profile && (profile.status === 'Active' || (Array.isArray(profile.status) && profile.status.includes('Active')));
+        
+        if (isActive) {
           setCustomerProfile(profile);
           if (appMode === 'login' || appMode === 'pending') {
             setAppMode('store');
