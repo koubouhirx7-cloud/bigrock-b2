@@ -530,10 +530,10 @@ function App() {
             <span className="material-symbols-outlined text-[32px]">pending_actions</span>
           </div>
           <div>
-            <h1 className="text-xl font-bold mb-2">承認待ち、または未登録です</h1>
+            <h1 className="text-xl font-bold mb-2">申請受付完了・承認待ち</h1>
             <p className="text-sm text-text-muted leading-relaxed">
-              現在のアカウント（{currentUser?.email}）は、B2B発注システムへのアクセス権限がありません。<br/><br/>
-              管理者の承認をお待ちいただくか、アカウント情報が正しく登録されているかご確認ください。
+              現在のアカウント（{currentUser?.email}）は、B2B発注システムへのアクセス承認待ち状態です。<br/><br/>
+              申請内容を確認後、担当者より承認完了のご連絡をいたしますので、今しばらくお待ちください。
             </p>
           </div>
           <div className="flex w-full gap-3 mt-4">
