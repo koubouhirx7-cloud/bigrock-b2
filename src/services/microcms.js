@@ -218,13 +218,13 @@ export const updateCustomer = async (id, data) => {
 /**
  * Update product stock.
  */
-export const updateProduct = async (id, stock) => {
+export const updateProduct = async (id, updates) => {
     try {
         const headers = await getAuthHeaders();
         const response = await fetch('/api/update-product', {
             method: 'PATCH',
             headers,
-            body: JSON.stringify({ id, stock })
+            body: JSON.stringify({ id, updates })
         });
         if (!response.ok) throw new Error(`Failed to update product: ${response.statusText}`);
         return await response.json();

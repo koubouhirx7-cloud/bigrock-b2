@@ -11,15 +11,23 @@ export default async function handler(req, res) {
     return res.status(401).json({ message: error.message });
   }
 
-  const { id, stock } = req.body;
+  const { id, updates } = req.body;
 
-  // SECURITY: Only `stock` is allowed to be updated via this endpoint.
-  // Reject requests that don't provide a valid stock value.
   if (!id) {
     return res.status(400).json({ message: 'Product ID is required' });
   }
-  if (stock === undefined || stock === null || typeof stock !== 'number') {
-    return res.status(400).json({ message: 'A valid numeric stock value is required' });
+  if (!updates || typeof updates !== 'object') {
+    return res.status(400).json({ message: 'Updates object is required' });
+  }
+
+  // SECURITY: Only allowed fields can be updated via this endpoint.
+  const allowedUpdates = {};
+  if (typeof updates.stock === 'number') allowedUpdates.stock = updates.stock;
+  if (typeof updates.basePrice === 'number') allowedUpdates.basePrice = updates.basePrice;
+  if (Array.isArray(updates.variants)) allowedUpdates.variants = updates.variants;
+
+  if (Object.keys(allowedUpdates).length === 0) {
+      return res.status(400).json({ message: 'No valid fields to update' });
   }
 
   const apiKey = process.env.VITE_MICROCMS_API_KEY || process.env.MICROCMS_API_KEY;
@@ -36,7 +44,7 @@ export default async function handler(req, res) {
         'Content-Type': 'application/json',
         'X-MICROCMS-API-KEY': apiKey
       },
-      body: JSON.stringify({ stock })
+      body: JSON.stringify(allowedUpdates)
     });
 
     if (!response.ok) {

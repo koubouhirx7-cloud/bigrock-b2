@@ -259,6 +259,7 @@ export default function Admin({ products, onExitAdmin, refreshProducts }) {
                 updates.variants = productForm.variants.map(v => ({
                     fieldId: v.fieldId || "variantItemY",
                     name: String(v.name),
+                    manufacturer: v.manufacturer || '',
                     stock: Number(v.stock)
                 }));
             } else {
@@ -1144,7 +1145,21 @@ export default function Admin({ products, onExitAdmin, refreshProducts }) {
                                             <div className="w-24 shrink-0 font-bold text-sm text-text-main break-words">
                                                 {v.name}
                                             </div>
-                                            <div className="flex gap-4 flex-1">
+                                            <div className="flex gap-4 flex-1 flex-wrap">
+                                                <div className="flex-1 min-w-[120px]">
+                                                    <label className="block text-[10px] text-text-muted mb-1 font-mono uppercase tracking-wider">メーカー</label>
+                                                    <input 
+                                                        type="text" 
+                                                        value={v.manufacturer || ''}
+                                                        onChange={(e) => {
+                                                            const newV = [...productForm.variants];
+                                                            newV[i] = { ...newV[i], manufacturer: e.target.value };
+                                                            setProductForm({ ...productForm, variants: newV });
+                                                        }}
+                                                        placeholder="例: Specialized"
+                                                        className="w-full p-2.5 text-sm bg-surface border border-border-dark rounded focus:border-primary focus:ring-1 focus:ring-primary text-text-main transition-all"
+                                                    />
+                                                </div>
                                                 <div className="flex-1 max-w-[100px]">
                                                     <label className="block text-[10px] text-text-muted mb-1 font-mono uppercase tracking-wider">在庫数</label>
                                                     <input 

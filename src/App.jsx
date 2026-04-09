@@ -128,8 +128,17 @@ function App() {
     if (!selectedProduct || !selectedProduct.variants) return {};
     return selectedProduct.variants.reduce((acc, v) => {
       const variantName = v.name || v.id || 'バリエーション名未設定';
-      const parts = variantName.split('/');
-      const groupName = parts.length > 1 ? parts[parts.length - 1].trim() : '全バリエーション';
+      let groupName = '全バリエーション';
+      
+      if (v.manufacturer && v.manufacturer.trim() !== '') {
+          groupName = v.manufacturer.trim();
+      } else {
+          const parts = variantName.split('/');
+          if (parts.length > 1) {
+              groupName = parts[parts.length - 1].trim();
+          }
+      }
+      
       if (!acc[groupName]) acc[groupName] = [];
       acc[groupName].push({ ...v, name: variantName });
       return acc;
@@ -410,6 +419,7 @@ function App() {
             parsedVariants = rawVariants.map(v => ({
               id: v.id || v.name,
               name: v.name,
+              manufacturer: v.manufacturer || '',
               stock: v.stock
             }));
           }
