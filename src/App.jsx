@@ -1110,9 +1110,9 @@ function App() {
                     <span className="material-symbols-outlined text-primary text-2xl">receipt_long</span>
                     注文保留一覧
                   </h3>
-                  <p className="text-sm text-text-muted flex items-center gap-1">
+                  <p className="text-sm text-text-muted mt-2 flex items-center gap-1">
                     <span className="material-symbols-outlined text-[16px] text-accent-red">info</span>
-                    <span className="font-bold text-accent-red">ご注意：</span> 在庫の取り置き期間は、保留日より<span className="font-bold underline">1週間以内</span>となります。
+                    <span className="font-bold text-accent-red">ご注意：</span> システムの都合上、注文の保留はカート内容のメモ保存機能であり、<span className="font-bold underline">実際の在庫を確保するものではありません</span>。保留中に在庫切れとなる場合がございますので決済はお早めに。（※保留データは1週間後に自動削除されます）
                   </p>
                 </div>
 
@@ -1143,7 +1143,7 @@ function App() {
                               <span className="text-xs text-text-muted py-0.5">保存日: {createdAtDate.toLocaleDateString('ja-JP')}</span>
                               <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold flex items-center gap-1 ${isExpired ? 'bg-accent-red text-white' : 'bg-primary/20 text-primary'}`}>
                                   <span className="material-symbols-outlined text-[12px]">{isExpired ? 'error' : 'schedule'}</span>
-                                  {isExpired ? '取り置き期限切れ' : `期限: ${expirationDate.toLocaleDateString('ja-JP')}まで`}
+                                  {isExpired ? '保存期限切れ' : `保存期限: ${expirationDate.toLocaleDateString('ja-JP')}まで`}
                               </span>
                             </div>
                             <p className="text-sm text-text-main mb-1">
@@ -1349,7 +1349,7 @@ function App() {
                           />
                           <p className="text-xs text-accent-red flex items-center gap-1 mt-3 font-bold bg-accent-red/10 px-2 py-1.5 rounded-sm">
                             <span className="material-symbols-outlined text-[14px]">info</span>
-                            在庫の取り置き期限は本日より1週間となります
+                            システムの都合上、保留中は実際の在庫は確保されません。在庫切れにご注意ください。
                           </p>
                       </div>
                   )}
