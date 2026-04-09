@@ -139,7 +139,7 @@ export default function Login() {
                 <div className="flex justify-center gap-6 mt-4">
                     <a href="#" onClick={(e) => { e.preventDefault(); setTermsModalView('terms'); setIsTermsModalOpen(true); }} className="text-xs text-text-muted hover:text-primary transition-colors hover:underline decoration-dotted underline-offset-4 tracking-widest uppercase font-mono">B2B利用規約</a>
                     <a href="#" onClick={(e) => { e.preventDefault(); setTermsModalView('privacy'); setIsTermsModalOpen(true); }} className="text-xs text-text-muted hover:text-primary transition-colors hover:underline decoration-dotted underline-offset-4 tracking-widest uppercase font-mono">プライバシーポリシー</a>
-                    <a href="#" onClick={(e) => e.preventDefault()} className="text-xs text-text-muted hover:text-primary transition-colors hover:underline decoration-dotted underline-offset-4 tracking-widest uppercase font-mono">公式ウェブサイト</a>
+                    <a href="https://www.bigrock-bike.jp/index.html" target="_blank" rel="noopener noreferrer" className="text-xs text-text-muted hover:text-primary transition-colors hover:underline decoration-dotted underline-offset-4 tracking-widest uppercase font-mono">公式ウェブサイト</a>
                 </div>
             </div>
 
