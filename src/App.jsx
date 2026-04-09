@@ -118,6 +118,7 @@ function App() {
   const [activeTab, setActiveTab] = useState('catalog')
   const [products, setProducts] = useState(productsDataFromJson)
   const [selectedProduct, setSelectedProduct] = useState(null)
+  const [selectedHistoryOrder, setSelectedHistoryOrder] = useState(null)
   const [expandedVariantGroups, setExpandedVariantGroups] = useState({})
   
   const toggleVariantGroup = (groupName) => {
@@ -1254,7 +1255,7 @@ function App() {
                            const items = JSON.parse(order.items || "[]");
                            const totalItems = items.reduce((sum, item) => sum + (item.quantity || 1), 0);
                            return (
-                            <tr key={order.id} className="hover:bg-black/5 transition-colors">
+                            <tr key={order.id} className="hover:bg-black/5 transition-colors cursor-pointer" onClick={() => setSelectedHistoryOrder(order)}>
                               <td className="px-6 py-4 font-mono text-text-main font-bold">{order.orderId}</td>
                               <td className="px-6 py-4 text-text-muted font-mono">{new Date(order.createdAt).toLocaleDateString('ja-JP')}</td>
                               <td className="px-6 py-4 text-text-main">{totalItems}点</td>
