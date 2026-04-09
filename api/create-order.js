@@ -42,6 +42,67 @@ export default async function handler(req, res) {
             return res.status(200).json(data);
         }
 
+        // --- 在庫自動引き落とし処理 (Stock auto-deduction) ---
+        try {
+            let parsedItems = [];
+            try {
+                parsedItems = JSON.parse(req.body.items || '[]');
+            } catch(e) {}
+
+            // productId単位でバリアントごとに引き算する数量をまとめる
+            const updatesByProduct = {};
+            parsedItems.forEach(item => {
+                const pid = item.id || item.productId;
+                const vid = item.variantId;
+                const qty = parseInt(item.quantity || 1, 10);
+                if (pid && vid && qty > 0) {
+                    if (!updatesByProduct[pid]) updatesByProduct[pid] = [];
+                    updatesByProduct[pid].push({ variantId: vid, qty });
+                }
+            });
+
+            // 各プロダクトを取得して在庫を引いて保存
+            for (const pid of Object.keys(updatesByProduct)) {
+                try {
+                    const prodRes = await fetch(`https://${serviceDomain}.microcms.io/api/v1/products/${pid}`, {
+                        headers: { 'X-MICROCMS-API-KEY': apiKey }
+                    });
+                    
+                    if (prodRes.ok) {
+                        const product = await prodRes.json();
+                        if (product && product.variants) {
+                            let hasChanges = false;
+                            const newVariants = product.variants.map(v => {
+                                const matchedTarget = updatesByProduct[pid].find(u => u.variantId === v.id);
+                                if (matchedTarget) {
+                                    hasChanges = true;
+                                    // 在庫数を減算 (必要に応じてマイナス数量でBO数を把握できるようにする)
+                                    return { ...v, stock: (v.stock || 0) - matchedTarget.qty };
+                                }
+                                return v;
+                            });
+
+                            if (hasChanges) {
+                                await fetch(`https://${serviceDomain}.microcms.io/api/v1/products/${pid}`, {
+                                    method: 'PATCH',
+                                    headers: {
+                                        'Content-Type': 'application/json',
+                                        'X-MICROCMS-API-KEY': apiKey
+                                    },
+                                    body: JSON.stringify({ variants: newVariants })
+                                });
+                            }
+                        }
+                    }
+                } catch (e) {
+                    console.error(`Failed to update stock for product ${pid}`, e);
+                }
+            }
+        } catch (stockErr) {
+            console.error("Stock reduction process failed:", stockErr);
+        }
+        // ---------------------------------
+
         const discordWebhookUrl = process.env.DISCORD_WEBHOOK_URL;
         if (discordWebhookUrl) {
             try {
