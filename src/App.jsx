@@ -272,15 +272,26 @@ function App() {
     });
   }, [orderHistory, historyFilter]);
 
-  const addToCart = (product, variant, addedQuantity = 1, isBO = false) => {
+  const addToCart = (product, variant, addedQuantity = 1) => {
     setCart(prevCart => {
       const cartItemId = variant ? `${product.id}_${variant.id}` : product.id;
       const existingItem = prevCart.find(item => item.cartItemId === cartItemId)
+      
       if (existingItem) {
-        return prevCart.map(item =>
-          item.cartItemId === cartItemId ? { ...item, quantity: item.quantity + addedQuantity, isBO: isBO || item.isBO } : item
-        )
+        return prevCart.map(item => {
+          if (item.cartItemId === cartItemId) {
+            const newQuantity = item.quantity + addedQuantity;
+            const liveP = productMap.get(item.productId || item.id) || product;
+            const liveV = liveP?.variants?.find(v => v.id === item.variantId) || variant;
+            const stock = liveV ? liveV.stock : 0;
+            return { ...item, quantity: newQuantity, isBO: stock < newQuantity };
+          }
+          return item;
+        })
       }
+      
+      const stock = variant ? variant.stock : 0;
+      const isBO = stock < addedQuantity;
       return [...prevCart, { ...product, cartItemId, variantId: variant?.id, variantName: variant?.name, quantity: addedQuantity, isBO }]
     })
 
@@ -295,8 +306,11 @@ function App() {
   const updateCartItemQuantity = (cartItemId, delta) => {
     setCart(prevCart => prevCart.map(item => {
       if (item.cartItemId === cartItemId) {
-        const newQuantity = item.quantity + delta
-        return { ...item, quantity: Math.max(0, newQuantity) }
+        const newQuantity = Math.max(0, item.quantity + delta)
+        const liveP = productMap.get(item.productId || item.id);
+        const liveV = liveP?.variants?.find(v => v.id === item.variantId);
+        const stock = liveV ? liveV.stock : (item.variants?.find(v => v.id === item.variantId)?.stock || 0);
+        return { ...item, quantity: newQuantity, isBO: stock < newQuantity }
       }
       return item
     }).filter(item => item.quantity > 0))
