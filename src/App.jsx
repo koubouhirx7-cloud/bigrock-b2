@@ -421,6 +421,12 @@ function App() {
         }
       };
       loadHistory();
+
+      // Draftsタブを開く時は必ず最新の在庫データをMicroCMSから再取得する（キャッシュを無視）
+      if (activeTab === 'drafts') {
+        sessionStorage.removeItem(PRODUCT_CACHE_KEY);
+        loadProducts();
+      }
     }
   }, [activeTab]);
 
@@ -1181,11 +1187,13 @@ function App() {
                               <p className="text-xs font-bold text-text-muted mb-2 border-b border-border-subtle pb-1">注文明細</p>
                               <div className="space-y-0 divide-y divide-border-subtle border-t border-border-subtle/50 mt-2">
                                 {JSON.parse(draft.items || '[]').map((item, idx) => {
+                                  // ライブデータのみを参照（スナップショット在庫は誤表示の原因になるため使用しない）
                                   const liveProduct = productMap.get(item.productId || item.id);
                                   const liveVariant = liveProduct?.variants?.find(v => v.id === item.variantId);
-                                  const snapVariant = item.variants?.find(v => v.id === item.variantId);
-                                  const relevantStock = liveVariant ? liveVariant.stock : (snapVariant ? snapVariant.stock : 0);
-                                  const isActuallyBO = item.isBO || (relevantStock < item.quantity);
+                                  // ライブデータが取得できた場合のみstock判定、取得できていない場合はisBO保存値を信頼
+                                  const isActuallyBO = liveVariant
+                                    ? liveVariant.stock < item.quantity
+                                    : item.isBO;
 
                                   return (
                                     <div key={idx} className="flex items-center py-2">
