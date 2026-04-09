@@ -74,6 +74,7 @@ export default function Admin({ products, onExitAdmin, refreshProducts }) {
     const [isCustomerModalOpen, setIsCustomerModalOpen] = useState(false);
     const [customerForm, setCustomerForm] = useState({ companyName: '', companyNameKana: '', repName: '', repNameKana: '', department: '', contactName: '', contactNameKana: '', email: '', phone: '', mobilePhone: '', fax: '', established: '', annualSales: '', industry: '', websiteUrl: '', shippingAddress: '', status: 'Active', newsletter: false });
     const [isSavingCustomer, setIsSavingCustomer] = useState(false);
+    const [viewingCustomer, setViewingCustomer] = useState(null);
 
     // Product Editing State
     const [editingProduct, setEditingProduct] = useState(null);
@@ -607,7 +608,7 @@ export default function Admin({ products, onExitAdmin, refreshProducts }) {
                                     </thead>
                                     <tbody className="text-sm">
                                         {customersList.map(customer => (
-                                            <tr key={customer.id} className="border-b border-border-dark/50 hover:bg-black/5 transition-colors">
+                                            <tr key={customer.id} className="border-b border-border-dark/50 hover:bg-black/5 transition-colors cursor-pointer" onClick={(e) => { if (!e.target.closest('button')) setViewingCustomer(customer); }}>
                                                 <td className="p-4">
                                                     <div className="font-bold text-text-main">{customer.companyName}</div>
                                                     <div className="text-xs text-text-muted mt-0.5">{customer.contactName || '担当者未設定'}</div>
@@ -1230,6 +1231,99 @@ export default function Admin({ products, onExitAdmin, refreshProducts }) {
                 </div>
             </div>
         )}
+
+        {/* Customer Details Modal (Read-Only) */}
+        {viewingCustomer && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-text-main/50 backdrop-blur-sm shadow-2xl animate-fade-in" onClick={() => setViewingCustomer(null)}>
+                <div className="bg-surface w-full max-w-2xl max-h-[90vh] rounded-xl shadow-2xl overflow-hidden flex flex-col" onClick={e => e.stopPropagation()}>
+                    <div className="p-6 border-b border-border-dark bg-background-main flex justify-between items-center z-10 shrink-0">
+                        <h2 className="text-xl font-bold flex items-center gap-2">
+                            <span className="material-symbols-outlined text-primary">badge</span>
+                            顧客登録情報
+                        </h2>
+                        <button onClick={() => setViewingCustomer(null)} className="text-text-muted hover:text-text-main transition-colors p-1 rounded-full hover:bg-black/5">
+                            <span className="material-symbols-outlined">close</span>
+                        </button>
+                    </div>
+                    
+                    <div className="p-6 overflow-y-auto bg-background-main/50 space-y-6 flex-1">
+                        <div className="bg-surface p-5 rounded-lg border border-border-dark shadow-sm">
+                            <h3 className="text-xs font-bold text-primary uppercase tracking-wider mb-4 border-b border-border-subtle pb-2">基本情報 (Basic Info)</h3>
+                            <div className="grid grid-cols-2 gap-4">
+                                <div>
+                                    <p className="text-[10px] text-text-muted uppercase tracking-wider">会社名</p>
+                                    <p className="text-sm font-bold text-text-main mt-0.5">{viewingCustomer.companyName}</p>
+                                    <p className="text-[10px] text-text-muted">{viewingCustomer.companyNameKana}</p>
+                                </div>
+                                <div>
+                                    <p className="text-[10px] text-text-muted uppercase tracking-wider">代表者名</p>
+                                    <p className="text-sm font-medium text-text-main mt-0.5">{viewingCustomer.repName || '未登録'}</p>
+                                    {viewingCustomer.repNameKana && <p className="text-[10px] text-text-muted">{viewingCustomer.repNameKana}</p>}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="bg-surface p-5 rounded-lg border border-border-dark shadow-sm">
+                            <h3 className="text-xs font-bold text-primary uppercase tracking-wider mb-4 border-b border-border-subtle pb-2">担当者・連絡先 (Contact Details)</h3>
+                            <div className="grid grid-cols-2 gap-y-4 gap-x-6">
+                                <div>
+                                    <p className="text-[10px] text-text-muted uppercase tracking-wider">部署名</p>
+                                    <p className="text-sm text-text-main mt-0.5">{viewingCustomer.department || '未登録'}</p>
+                                </div>
+                                <div>
+                                    <p className="text-[10px] text-text-muted uppercase tracking-wider">担当者名</p>
+                                    <p className="text-sm font-medium text-text-main mt-0.5">{viewingCustomer.contactName}</p>
+                                    <p className="text-[10px] text-text-muted">{viewingCustomer.contactNameKana}</p>
+                                </div>
+                                <div className="col-span-2">
+                                    <p className="text-[10px] text-text-muted uppercase tracking-wider">メールアドレス</p>
+                                    <p className="text-sm font-mono text-text-main mt-0.5">{viewingCustomer.email}</p>
+                                </div>
+                                <div>
+                                    <p className="text-[10px] text-text-muted uppercase tracking-wider">電話番号</p>
+                                    <p className="text-sm font-mono text-text-main mt-0.5">{viewingCustomer.phone || '未登録'}</p>
+                                </div>
+                                <div>
+                                    <p className="text-[10px] text-text-muted uppercase tracking-wider">携帯番号</p>
+                                    <p className="text-sm font-mono text-text-main mt-0.5">{viewingCustomer.mobilePhone || '未登録'}</p>
+                                </div>
+                                <div className="col-span-2">
+                                    <p className="text-[10px] text-text-muted uppercase tracking-wider">配送先住所</p>
+                                    <p className="text-sm text-text-main mt-0.5 whitespace-pre-wrap">{viewingCustomer.shippingAddress || '未登録'}</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="bg-surface p-5 rounded-lg border border-border-dark shadow-sm">
+                            <h3 className="text-xs font-bold text-primary uppercase tracking-wider mb-4 border-b border-border-subtle pb-2">会社情報 (Company Profile)</h3>
+                            <div className="grid grid-cols-2 gap-4">
+                                <div>
+                                    <p className="text-[10px] text-text-muted uppercase tracking-wider">設立年</p>
+                                    <p className="text-sm text-text-main mt-0.5">{viewingCustomer.established || '未登録'}</p>
+                                </div>
+                                <div>
+                                    <p className="text-[10px] text-text-muted uppercase tracking-wider">年商</p>
+                                    <p className="text-sm text-text-main mt-0.5">{viewingCustomer.annualSales || '未登録'}</p>
+                                </div>
+                                <div>
+                                    <p className="text-[10px] text-text-muted uppercase tracking-wider">主な事業内容</p>
+                                    <p className="text-sm text-text-main mt-0.5">{viewingCustomer.industry || '未登録'}</p>
+                                </div>
+                                <div>
+                                    <p className="text-[10px] text-text-muted uppercase tracking-wider">ウェブサイト / SNS</p>
+                                    <p className="text-sm text-primary font-mono truncate mt-0.5">
+                                        {viewingCustomer.websiteUrl ? (
+                                            <a href={viewingCustomer.websiteUrl} target="_blank" rel="noopener noreferrer" className="hover:underline">{viewingCustomer.websiteUrl}</a>
+                                        ) : '未登録'}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        )}
+
         </div>
     );
 }
