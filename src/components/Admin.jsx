@@ -909,7 +909,7 @@ export default function Admin({ products, onExitAdmin, refreshProducts }) {
                                             className="w-full bg-background-main border border-border-dark px-4 py-3 rounded text-text-main focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all appearance-none cursor-pointer font-bold"
                                         >
                                             <option value="処理中">処理中 (Processing)</option>
-                                            <option value="発送準備中">発送準備中 (Preparing to Ship)</option>
+                                            <option value="本国手配中">本国手配中 (Backordered)</option>
                                             <option value="発送済">発送済 (Shipped)</option>
                                             <option value="下書き">注文保留 (Hold)</option>
                                         </select>
