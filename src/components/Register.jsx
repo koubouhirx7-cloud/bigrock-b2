@@ -309,7 +309,7 @@ export default function Register({ setParentTab }) {
                             発送完了通知等のスムーズな連携をご希望の方は、以下のボタンより公式LINEを友だち追加し、トーク画面でお客様の<strong>『会社名』</strong>を送信してください。
                         </p>
                         <a 
-                            href="https://lin.ee/ここにURLを入力" 
+                            href="https://line.me/R/ti/p/@415nofpb" 
                             target="_blank" 
                             rel="noopener noreferrer"
                             className="inline-flex items-center justify-center gap-2 bg-[#06C755] text-white font-bold py-2.5 px-6 rounded-full text-xs hover:bg-[#05b34c] transition-colors shadow-sm w-full md:w-auto"
@@ -317,8 +317,7 @@ export default function Register({ setParentTab }) {
                             公式LINEを友だち追加する
                         </a>
                         <p className="text-[10px] text-text-muted mt-3">
-                            ※システム管理者が確認し、今後の通知を手配いたします。<br/>
-                            ※こちらのボタンのURL（リンク先）は、運営側の公式LINE URLに後ほど差し替えてください。
+                            ※システム管理者が確認し、今後の通知を手配いたします。
                         </p>
                     </div>
 
