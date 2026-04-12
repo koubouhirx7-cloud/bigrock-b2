@@ -3,7 +3,7 @@ import { auth } from './firebase.js';
 /**
  * Utility to generate Authentication headers securely using Firebase ID Tokens.
  */
-const getAuthHeaders = async () => {
+export const getAuthHeaders = async () => {
     const headers = { 'Content-Type': 'application/json' };
     if (auth.currentUser) {
         const token = await auth.currentUser.getIdToken();

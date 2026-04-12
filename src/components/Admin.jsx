@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { fetchOrders, updateOrder, deleteOrder, fetchCustomers, createCustomer, updateCustomer, deleteCustomer, updateProduct } from '../services/microcms';
+import { fetchOrders, updateOrder, deleteOrder, fetchCustomers, createCustomer, updateCustomer, deleteCustomer, updateProduct, getAuthHeaders } from '../services/microcms';
 import { auth } from '../services/firebase';
 
 export default function Admin({ products, onExitAdmin, refreshProducts }) {
@@ -133,11 +133,10 @@ export default function Admin({ products, onExitAdmin, refreshProducts }) {
             // Send automatic email notification if checked
             if (sendNotificationEmail && editingOrder.customerEmail) {
                 try {
+                    const headers = await getAuthHeaders();
                     const emailRes = await fetch('/api/send-email', {
                         method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
+                        headers,
                         body: JSON.stringify({
                             to: editingOrder.customerEmail,
                             subject: `【BIGROCK】注文状況の更新お知らせ (ID: ${editingOrder.orderId})`,
