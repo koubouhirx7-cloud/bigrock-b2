@@ -1,4 +1,5 @@
 import { verifyToken } from './utils/verify-token.js';
+import nodemailer from 'nodemailer';
 
 export default async function handler(req, res) {
     if (req.method !== 'POST') {
@@ -16,40 +17,37 @@ export default async function handler(req, res) {
         return res.status(400).json({ error: 'Missing required fields' });
     }
 
-    const resendApiKey = process.env.RESEND_API_KEY;
+    const smtpHost = process.env.SMTP_HOST;
+    const smtpPort = process.env.SMTP_PORT;
+    const smtpUser = process.env.SMTP_USER;
+    const smtpPass = process.env.SMTP_PASS;
     const adminEmail = process.env.VITE_ADMIN_EMAIL || "notifications@example.com";
     
-    if (!resendApiKey) {
-        return res.status(500).json({ error: 'RESEND_API_KEY is not configured in environment variables. Please configure it in Vercel.' });
+    if (!smtpHost || !smtpUser || !smtpPass) {
+        return res.status(500).json({ error: 'SMTP configuration is missing in environment variables. Please check Vercel settings.' });
     }
 
     try {
-        const payload = {
-            // NOTE: Replace 'onboarding@resend.dev' with your verified domain email if necessary
-            // E.g., 'BIGROCK B2B <info@your-verified-domain.com>'
-            // Or use onboarding@resend.dev for testing (only to registered email)
-            from: 'BIGROCK B2B <onboarding@resend.dev>', 
-            to: [to, adminEmail], // Send to customer and BCC admin
+        const transporter = nodemailer.createTransport({
+            host: smtpHost,
+            port: parseInt(smtpPort || '465', 10),
+            secure: parseInt(smtpPort || '465', 10) === 465, 
+            auth: {
+                user: smtpUser,
+                pass: smtpPass
+            }
+        });
+
+        const mailOptions = {
+            from: `BIGROCK B2B <${smtpUser}>`, 
+            to: to,
+            bcc: adminEmail, // Send to customer and BCC admin
             subject: subject,
             text: text
         };
 
-        const response = await fetch('https://api.resend.com/emails', {
-            method: 'POST',
-            headers: {
-                'Authorization': `Bearer ${resendApiKey}`,
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(payload)
-        });
-
-        if (!response.ok) {
-            const errData = await response.json().catch(() => ({}));
-            throw new Error(`Resend API error: ${JSON.stringify(errData)}`);
-        }
-
-        const data = await response.json();
-        return res.status(200).json({ success: true, data });
+        const info = await transporter.sendMail(mailOptions);
+        return res.status(200).json({ success: true, messageId: info.messageId });
     } catch (error) {
         console.error('Email sending failed:', error);
         return res.status(500).json({ error: 'Failed to send email', details: error.message });

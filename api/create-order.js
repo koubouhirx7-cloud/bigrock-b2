@@ -1,4 +1,5 @@
 import { verifyToken } from './utils/verify-token.js';
+import nodemailer from 'nodemailer';
 
 export default async function handler(req, res) {
     if (req.method !== 'POST') {
@@ -184,6 +185,63 @@ export default async function handler(req, res) {
 
             } catch (notifyError) {
                 console.error("Failed to process Discord notification", notifyError);
+            }
+        }
+        // ---------------------------------
+
+        // --- サンクスメール自動送信 (SMTP / Nodemailer) ---
+        const smtpHost = process.env.SMTP_HOST;
+        const smtpPort = process.env.SMTP_PORT;
+        const smtpUser = process.env.SMTP_USER;
+        const smtpPass = process.env.SMTP_PASS;
+
+        if (smtpHost && smtpUser && smtpPass && req.body.customerEmail) {
+            try {
+                const { orderId, companyName, customerEmail, totalAmount, items } = req.body;
+                let parsedItems = [];
+                try {
+                    parsedItems = JSON.parse(items || '[]');
+                } catch(e) {}
+                
+                let text = `${companyName || 'ゲスト'} 様\n\n`;
+                text += `BIGROCK B2Bをご利用いただき、誠にありがとうございます。\n`;
+                text += `以下の内容でご注文を受け付けました。\n\n`;
+                text += `【注文番号】 ${orderId || '不明'}\n`;
+                text += `【合計金額】 ¥${Number(totalAmount || 0).toLocaleString()} (税込)\n\n`;
+                text += `【ご注文内容】\n`;
+                parsedItems.forEach(item => {
+                    const variantStr = item.variantName ? ` ${item.variantName}` : (item.variant ? ` ${item.variant}` : "");
+                    text += `・${item.productName || item.name}${variantStr} - ${item.quantity}点\n`;
+                });
+                text += `\nご注文の状況は、B2Bマイページよりご確認いただけます。\n`;
+                text += `発送などの進捗がございましたら、改めてご連絡いたします。\n\n`;
+                text += `引き続きよろしくお願いいたします。\n`;
+
+                const fromEmail = `BIGROCK B2B <${smtpUser}>`;
+                const adminEmail = process.env.VITE_ADMIN_EMAIL || "notifications@example.com";
+
+                const transporter = nodemailer.createTransport({
+                    host: smtpHost,
+                    port: parseInt(smtpPort || '465', 10),
+                    secure: parseInt(smtpPort || '465', 10) === 465,
+                    auth: {
+                        user: smtpUser,
+                        pass: smtpPass
+                    }
+                });
+
+                const mailOptions = {
+                    from: fromEmail,
+                    to: customerEmail,
+                    bcc: adminEmail, // 送信先(顧客)とBCC(管理者)
+                    subject: `【BIGROCK】ご注文ありがとうございます (ID: ${orderId || '不明'})`,
+                    text: text
+                };
+
+                // Vercel環境では関数終了時に通信が切断されるためawaitする
+                await transporter.sendMail(mailOptions);
+            } catch (emailErr) {
+                console.error("Auto thank you email failed:", emailErr);
             }
         }
         // ---------------------------------
