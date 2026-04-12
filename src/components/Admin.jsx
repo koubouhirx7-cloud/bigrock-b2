@@ -132,25 +132,35 @@ export default function Admin({ products, onExitAdmin, refreshProducts }) {
             
             // Send automatic email notification if checked
             if (sendNotificationEmail && editingOrder.customerEmail) {
-                // Ignore errors for email sending so it doesn't fail the whole update process
-                fetch('/api/send-email', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        to: editingOrder.customerEmail,
-                        subject: `【BIGROCK】注文状況の更新お知らせ (ID: ${editingOrder.orderId})`,
-                        text: generatedNotificationText
-                    })
-                }).catch(e => console.error("Email send trigger failed", e));
+                try {
+                    const emailRes = await fetch('/api/send-email', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            to: editingOrder.customerEmail,
+                            subject: `【BIGROCK】注文状況の更新お知らせ (ID: ${editingOrder.orderId})`,
+                            text: generatedNotificationText
+                        })
+                    });
+                    if (!emailRes.ok) {
+                        const errData = await emailRes.json().catch(() => ({ error: 'Unknown Error' }));
+                        alert(`⚠️ 注文状況は更新されましたが、メール送信に失敗しました：\n${errData.error || '不明なエラー'}`);
+                    } else {
+                        alert('注文状況を更新し、お客様へ通知メールを送信しました。');
+                    }
+                } catch (e) {
+                    alert(`⚠️ 注文状況は更新されましたが、サーバー通信エラーでメールが送信できませんでした：\n${e.message}`);
+                }
+            } else {
+                alert('注文状況を更新しました。');
             }
 
             // Re-fetch orders
             const data = await fetchOrders();
             const sortedOrders = data.sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt));
             setOrdersList(sortedOrders);
-            setEditingOrder(null);
         } catch (error) {
             alert('Failed to update order: ' + error.message);
         } finally {

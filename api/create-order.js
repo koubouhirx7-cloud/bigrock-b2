@@ -190,10 +190,10 @@ export default async function handler(req, res) {
         // ---------------------------------
 
         // --- サンクスメール自動送信 (SMTP / Nodemailer) ---
-        const smtpHost = process.env.SMTP_HOST;
-        const smtpPort = process.env.SMTP_PORT;
-        const smtpUser = process.env.SMTP_USER;
-        const smtpPass = process.env.SMTP_PASS;
+        const smtpHost = (process.env.SMTP_HOST || '').replace(/^"|"$/g, '').trim();
+        const smtpPort = (process.env.SMTP_PORT || '').replace(/^"|"$/g, '').trim() || '465';
+        const smtpUser = (process.env.SMTP_USER || '').replace(/^"|"$/g, '').trim();
+        const smtpPass = (process.env.SMTP_PASS || '').replace(/^"|"$/g, '').trim();
 
         if (smtpHost && smtpUser && smtpPass && req.body.customerEmail) {
             try {
@@ -217,13 +217,13 @@ export default async function handler(req, res) {
                 text += `発送などの進捗がございましたら、改めてご連絡いたします。\n\n`;
                 text += `引き続きよろしくお願いいたします。\n`;
 
-                const fromEmail = `BIGROCK B2B <${smtpUser}>`;
-                const adminEmail = process.env.VITE_ADMIN_EMAIL || "notifications@example.com";
+                const fromEmail = `"BIGROCK B2B" <${smtpUser}>`;
+                const adminEmail = (process.env.VITE_ADMIN_EMAIL || '').replace(/^"|"$/g, '').trim() || "notifications@example.com";
 
                 const transporter = nodemailer.createTransport({
                     host: smtpHost,
-                    port: parseInt(smtpPort || '465', 10),
-                    secure: parseInt(smtpPort || '465', 10) === 465,
+                    port: parseInt(smtpPort, 10),
+                    secure: parseInt(smtpPort, 10) === 465,
                     auth: {
                         user: smtpUser,
                         pass: smtpPass

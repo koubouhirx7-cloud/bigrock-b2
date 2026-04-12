@@ -17,11 +17,11 @@ export default async function handler(req, res) {
         return res.status(400).json({ error: 'Missing required fields' });
     }
 
-    const smtpHost = process.env.SMTP_HOST;
-    const smtpPort = process.env.SMTP_PORT;
-    const smtpUser = process.env.SMTP_USER;
-    const smtpPass = process.env.SMTP_PASS;
-    const adminEmail = process.env.VITE_ADMIN_EMAIL || "notifications@example.com";
+    const smtpHost = (process.env.SMTP_HOST || '').replace(/^"|"$/g, '').trim();
+    const smtpPort = (process.env.SMTP_PORT || '').replace(/^"|"$/g, '').trim() || '465';
+    const smtpUser = (process.env.SMTP_USER || '').replace(/^"|"$/g, '').trim();
+    const smtpPass = (process.env.SMTP_PASS || '').replace(/^"|"$/g, '').trim();
+    const adminEmail = (process.env.VITE_ADMIN_EMAIL || '').replace(/^"|"$/g, '').trim() || "notifications@example.com";
     
     if (!smtpHost || !smtpUser || !smtpPass) {
         return res.status(500).json({ error: 'SMTP configuration is missing in environment variables. Please check Vercel settings.' });
@@ -30,8 +30,8 @@ export default async function handler(req, res) {
     try {
         const transporter = nodemailer.createTransport({
             host: smtpHost,
-            port: parseInt(smtpPort || '465', 10),
-            secure: parseInt(smtpPort || '465', 10) === 465, 
+            port: parseInt(smtpPort, 10),
+            secure: parseInt(smtpPort, 10) === 465, 
             auth: {
                 user: smtpUser,
                 pass: smtpPass
@@ -39,7 +39,7 @@ export default async function handler(req, res) {
         });
 
         const mailOptions = {
-            from: `BIGROCK B2B <${smtpUser}>`, 
+            from: `"BIGROCK B2B" <${smtpUser}>`, 
             to: to,
             bcc: adminEmail, // Send to customer and BCC admin
             subject: subject,
