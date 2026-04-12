@@ -88,11 +88,20 @@ export default function Admin({ products, onExitAdmin, refreshProducts }) {
     const [editShippingInfo, setEditShippingInfo] = useState('');
     const [isUpdatingOrder, setIsUpdatingOrder] = useState(false);
     const [sendNotificationEmail, setSendNotificationEmail] = useState(true);
+    const [selectedMessageTab, setSelectedMessageTab] = useState('standard');
+
+    const messageTemplates = {
+        standard: "以下の通り、注文状況が更新されましたのでお知らせいたします。",
+        payment: "ご入金を確認いたしました。\n商品の手配・発送準備を進めております。",
+        shipped: "商品の発送が完了いたしました。\n到着まで今しばらくお待ちください。",
+        backorder: "現在、ご注文いただいた商品の一部（または全部）がメーカー手配中(BO)となっております。\n大変お待たせして申し訳ございませんが、入荷次第順次発送またはご連絡いたしますので今しばらくお待ちください。",
+        cancel: "誠に恐れ入りますが、以下のご注文につきまして一時キャンセル処理を行わせていただきました。"
+    };
 
     const generatedNotificationText = useMemo(() => {
         if (!editingOrder) return "";
         let text = `${editingOrder.companyName || 'ゲスト'} 様\n\n`;
-        text += `以下の通り、注文状況が更新されましたのでお知らせいたします。\n\n`;
+        text += `${messageTemplates[selectedMessageTab] || messageTemplates.standard}\n\n`;
         text += `【注文内容】\n`;
         
         try {
@@ -119,6 +128,7 @@ export default function Admin({ products, onExitAdmin, refreshProducts }) {
         setEditingOrder(order);
         setEditStatus(order.status || '処理中');
         setEditShippingInfo(order.shippingInfo || '');
+        setSelectedMessageTab('standard');
     };
 
     const handleUpdateOrder = async () => {
@@ -997,8 +1007,31 @@ export default function Admin({ products, onExitAdmin, refreshProducts }) {
                                 </button>
                             </div>
                             
+                            {/* Message Template Tabs */}
+                            <div className="flex flex-wrap gap-2 pt-2">
+                                {Object.entries({
+                                    standard: "標準の更新",
+                                    payment: "入金確認",
+                                    shipped: "発送完了",
+                                    backorder: "入荷待ち(BO)",
+                                    cancel: "キャンセル"
+                                }).map(([key, label]) => (
+                                    <button
+                                        key={key}
+                                        onClick={() => setSelectedMessageTab(key)}
+                                        className={`px-3 py-1.5 text-xs font-bold rounded-full transition-all border ${
+                                            selectedMessageTab === key 
+                                                ? 'bg-primary border-primary text-background-main shadow-md' 
+                                                : 'bg-background-main border-border-dark text-text-muted hover:border-text-muted hover:bg-surface'
+                                        }`}
+                                    >
+                                        {label}
+                                    </button>
+                                ))}
+                            </div>
+                            
                             {/* Template Preview */}
-                            <div className="bg-background-main border border-border-dark rounded p-3 relative group">
+                            <div className="bg-background-main border border-border-dark rounded p-3 relative group mt-2">
                                 <p className="text-[10px] font-bold text-text-muted mb-2 uppercase tracking-wider flex items-center gap-1">
                                     <span className="material-symbols-outlined text-[12px]">visibility</span>
                                     自動生成メッセージプレビュー
