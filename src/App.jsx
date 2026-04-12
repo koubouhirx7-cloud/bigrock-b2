@@ -350,7 +350,7 @@ function App() {
       console.log("Order successfully created in MicroCMS");
     } catch (error) {
       console.error("Failed to push order to MicroCMS", error);
-      alert("発注の送信に失敗しました。時間をおいてもう一度お試しください。");
+      alert(`発注の送信に失敗しました。\n詳細: ${error.message}`);
       setIsPlacingOrder(false);
       return; // Stop if it fails
     }

@@ -53,7 +53,8 @@ export const createOrder = async (orderData) => {
         });
 
         if (!response.ok) {
-            throw new Error(`Failed to create order via proxy: ${response.statusText}`);
+            const errData = await response.json().catch(() => ({}));
+            throw new Error(errData.error || `Failed to create order: ${response.statusText}`);
         }
 
         const data = await response.json();
