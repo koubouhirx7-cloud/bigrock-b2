@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useMemo } from 'react';
 import { fetchOrders, updateOrder, deleteOrder, fetchCustomers, createCustomer, updateCustomer, deleteCustomer, updateProduct, getAuthHeaders } from '../services/microcms';
 import { auth } from '../services/firebase';
+import { formatContractEmail } from '../utils/contractTemplate';
 
 export default function Admin({ products, onExitAdmin, refreshProducts }) {
     const [adminTab, setAdminTab] = useState('products');
@@ -291,6 +291,36 @@ export default function Admin({ products, onExitAdmin, refreshProducts }) {
         try {
             if (editingCustomer) {
                 await updateCustomer(editingCustomer.id, customerForm);
+                
+                // === 電子契約控え（承認メール）の自動送信ロジック ===
+                const oldStatus = Array.isArray(editingCustomer.status) ? editingCustomer.status[0] : editingCustomer.status;
+                const newStatus = Array.isArray(customerForm.status) ? customerForm.status[0] : customerForm.status;
+                
+                if ((oldStatus === 'Inactive' || !oldStatus) && newStatus === 'Active') {
+                    if (customerForm.email) {
+                        try {
+                            const { subject, text } = formatContractEmail(customerForm);
+                            const token = await auth.currentUser.getIdToken(true);
+                            await fetch('/api/send-email', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'Authorization': `Bearer ${token}`
+                                },
+                                body: JSON.stringify({
+                                    to: customerForm.email,
+                                    subject: subject,
+                                    text: text
+                                })
+                            });
+                            console.log("Contract email sent successfully.");
+                        } catch (emailError) {
+                            console.error("Failed to send contract email:", emailError);
+                            alert("各種情報の更新は成功しましたが、契約控えメールの送信に失敗しました。");
+                        }
+                    }
+                }
+                // ======================================
             } else {
                 await createCustomer(customerForm);
             }
