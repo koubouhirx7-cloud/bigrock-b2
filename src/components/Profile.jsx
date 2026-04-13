@@ -102,7 +102,7 @@ export default function Profile({ customerProfile, setCustomerProfile }) {
                         住所や連絡先が変更になった場合は、こちらから更新をお願いいたします。
                     </p>
                 </div>
-                {!isEditing && (
+                {!isEditing && customerProfile?.id ? (
                     <button
                         onClick={() => setIsEditing(true)}
                         className="bg-background-main border border-border-dark hover:bg-surface-highlight text-text-main font-bold py-2.5 px-6 rounded transition-colors flex items-center justify-center gap-2 shadow-sm whitespace-nowrap"
@@ -110,7 +110,12 @@ export default function Profile({ customerProfile, setCustomerProfile }) {
                         <span className="material-symbols-outlined text-[18px]">edit</span>
                         編集モードにする
                     </button>
-                )}
+                ) : !isEditing && !customerProfile?.id ? (
+                    <div className="p-3 bg-primary/10 border border-primary/20 rounded text-sm text-primary flex items-center gap-2">
+                        <span className="material-symbols-outlined text-[18px]">info</span>
+                        管理者アカウントのため編集できません
+                    </div>
+                ) : null}
             </div>
 
             <div className={`bg-surface border ${isEditing ? 'border-primary ring-1 ring-primary/20' : 'border-border-subtle'} rounded p-6 shadow-sm`}>
