@@ -182,6 +182,19 @@ function App() {
 
   const verifyAdminAccess = async () => {
     if (!adminPasswordInput) return;
+
+    // Frontend Lockout Check
+    const lockedUntil = localStorage.getItem('adminLockout');
+    if (lockedUntil && Date.now() < parseInt(lockedUntil, 10)) {
+        const remainingStr = Math.ceil((parseInt(lockedUntil, 10) - Date.now()) / 60000);
+        alert(`セキュリティ管理のためロックされています。あと約${remainingStr}分後に再度お試しください。`);
+        setAdminPasswordInput('');
+        return;
+    } else if (lockedUntil) {
+        localStorage.removeItem('adminLockout');
+        localStorage.removeItem('adminAttempts');
+    }
+
     setIsVerifyingAdmin(true);
     try {
       const res = await fetch('/api/verify-admin', {
@@ -190,12 +203,25 @@ function App() {
         body: JSON.stringify({ password: adminPasswordInput })
       });
       const data = await res.json();
-      if (data.success) {
+      if (res.ok && data.success) {
         setAppMode('admin');
         setShowAdminAuthModal(false);
         setAdminPasswordInput('');
+        localStorage.removeItem('adminAttempts'); // Reset on success
       } else {
-        alert('パスワードが間違っています。');
+        // Track failed attempts locally for strict UX feedback regardless of serverless cold starts
+        let attempts = parseInt(localStorage.getItem('adminAttempts') || '0', 10);
+        attempts += 1;
+        
+        if (attempts >= 5) {
+            const lockoutTime = Date.now() + 15 * 60 * 1000; // 15 mins
+            localStorage.setItem('adminLockout', lockoutTime.toString());
+            alert('5回連続でパスワードを間違えたため、セキュリティ保護により15分間ロックされました。');
+            setShowAdminAuthModal(false);
+        } else {
+            localStorage.setItem('adminAttempts', attempts.toString());
+            alert(`パスワードが間違っています。（残り${5 - attempts}回間違えるとロックされます）`);
+        }
         setAdminPasswordInput('');
       }
     } catch(e) {
