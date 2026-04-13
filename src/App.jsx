@@ -2,6 +2,7 @@ import { useState, useEffect, useRef, useMemo } from 'react'
 import productsDataFromJson from './data/products.json'
 import Login from './components/Login'
 import Admin from './components/Admin'
+import Profile from './components/Profile'
 import { fetchProducts, createOrder, fetchOrders, fetchCustomers, deleteOrder } from './services/microcms'
 import { useAuth } from './context/AuthContext'
 
@@ -736,6 +737,14 @@ function App() {
             </div>
             <span className="text-sm font-medium">カートを見る</span>
           </button>
+
+          <button
+            className={`group flex items-center w-full gap-3 px-6 py-3 mt-4 transition-colors ${activeTab === 'profile' ? 'bg-black/5 border-l-2 border-primary text-primary' : 'border-l-2 border-transparent text-text-muted hover:text-text-main hover:bg-black/5'}`}
+            onClick={() => setActiveTab('profile')}
+          >
+            <span className="material-symbols-outlined">manage_accounts</span>
+            <span className="text-sm font-medium">登録情報の確認・変更</span>
+          </button>
         </nav>
         {/* Admin Link (Test) */}
         <div className="px-4 pb-2">
@@ -1282,6 +1291,13 @@ function App() {
                     </div>
                   )}
                 </div>
+              </div>
+            )}
+            
+            {/* --- PROFILE VIEW --- */}
+            {activeTab === 'profile' && (
+              <div className="flex flex-col h-full overflow-y-auto">
+                <Profile customerProfile={customerProfile} setCustomerProfile={setCustomerProfile} />
               </div>
             )}
 
