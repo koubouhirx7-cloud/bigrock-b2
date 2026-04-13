@@ -11,20 +11,26 @@ export default function TermsModal({ isOpen, onClose, initialView = 'terms' }) {
             <div className="bg-surface w-full max-w-3xl h-full max-h-[85vh] rounded shadow-2xl flex flex-col overflow-hidden border border-border-dark animate-in zoom-in-95 duration-200 relative">
                 
                 {/* Header Navigation */}
-                <div className="flex border-b border-border-dark bg-surface-highlight shrink-0">
+                <div className="flex border-b border-border-dark bg-surface-highlight shrink-0 flex-wrap">
                     <button 
-                        className={`flex-1 py-4 text-sm font-bold tracking-widest transition-colors ${view === 'terms' ? 'text-primary border-b-2 border-primary bg-background-main' : 'text-text-muted hover:text-text-main hover:bg-background-main/50'}`}
+                        className={`flex-1 py-4 px-2 text-xs md:text-sm font-bold tracking-widest transition-colors whitespace-nowrap ${view === 'terms' ? 'text-primary border-b-2 border-primary bg-background-main' : 'text-text-muted hover:text-text-main hover:bg-background-main/50'}`}
                         onClick={() => setView('terms')}
                     >
                         B2B利用規約
                     </button>
                     <button 
-                        className={`flex-1 py-4 text-sm font-bold tracking-widest transition-colors ${view === 'privacy' ? 'text-primary border-b-2 border-primary bg-background-main' : 'text-text-muted hover:text-text-main hover:bg-background-main/50'}`}
+                        className={`flex-1 py-4 px-2 text-xs md:text-sm font-bold tracking-widest transition-colors whitespace-nowrap ${view === 'privacy' ? 'text-primary border-b-2 border-primary bg-background-main' : 'text-text-muted hover:text-text-main hover:bg-background-main/50'}`}
                         onClick={() => setView('privacy')}
                     >
                         プライバシーポリシー
                     </button>
-                    <button onClick={onClose} className="px-6 border-l border-border-dark text-text-muted hover:text-accent-red hover:bg-accent-red/10 transition-colors flex items-center justify-center">
+                    <button 
+                        className={`flex-1 py-4 px-2 text-xs md:text-sm font-bold tracking-widest transition-colors whitespace-nowrap ${view === 'tokushoho' ? 'text-primary border-b-2 border-primary bg-background-main' : 'text-text-muted hover:text-text-main hover:bg-background-main/50'}`}
+                        onClick={() => setView('tokushoho')}
+                    >
+                        特定商取引法に基づく表記
+                    </button>
+                    <button onClick={onClose} className="px-4 md:px-6 border-l border-border-dark text-text-muted hover:text-accent-red hover:bg-accent-red/10 transition-colors flex items-center justify-center shrink-0">
                         <span className="material-symbols-outlined">close</span>
                     </button>
                 </div>
@@ -35,64 +41,47 @@ export default function TermsModal({ isOpen, onClose, initialView = 'terms' }) {
                     {view === 'terms' && (
                         <div className="prose prose-sm prose-invert max-w-none text-text-main">
                             <h2 className="text-xl font-bold mb-6 text-primary tracking-tight">B2B取引 利用規約</h2>
-                            <p className="text-xs text-text-muted mb-8">最終改定日: 2024年4月1日</p>
                             
                             <div className="space-y-8 leading-relaxed">
                                 <section>
-                                    <h3 className="text-sm font-bold mb-3 border-b border-border-dark pb-2 text-slate-200">第1条（適用）</h3>
+                                    <h3 className="text-sm font-bold mb-3 border-b border-border-dark pb-2 text-slate-200">第1条（目的および適用範囲）</h3>
                                     <p className="text-sm text-slate-300">
-                                        本規約は、BIGROCK（以下「当社」といいます。）が提供するB2B発注システム（以下「本サービス」といいます。）を利用する販売店（以下「ディーラー」といいます。）と当社との間の本サービスの利用に関わる一切の関係に適用されるものとします。<br />
-                                        ディーラーは、本サービスの利用にあたり、本規約に同意し、これを遵守するものとします。
+                                        本規約は、Highlander / 里山の自転車店（以下「当社」といいます）が運営するB2B発注システム（以下「本システム」といいます）を、販売店（以下「ディーラー」といいます）が利用する際の条件を定めるものです。
                                     </p>
                                 </section>
 
                                 <section>
-                                    <h3 className="text-sm font-bold mb-3 border-b border-border-dark pb-2 text-slate-200">第2条（登録および審査）</h3>
+                                    <h3 className="text-sm font-bold mb-3 border-b border-border-dark pb-2 text-slate-200">第2条（利用登録とアカウント管理）</h3>
                                     <p className="text-sm text-slate-300">
-                                        1. 登録希望者は、当社の定める方法によって利用登録を申請し、当社がこれを承認することによって、利用登録が完了するものとします。<br />
-                                        2. 当社は、登録希望者に以下の事由があると判断した場合、利用登録の申請を承認しないことがあり、その理由については一切の開示義務を負わないものとします。
-                                    </p>
-                                    <ul className="list-disc pl-5 mt-2 text-sm text-slate-400 space-y-1">
-                                        <li>利用登録の申請に際して虚偽の事項を届け出た場合</li>
-                                        <li>本規約に違反したことがある者からの申請である場合</li>
-                                        <li>その他、当社が利用登録を相当でないと判断した場合</li>
-                                    </ul>
-                                </section>
-
-                                <section>
-                                    <h3 className="text-sm font-bold mb-3 border-b border-border-dark pb-2 text-slate-200">第3条（Googleアカウントの連携と管理）</h3>
-                                    <p className="text-sm text-slate-300">
-                                        ディーラーは、本サービスのログインに利用するGoogleアカウントを自己の責任において適切に管理するものとします。アカウントの第三者への貸与、譲渡、売買等は禁止します。
+                                        1. 本システムの利用を希望する法人は、本規約に同意の上、当社所定の方法により利用登録を申請するものとします。<br />
+                                        2. 登録にはGoogleアカウントが必要となります。ディーラーは自身のアカウント（メールアドレス等）を自己の責任において厳重に管理し、第三者への貸与や譲渡を禁じます。<br />
+                                        3. 当社は、申請者が当社の取引基準を満たさないと判断した場合、登録を承認しない権利を有します。
                                     </p>
                                 </section>
 
                                 <section>
-                                    <h3 className="text-sm font-bold mb-3 border-b border-border-dark pb-2 text-slate-200">第4条（禁止事項）</h3>
+                                    <h3 className="text-sm font-bold mb-3 border-b border-border-dark pb-2 text-slate-200">第3条（商品の発注および売買契約の成立）</h3>
                                     <p className="text-sm text-slate-300">
-                                        ディーラーは、本サービスの利用にあたり、以下の行為をしてはなりません。
+                                        1. ディーラーは、本システムを通じて提供される価格・在庫情報を元に商品の発注を行うことができます。<br />
+                                        2. 発注に対する当社からの「注文確認（または入金確認）」の通知がディーラーに到達した時点で、該当商品に関する売買契約が成立するものとします。<br />
+                                        3. 納期遅延、在庫不足、またはその他の不可抗力により、ご希望の数量や納期での提供が困難な場合、当社は契約の変更またはキャンセルを協議する権利を有します。
                                     </p>
-                                    <ul className="list-disc pl-5 mt-2 text-sm text-slate-400 space-y-1">
-                                        <li>法令または公序良俗に違反する行為</li>
-                                        <li>犯罪行為に関連する行為</li>
-                                        <li>当社のサーバーまたはネットワークの機能を破壊したり、妨害したりする行為</li>
-                                        <li>本サービスの運営を妨害するおそれのある行為</li>
-                                        <li>他のユーザーに関する個人情報等を収集または蓄積する行為</li>
-                                        <li>不正アクセスをし、またはこれを試みる行為</li>
-                                        <li>他のユーザーに成りすます行為</li>
-                                    </ul>
+                                </section>
+
+                                <section>
+                                    <h3 className="text-sm font-bold mb-3 border-b border-border-dark pb-2 text-slate-200">第4条（支払条件）</h3>
+                                    <p className="text-sm text-slate-300">
+                                        発注代金の支払いは、別途当社が指定する銀行振込、または両者間で別途合意した取引条件（掛売り等）に従うものとします。振込手数料は原則としてディーラーの負担とします。
+                                    </p>
                                 </section>
                                 
                                 <section>
-                                    <h3 className="text-sm font-bold mb-3 border-b border-border-dark pb-2 text-slate-200">第5条（本サービスの提供の停止等）</h3>
+                                    <h3 className="text-sm font-bold mb-3 border-b border-border-dark pb-2 text-slate-200">第5条（免責事項および損害賠償）</h3>
                                     <p className="text-sm text-slate-300">
-                                        当社は、以下のいずれかの事由があると判断した場合、ディーラーに事前に通知することなく本サービスの全部または一部の提供を停止または中断することができるものとします。
-                                        当社は、本サービスの提供の停止または中断により、ユーザーまたは第三者が被ったいかなる不利益または損害についても、一切の責任を負わないものとします。
+                                        1. 当社は、本システムの稼働状態について細心の注意を払いますが、システム障害やデータ消失によりディーラーに事業上の損害が生じた場合であっても、当社は原則として賠償の責任を負わないものとします。<br />
+                                        2. 当社に故意または重過失があった場合に限り、該当取引の金額を上限として損害を賠償します。
                                     </p>
                                 </section>
-                                
-                                <p className="text-xs text-text-muted mt-8 p-4 bg-surface rounded border border-border-dark">
-                                    ※このテキストはダミーのひな形です。実際の運用に合わせて内容を書き換えてください。
-                                </p>
                             </div>
                         </div>
                     )}
@@ -100,40 +89,77 @@ export default function TermsModal({ isOpen, onClose, initialView = 'terms' }) {
                     {view === 'privacy' && (
                         <div className="prose prose-sm prose-invert max-w-none text-text-main">
                             <h2 className="text-xl font-bold mb-6 text-primary tracking-tight">プライバシーポリシー</h2>
-                            <p className="text-xs text-text-muted mb-8">最終改定日: 2024年4月1日</p>
                             
                             <div className="space-y-8 leading-relaxed">
                                 <section>
-                                    <h3 className="text-sm font-bold mb-3 border-b border-border-dark pb-2 text-slate-200">第1条（個人情報）</h3>
+                                    <h3 className="text-sm font-bold mb-3 border-b border-border-dark pb-2 text-slate-200">第1条（個人情報の取得方針）</h3>
                                     <p className="text-sm text-slate-300">
-                                        「個人情報」とは、個人情報保護法にいう「個人情報」を指すものとし、生存する個人に関する情報であって、当該情報に含まれる氏名、生年月日、住所、電話番号、連絡先その他の記述等により特定の個人を識別できる情報、および容貌、指紋、声紋にかかるデータ、及び健康保険証の保険者番号などの当該情報単体から特定の個人を識別できる情報（個人識別情報）を指します。
+                                        Highlander / 里山の自転車店（以下「当社」といいます）は、B2B業務の遂行および本システムの提供にあたり、ディーラーの担当者様の氏名、連絡先（電話番号、メールアドレス等）、所在地の情報を適正かつ公正な手段で取得します。
                                     </p>
                                 </section>
 
                                 <section>
-                                    <h3 className="text-sm font-bold mb-3 border-b border-border-dark pb-2 text-slate-200">第2条（個人情報の収集方法）</h3>
+                                    <h3 className="text-sm font-bold mb-3 border-b border-border-dark pb-2 text-slate-200">第2条（個人情報の利用目的）</h3>
                                     <p className="text-sm text-slate-300">
-                                        当社は、ユーザーが利用登録をする際に氏名、生年月日、住所、電話番号、メールアドレスなどの個人情報をお尋ねすることがあります。
-                                    </p>
-                                </section>
-
-                                <section>
-                                    <h3 className="text-sm font-bold mb-3 border-b border-border-dark pb-2 text-slate-200">第3条（個人情報を収集・利用する目的）</h3>
-                                    <p className="text-sm text-slate-300">
-                                        当社が個人情報を収集・利用する目的は、以下のとおりです。
+                                        当社が取得した個人情報の利用目的は以下の通りです。
                                     </p>
                                     <ul className="list-disc pl-5 mt-2 text-sm text-slate-400 space-y-1">
-                                        <li>当社サービスの提供・運営のため</li>
-                                        <li>ユーザーからのお問い合わせに回答するため（本人確認を行うことを含む）</li>
-                                        <li>ユーザーが利用中のサービスの新機能、更新情報、キャンペーン等及び当社が提供する他のサービスの案内のメールを送付するため</li>
-                                        <li>メンテナンス、重要なお知らせなど必要に応じたご連絡のため</li>
-                                        <li>利用規約に違反したユーザーや、不正・不当な目的でサービスを利用しようとするユーザーの特定をし、ご利用をお断りするため</li>
+                                        <li>商品の発送、納品書・請求書の送付等、取引の履行のため</li>
+                                        <li>本システムのアカウント管理および認証のため</li>
+                                        <li>製品情報、重要なお知らせ（リコール等を含む）の提供のため</li>
+                                        <li>お問い合わせへの対応および業務上の連絡のため</li>
                                     </ul>
                                 </section>
 
-                                <p className="text-xs text-text-muted mt-8 p-4 bg-surface rounded border border-border-dark">
-                                    ※このテキストはダミーのひな形です。実際の運用に合わせて内容を書き換えてください。
-                                </p>
+                                <section>
+                                    <h3 className="text-sm font-bold mb-3 border-b border-border-dark pb-2 text-slate-200">第3条（第三者への提供制限）</h3>
+                                    <p className="text-sm text-slate-300">
+                                        当社は、以下の場合を除き、取得した個人情報を第三者に提供・開示することはいたしません。
+                                        (1) 本人の同意がある場合
+                                        (2) 法令に基づき開示を要請された場合
+                                        (3) 配送業者等、業務の遂行に必要な範囲で業務委託先に提供する場合
+                                    </p>
+                                </section>
+
+                                <section>
+                                    <h3 className="text-sm font-bold mb-3 border-b border-border-dark pb-2 text-slate-200">第4条（安全管理措置）</h3>
+                                    <p className="text-sm text-slate-300">
+                                        当社は、取り扱う個人情報の漏洩、滅失またはき損の防止、その他個人情報の安全管理のために必要かつ適切な措置を講じます。
+                                    </p>
+                                </section>
+                            </div>
+                        </div>
+                    )}
+
+                    {view === 'tokushoho' && (
+                        <div className="prose prose-sm prose-invert max-w-none text-text-main">
+                            <h2 className="text-xl font-bold mb-6 text-primary tracking-tight">特定商取引法に基づく表記</h2>
+                            
+                            <div className="space-y-6 leading-relaxed">
+                                <div className="grid grid-cols-1 md:grid-cols-[200px_1fr] gap-4 border-b border-border-dark pb-4">
+                                    <div className="font-bold text-slate-200 text-sm">販売業者</div>
+                                    <div className="text-sm text-slate-300">Highlander / 里山の自転車店</div>
+                                </div>
+                                
+                                <div className="grid grid-cols-1 md:grid-cols-[200px_1fr] gap-4 border-b border-border-dark pb-4">
+                                    <div className="font-bold text-slate-200 text-sm">運営責任者</div>
+                                    <div className="text-sm text-slate-300">村上 大輔</div>
+                                </div>
+
+                                <div className="grid grid-cols-1 md:grid-cols-[200px_1fr] gap-4 border-b border-border-dark pb-4">
+                                    <div className="font-bold text-slate-200 text-sm">所在地</div>
+                                    <div className="text-sm text-slate-300">〒669-2222<br />兵庫県丹波篠山市味間南558-3</div>
+                                </div>
+
+                                <div className="grid grid-cols-1 md:grid-cols-[200px_1fr] gap-4 border-b border-border-dark pb-4">
+                                    <div className="font-bold text-slate-200 text-sm">電話番号</div>
+                                    <div className="text-sm text-slate-300">079-598-2334</div>
+                                </div>
+
+                                <div className="grid grid-cols-1 md:grid-cols-[200px_1fr] gap-4 border-b border-border-dark pb-4">
+                                    <div className="font-bold text-slate-200 text-sm">メールアドレス</div>
+                                    <div className="text-sm text-slate-300">info@bigrock-bike.jp</div>
+                                </div>
                             </div>
                         </div>
                     )}
