@@ -39,7 +39,7 @@ export default function Profile({ customerProfile, setCustomerProfile }) {
         }
 
         // Basic validation
-        if (!formData.companyName || !formData.repName || !formData.contactName || !formData.phone || !formData.shippingAddress) {
+        if (!formData.companyName || !formData.repName || !formData.contactName || !formData.phone || !formData.shippingAddress || !formData.established || !formData.industry || !formData.annualSales || !formData.websiteUrl) {
             alert('必須項目(*)を入力してください。');
             return;
         }
@@ -188,10 +188,10 @@ export default function Profile({ customerProfile, setCustomerProfile }) {
                     <div className="space-y-4">
                         <h3 className="text-base font-bold border-b border-border-dark pb-2 text-text-main">企業付加情報</h3>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <InputField label="設立年月" name="established" value={formData.established} onChange={handleChange} isEditing={isEditing} />
-                            <InputField label="業態 / 業種" name="industry" value={formData.industry} onChange={handleChange} isEditing={isEditing} />
-                            <InputField label="年商 (千円)" name="annualSales" value={formData.annualSales} onChange={handleChange} isEditing={isEditing} />
-                            <InputField label="ホームページURL" name="websiteUrl" value={formData.websiteUrl} onChange={handleChange} isEditing={isEditing} type="url" />
+                            <InputField label="設立年月" name="established" value={formData.established} onChange={handleChange} isEditing={isEditing} required />
+                            <InputField label="業態 / 業種" name="industry" value={formData.industry} onChange={handleChange} isEditing={isEditing} required />
+                            <InputField label="年商 (千円)" name="annualSales" value={formData.annualSales} onChange={handleChange} isEditing={isEditing} required />
+                            <InputField label="ホームページURL" name="websiteUrl" value={formData.websiteUrl} onChange={handleChange} isEditing={isEditing} type="url" required />
                         </div>
                     </div>
                 </div>

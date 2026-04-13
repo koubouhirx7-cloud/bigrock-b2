@@ -161,7 +161,7 @@ export default function Register({ setParentTab }) {
         }
 
         // Basic Validation
-        if (!regForm.companyName || !regForm.companyNameKana || !regForm.representativeLastName || !regForm.representativeFirstName || !regForm.contactLastName || !regForm.contactFirstName || !regForm.postalCode || !regForm.addressLine1 || !regForm.phone) {
+        if (!regForm.companyName || !regForm.companyNameKana || !regForm.representativeLastName || !regForm.representativeFirstName || !regForm.contactLastName || !regForm.contactFirstName || !regForm.postalCode || !regForm.addressLine1 || !regForm.phone || !regForm.establishedYearMonth || !regForm.industry || !regForm.annualSales || !regForm.websiteUrl) {
             alert("必須項目(*)をすべて入力してください。");
             return;
         }
